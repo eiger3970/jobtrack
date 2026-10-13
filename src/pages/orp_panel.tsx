@@ -32,6 +32,7 @@ export default function OrpPanel({ apps, t, onClose }: { apps: Application[]; t:
   const [mode, setMode] = useState<'month' | 'before'>('month')
   const [busy, setBusy] = useState(false)
   const [copied, setCopied] = useState('')
+  const [info, setInfo] = useState(false)
 
   function update(p: Partial<Saved>) {
     const next = { ...profile, ...p }
@@ -88,7 +89,21 @@ export default function OrpPanel({ apps, t, onClose }: { apps: Application[]; t:
     <div className="modal" onClick={onClose}>
       <div className="modal-content orp-panel" onClick={e => e.stopPropagation()}>
         <h3>{t('orp.title')}</h3>
-        <label className="modal-label">{t('orp.registered')}</label>
+        {/* 2026-10-13 owner: "help how to use the ORP registration date, One
+            month, Before unemployment - add an i for info" */}
+        <label className="modal-label orp-label-info">{t('orp.registered')}
+          <button type="button" className="info-btn" aria-label={t('orp.info.title')} onClick={() => setInfo(v => !v)}>i</button>
+        </label>
+        {info && (
+          <div className="orp-info">
+            <p className="orp-info-quick">{t('orp.info.quick')}</p>
+            <ul>
+              <li><b>{t('orp.registered')}</b>: {t('orp.info.registered')}</li>
+              <li><b>{t('orp.month')}</b>: {t('orp.info.month')}</li>
+              <li><b>{t('orp.before')}</b>: {t('orp.info.before')}</li>
+            </ul>
+          </div>
+        )}
         <input type="date" value={profile.registered} onChange={e => update({ registered: e.target.value })} />
 
         <div className="orp-tabs">

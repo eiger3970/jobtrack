@@ -299,3 +299,7 @@
 .howto-go-main { border-color: #00ff41; box-shadow: 0 0 12px rgba(0,255,65,0.35); font-weight: 700; }
 .orp-paper { margin-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.6rem; display: grid; gap: 0.5rem; }
 .orp-paper summary { cursor: pointer; color: var(--text-dim); font-size: 0.9rem; }
+.orp-label-info { display: flex; align-items: center; gap: 0.4rem; }
+.orp-info { border: 1px solid rgba(0,255,65,0.3); border-radius: 10px; padding: 0.6rem 0.8rem; margin: 0.2rem 0 0.5rem; font-size: 0.88rem; color: var(--star); }
+.orp-info-quick { color: #19b86a; font-weight: 700; border-left: 3px solid #19b86a; padding-left: 0.5rem; margin: 0 0 0.5rem; }
+.orp-info ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.3rem; }

@@ -899,6 +899,31 @@
       "en": "Office wants the paper form? Make the 716.007 PDF",
       "de": "Amt will das Papierformular? 716.007-PDF erstellen",
       "fr": "L'office veut le formulaire papier? Créer le PDF 716.007"
+    },
+    "orp.info.title": {
+      "en": "How to use these",
+      "de": "So funktioniert's",
+      "fr": "Mode d'emploi"
+    },
+    "orp.info.quick": {
+      "en": "Quick answer: every month, pick One month and enter those searches in Job-Room before the 5th. Before unemployment is only for your first registration.",
+      "de": "Kurze Antwort: jeden Monat Ein Monat wählen und diese Bewerbungen vor dem 5. in Job-Room eintragen. Vor Arbeitslosigkeit nur bei der ersten Anmeldung.",
+      "fr": "Réponse rapide: chaque mois, choisissez Un mois et saisissez ces recherches dans Job-Room avant le 5. Avant chômage sert seulement à la première inscription."
+    },
+    "orp.info.registered": {
+      "en": "the day you registered with the ORP - it is on your registration confirmation (\"Date d'inscription ORP\"). Remembered, enter it once.",
+      "de": "der Tag deiner RAV-Anmeldung - steht auf der Anmeldebestätigung. Wird gespeichert, nur einmal eingeben.",
+      "fr": "le jour de votre inscription à l'ORP - il figure sur votre confirmation d'inscription («Date d'inscription ORP»). Mémorisé, à saisir une fois."
+    },
+    "orp.info.month": {
+      "en": "the searches of one calendar month, for the monthly entry in Job-Room, due before the 5th of the next month.",
+      "de": "die Bewerbungen eines Kalendermonats, für den monatlichen Eintrag in Job-Room, fällig vor dem 5. des Folgemonats.",
+      "fr": "les recherches d'un mois civil, pour la saisie mensuelle dans Job-Room, à faire avant le 5 du mois suivant."
+    },
+    "orp.info.before": {
+      "en": "the 3 months before your registration date - the ORP asks for these once, when you first register. Needs the registration date.",
+      "de": "die 3 Monate vor deinem Anmeldedatum - das RAV verlangt sie einmal, bei der ersten Anmeldung. Braucht das Anmeldedatum.",
+      "fr": "les 3 mois avant votre date d'inscription - l'ORP les demande une fois, à la première inscription. Nécessite la date d'inscription."
     }
   }
 }
