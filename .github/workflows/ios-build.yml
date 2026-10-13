@@ -1,0 +1,43 @@
+name: iOS Build (unsigned)
+
+# Same shape as LocalSync's unsigned build: an .ipa for iLoader on the
+# owner's own phone. TestFlight/App Store signing comes once this is tested.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Web app + Capacitor sync
+        run: |
+          npm ci
+          npm run build
+          npx cap sync ios
+
+      - name: Build iOS archive (no signing)
+        run: |
+          set -o pipefail
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath build/App.xcarchive archive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" | tail -40
+          mkdir -p build/Payload
+          cp -r build/App.xcarchive/Products/Applications/App.app build/Payload/
+          cd build && zip -qr JobTrack.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: JobTrack-ipa
+          path: build/JobTrack.ipa

@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core'
 import { buyPro, makeL, ProBox, useProKey } from '../lib/pro'
 
 // 2026-10-06: JobTrack Pro, $5 once (Kevin: "More Pro tiers", like
@@ -47,7 +48,10 @@ function calendarFile(apps: App[], L: ReturnType<typeof makeL>) {
 
 export default function JobTrackPro({ apps, lang }: { apps: App[]; lang: string }) {
   const L = makeL(lang)
-  const { pro } = useProKey(PRO_KEY, 'jobtrack-pro-')
+  // App Store build: paid once at download, so Pro is included - Apple allows
+  // no PayPal / Lightning purchase inside an app (guideline 3.1.1).
+  const { pro: webPro } = useProKey(PRO_KEY, 'jobtrack-pro-')
+  const pro = webPro || Capacitor.isNativePlatform()
   const total = apps.length
   const replied = apps.filter(a => REPLIED.includes(a.status)).length
   const interviewed = apps.filter(a => INTERVIEWED.includes(a.status)).length

@@ -3,6 +3,11 @@ import { useLanguage } from '../context/language'
 import jobTrackI18n from './job_track_i18n.json'
 import './job_track.css'
 import JobTrackPro from './job_track_pro'
+import { type Application, type OrpMethod, ORP_DEFAULTS } from '../lib/orp'
+import OrpPanel from './orp_panel'
+import { planReminders } from '../lib/reminders'
+import { saveFile, stamp } from '../lib/save_file'
+import { Capacitor } from '@capacitor/core'
 
 // same lookup pattern as home.tsx's getString - English fallback, then the raw key, never a blank string.
 function getString(key: string, lang: 'en' | 'de' | 'fr'): string {
@@ -21,7 +26,7 @@ function getStringVariant(key: string, lang: 'en' | 'de' | 'fr', seed: number): 
   return pool[((seed % pool.length) + pool.length) % pool.length]
 }
 
-interface App { id: number; company: string; role: string; date: string; status: string; cv: string; cover: string; nextDate: string; notes: string }
+type App = Application
 
 const STATUSES = ['applied','screening','interview','technical','offer','accepted','rejected']
 const STORAGE = 'kworld_jobtrack'
@@ -162,7 +167,9 @@ export default function JobTrack() {
   const [filter, setFilter] = useState('all')
   const [modal, setModal] = useState(false)
   const [editing, setEditing] = useState<App | null>(null)
-  const [form, setForm] = useState({ company:'', role:'', date: new Date().toISOString().slice(0,10), status:'applied', cv:'', cover:'', nextDate:'', notes:'' })
+  const [form, setForm] = useState<Omit<App, 'id'>>({ company:'', role:'', date: new Date().toISOString().slice(0,10), status:'applied', cv:'', cover:'', nextDate:'', notes:'' })
+  const [orpOpen, setOrpOpen] = useState(false)
+  const [orpPanel, setOrpPanel] = useState(false)
   const [showStorageInfo, setShowStorageInfo] = useState(false)
   const infoRef = useRef<HTMLDivElement>(null)
   const [showEmailInfo, setShowEmailInfo] = useState(false)
@@ -208,6 +215,8 @@ export default function JobTrack() {
   }
 
   useEffect(() => { localStorage.setItem(STORAGE, JSON.stringify(apps)) }, [apps])
+  // 2026-10-13: ORP reminders (1st, 4th, short weeks) re-planned with the real counts
+  useEffect(() => { void planReminders(apps).catch(() => {}) }, [apps])
 
   const [backupSnapshot, setBackupSnapshot] = useState<string | null>(() => readStored(BACKUP_SNAPSHOT_STORAGE))
   const [backupAt, setBackupAt] = useState<string | null>(() => readStored(BACKUP_AT_STORAGE))
@@ -266,8 +275,8 @@ export default function JobTrack() {
   }
   const sortMark = (col: 'date' | 'company') => sortBy.col === col ? (sortBy.asc ? ' ▲' : ' ▼') : ''
 
-  function openAdd() { setEditing(null); setForm({ company:'',role:'',date:new Date().toISOString().slice(0,10),status:'applied',cv:'',cover:'',nextDate:'',notes:'' }); setModal(true) }
-  function openEdit(a: App) { setEditing(a); setForm({ company:a.company,role:a.role,date:a.date,status:a.status,cv:a.cv,cover:a.cover,nextDate:a.nextDate,notes:a.notes }); setModal(true) }
+  function openAdd() { setEditing(null); setOrpOpen(false); setForm({ company:'',role:'',date:new Date().toISOString().slice(0,10),status:'applied',cv:'',cover:'',nextDate:'',notes:'', ...ORP_DEFAULTS }); setModal(true) }
+  function openEdit(a: App) { const { id: _id, ...rest } = a; setEditing(a); setOrpOpen(false); setForm({ ...ORP_DEFAULTS, ...rest }); setModal(true) }
   function save() {
     if (!form.company || !form.role) return
     if (editing) { setApps(apps.map(a => a.id === editing.id ? { ...form, id: a.id } : a)) }
@@ -503,13 +512,9 @@ export default function JobTrack() {
 
   function exportBackup() {
     const backup = { apps, quota }
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
     const d = new Date()
-    const ts = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`
-    const a = document.createElement('a')
-    a.href = url; a.download = `${ts}_jobtrack_backup.json`; a.click()
-    URL.revokeObjectURL(url)
+    // app: iOS share sheet (Files, Mail, AirDrop); browser: download
+    void saveFile(`${stamp(d)}_jobtrack_backup.json`, JSON.stringify(backup, null, 2), 'application/json')
     const snapshot = JSON.stringify(backup)
     const at = d.toISOString()
     try {
@@ -711,6 +716,11 @@ export default function JobTrack() {
         <div className="toolbar">
           <div className="toolbar-primary">
             <button className="btn btn-glow" onClick={openAdd}>{t('add')}</button>
+            {/* 2026-10-13 owner: ORP proofs (716.007 PDF + Job-Room) in one tap */}
+            <button className="btn-secondary export-btn orp-btn" onClick={() => setOrpPanel(true)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><path d="M9 15l2 2 4-4" /></svg>
+              {t('orp.button')}
+            </button>
             <button className="btn-secondary export-btn" onClick={() => setBulkModal(true)}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>
               {t('bulkAdd')}
@@ -721,10 +731,11 @@ export default function JobTrack() {
             </button>
           </div>
           <div className="toolbar-tools">
-            <button className="btn-secondary export-btn" onClick={exportPDF} title={t('export')}>
+            {/* app: a print window can't open inside iOS - ORP proofs makes the PDF there */}
+            {!Capacitor.isNativePlatform() && <button className="btn-secondary export-btn" onClick={exportPDF} title={t('export')}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12" /><path d="M7 10l5 5 5-5" /><path d="M5 21h14" /></svg>
               <span className="export-btn-label">{t('export')}</span>
-            </button>
+            </button>}
             <button className="btn-secondary export-btn" onClick={copyAsList} disabled={apps.length === 0} title={t('copyList')}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
               <span className="export-btn-label">{copiedList ? t('copyList.done') : t('copyList')}</span>
@@ -867,6 +878,8 @@ export default function JobTrack() {
         </div>
       </div>
 
+      {orpPanel && <OrpPanel apps={apps} t={t} onClose={() => setOrpPanel(false)} />}
+
       {modal && (
         <div className="modal" onClick={() => setModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -885,6 +898,26 @@ export default function JobTrack() {
             {/* 2026-09-25: user couldn't find Notes - an unlabelled box at the bottom. */}
             <label className="modal-label">{t('field.notes').replace(/\.+$/, '')}</label>
             <textarea rows={2} placeholder={t('field.notes')} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+            {/* 2026-10-13 owner: the ORP form 716.007 fields - folded, defaults already set */}
+            <button type="button" className="orp-fold" onClick={() => setOrpOpen(o => !o)} aria-expanded={orpOpen}>
+              {orpOpen ? '▾' : '▸'} {t('orp.details')}
+            </button>
+            {orpOpen && (
+              <div className="orp-fields">
+                <input type="text" placeholder={t('orp.address')} value={form.address ?? ''} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
+                <input type="text" placeholder={t('orp.contact')} value={form.contact ?? ''} onChange={e => setForm(f => ({ ...f, contact: e.target.value }))} />
+                <label className="modal-label">{t('orp.method')}</label>
+                <select value={form.method ?? 'electronic'} onChange={e => setForm(f => ({ ...f, method: e.target.value as OrpMethod }))}>
+                  <option value="electronic">{t('orp.method.electronic')}</option>
+                  <option value="visit">{t('orp.method.visit')}</option>
+                  <option value="phone">{t('orp.method.phone')}</option>
+                </select>
+                <label className="modal-label">{t('orp.rate')}</label>
+                <input type="number" min={10} max={100} step={10} value={form.rate ?? 100} onChange={e => setForm(f => ({ ...f, rate: Number(e.target.value) || 100 }))} />
+                <label className="orp-check"><input type="checkbox" checked={!!form.assigned} onChange={e => setForm(f => ({ ...f, assigned: e.target.checked }))} /> {t('orp.assigned')}</label>
+                {form.status === 'rejected' && <input type="text" placeholder={t('orp.motif')} value={form.motif ?? ''} onChange={e => setForm(f => ({ ...f, motif: e.target.value }))} />}
+              </div>
+            )}
             <div className="modal-buttons">
               <button className="btn-secondary" onClick={() => setModal(false)}>{t('cancel')}</button>
               <button className="btn" onClick={save}>{t('save')}</button>
