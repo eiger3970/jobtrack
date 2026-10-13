@@ -202,9 +202,9 @@
       "fr": "Actions"
     },
     "table.empty": {
-      "en": "No applications yet. Click \"+ Add Application\" to get started.",
-      "de": "Noch keine Bewerbungen. Klicke auf „+ Bewerbung hinzufügen”, um zu starten.",
-      "fr": "Aucune candidature pour l'instant. Cliquez sur « + Ajouter une candidature » pour commencer."
+      "en": "No applications yet. Tap \"1. Add application\" at the top.",
+      "de": "Noch keine Bewerbungen. Oben auf \"1. Bewerbung hinzufügen\" tippen.",
+      "fr": "Aucune candidature. Touchez \"1. Ajouter une candidature\" en haut."
     },
     "action.edit": {
       "en": "Edit",
