@@ -894,6 +894,8 @@ export default function JobTrack() {
             {/* 2026-10-13 owner: "trouble entering data" - paste the ad, the fields fill themselves */}
             {!editing && (
               <div className="ad-paste">
+                {/* 2026-10-13 owner: "that critical user step is needed, Ctrl+A and Ctrl+C" */}
+                <p className="ad-step">{t(/iPhone|iPad|Android/i.test(navigator.userAgent) ? 'ad.step.phone' : 'ad.step.computer')}</p>
                 <textarea rows={3} placeholder={t('ad.paste')} value={adText} onChange={e => { setAdText(e.target.value); setAdFilled(false) }} />
                 <button type="button" className="btn" disabled={!adText.trim()} onClick={() => {
                   const ad = parseAd(adText)

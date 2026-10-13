@@ -926,9 +926,9 @@
       "fr": "3 mois avant l'inscription, demandés une fois"
     },
     "ad.paste": {
-      "en": "Paste the job ad here (in the ad: select all text, Copy)",
-      "de": "Stelleninserat hier einfügen (im Inserat: alles markieren, Kopieren)",
-      "fr": "Collez l'annonce ici (dans l'annonce: tout sélectionner, Copier)"
+      "en": "Paste the job ad here",
+      "de": "Stelleninserat hier einfügen",
+      "fr": "Collez l'annonce ici"
     },
     "ad.fill": {
       "en": "Fill in from the ad",
@@ -939,6 +939,16 @@
       "en": "Filled in - check, then Save.",
       "de": "Ausgefüllt - prüfen, dann Speichern.",
       "fr": "Rempli - vérifiez, puis Enregistrer."
+    },
+    "ad.step.computer": {
+      "en": "In the job ad: Ctrl+A, Ctrl+C. Here: Ctrl+V.",
+      "de": "Im Inserat: Ctrl+A, Ctrl+C. Hier: Ctrl+V.",
+      "fr": "Dans l'annonce: Ctrl+A, Ctrl+C. Ici: Ctrl+V."
+    },
+    "ad.step.phone": {
+      "en": "In the job ad: press and hold the text -> Select All -> Copy. Here: tap, Paste.",
+      "de": "Im Inserat: Text gedrückt halten -> Alles auswählen -> Kopieren. Hier: tippen, Einsetzen.",
+      "fr": "Dans l'annonce: appui long sur le texte -> Tout sélectionner -> Copier. Ici: toucher, Coller."
     }
   }
 }
