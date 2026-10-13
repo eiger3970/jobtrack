@@ -238,7 +238,10 @@ export default function JobTrack() {
   // reminder that works everywhere; this is the extra net on desktop.
   useEffect(() => {
     if (!unbackedUp) return
-    function warn(e: BeforeUnloadEvent) { e.preventDefault(); e.returnValue = '' }
+    // 2026-10-13 owner: "Save + write the cover letter" showed the browser's
+    // "Leave page?" - scary, and nothing is lost there (saved first). Our own
+    // move to the letter page skips the warning.
+    function warn(e: BeforeUnloadEvent) { if ((window as unknown as { kworldLeaving?: boolean }).kworldLeaving) return; e.preventDefault(); e.returnValue = '' }
     window.addEventListener('beforeunload', warn)
     return () => window.removeEventListener('beforeunload', warn)
   }, [unbackedUp])
@@ -915,6 +918,7 @@ export default function JobTrack() {
                       localStorage.setItem(STORAGE, JSON.stringify(next))
                       sessionStorage.setItem('kworld_jobtrack_handoff', JSON.stringify({ id, ad: adText, company: form.company, role: form.role, contact: form.contact ?? '', address: form.address ?? '' }))
                     } catch { /* storage blocked - the letter page still opens empty */ }
+                    ;(window as unknown as { kworldLeaving?: boolean }).kworldLeaving = true
                     window.location.href = '/cl-gen'
                   }}>{t('ad.letter')}</button>
                 )}
