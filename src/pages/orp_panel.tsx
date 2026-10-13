@@ -30,7 +30,6 @@ export default function OrpPanel({ apps, t, onClose }: { apps: Application[]; t:
   const now = new Date()
   const [month, setMonth] = useState(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
   const [mode, setMode] = useState<'month' | 'before'>('month')
-  const [view, setView] = useState<'summary' | 'jobroom'>('summary')
   const [busy, setBusy] = useState(false)
   const [copied, setCopied] = useState('')
 
@@ -89,8 +88,6 @@ export default function OrpPanel({ apps, t, onClose }: { apps: Application[]; t:
     <div className="modal" onClick={onClose}>
       <div className="modal-content orp-panel" onClick={e => e.stopPropagation()}>
         <h3>{t('orp.title')}</h3>
-        <input type="text" placeholder={t('orp.name')} value={profile.name} onChange={e => update({ name: e.target.value })} />
-        <input type="text" placeholder={t('orp.avs')} value={profile.avs} onChange={e => update({ avs: e.target.value })} />
         <label className="modal-label">{t('orp.registered')}</label>
         <input type="date" value={profile.registered} onChange={e => update({ registered: e.target.value })} />
 
@@ -105,13 +102,10 @@ export default function OrpPanel({ apps, t, onClose }: { apps: Application[]; t:
           <p className="orp-warn">{t('orp.shortWeeks')} {shortWeeks.map(([wk, n]) => `${swissDate(wk)} (${n})`).join(', ')}</p>
         )}
 
-        <div className="orp-tabs">
-          <button className="btn" disabled={busy || !profile.name || !profile.avs || rows.length === 0} onClick={makePdf}>{busy ? '…' : t('orp.pdf')}</button>
-          <button className="btn-secondary" disabled={rows.length === 0} onClick={() => setView(v => v === 'jobroom' ? 'summary' : 'jobroom')}>{t('orp.jobroom')}</button>
-        </div>
-        {(!profile.name || !profile.avs) && <p className="orp-hint">{t('orp.needProfile')}</p>}
-
-        {view === 'jobroom' && (
+        {/* 2026-10-13 owner: "digital online is best" - Job-Room cards come
+            first; the paper-form PDF is only for an office that asks for it */}
+        <p className="orp-hint">{t('orp.jobroomHint')}</p>
+        {rows.length > 0 && (
           <div className="orp-cards">
             {rows.map((a, i) => (
               <div key={a.id} className="orp-card">
@@ -128,6 +122,13 @@ export default function OrpPanel({ apps, t, onClose }: { apps: Application[]; t:
             ))}
           </div>
         )}
+        <details className="orp-paper">
+          <summary>{t('orp.paper')}</summary>
+          <p className="orp-hint">{t('orp.needProfile')}</p>
+          <input type="text" placeholder={t('orp.name')} value={profile.name} onChange={e => update({ name: e.target.value })} />
+          <input type="text" placeholder={t('orp.avs')} value={profile.avs} onChange={e => update({ avs: e.target.value })} />
+          <button className="btn-secondary" disabled={busy || !profile.name || !profile.avs || rows.length === 0} onClick={makePdf}>{busy ? '…' : t('orp.pdf')}</button>
+        </details>
         <div className="modal-buttons"><button className="btn-secondary" onClick={onClose}>{t('close')}</button></div>
       </div>
     </div>

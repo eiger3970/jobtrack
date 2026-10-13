@@ -811,14 +811,14 @@
       "fr": "Motif du refus"
     },
     "orp.button": {
-      "en": "ORP proofs",
-      "de": "RAV-Nachweise",
-      "fr": "Preuves ORP"
+      "en": "Job-Room entries (ORP)",
+      "de": "Job-Room-Einträge (RAV)",
+      "fr": "Saisies Job-Room (ORP)"
     },
     "orp.title": {
-      "en": "ORP job-search proofs",
-      "de": "RAV-Arbeitsbemühungen",
-      "fr": "Preuves de recherches ORP"
+      "en": "Job-Room entries for the ORP",
+      "de": "Job-Room-Einträge für das RAV",
+      "fr": "Saisies Job-Room pour l'ORP"
     },
     "orp.name": {
       "en": "Name and first name (as on your ORP letters)",
@@ -889,6 +889,16 @@
       "en": "No answer for 4+ weeks - any news? Update the status (or paste the email).",
       "de": "Seit über 4 Wochen keine Antwort - Neuigkeiten? Status aktualisieren (oder E-Mail einfügen).",
       "fr": "Pas de réponse depuis plus de 4 semaines - des nouvelles? Mettez à jour le statut (ou collez l'e-mail)."
+    },
+    "orp.jobroomHint": {
+      "en": "Quick answer: Job-Room -> Efforts to find work -> add each search below, tap Copy next to each field.",
+      "de": "Kurze Antwort: Job-Room -> Arbeitsbemühungen -> jede Bewerbung unten eintragen, bei jedem Feld auf Kopieren tippen.",
+      "fr": "Réponse rapide: Job-Room -> Recherches d'emploi -> saisissez chaque recherche ci-dessous, touchez Copier à côté de chaque champ."
+    },
+    "orp.paper": {
+      "en": "Office wants the paper form? Make the 716.007 PDF",
+      "de": "Amt will das Papierformular? 716.007-PDF erstellen",
+      "fr": "L'office veut le formulaire papier? Créer le PDF 716.007"
     }
   }
 }

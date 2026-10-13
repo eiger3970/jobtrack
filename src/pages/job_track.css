@@ -297,3 +297,5 @@
 .howto-go:disabled { opacity: 0.45; cursor: default; }
 .howto-go svg { width: 20px; height: 20px; color: #00ff41; flex-shrink: 0; }
 .howto-go-main { border-color: #00ff41; box-shadow: 0 0 12px rgba(0,255,65,0.35); font-weight: 700; }
+.orp-paper { margin-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.6rem; display: grid; gap: 0.5rem; }
+.orp-paper summary { cursor: pointer; color: var(--text-dim); font-size: 0.9rem; }
