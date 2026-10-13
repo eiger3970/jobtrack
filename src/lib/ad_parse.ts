@@ -24,8 +24,12 @@ function after(ls: string[], labels: RegExp): string {
 
 export function parseAd(text: string): ParsedAd {
   const ls = lines(text)
-  const first = ls[0] ?? ''
-  const role = first.replace(RATE, '').replace(/\s+-?\s*$/, '').trim()
+  // 2026-10-13: Ctrl+A copies the site's menu too ("Header", "Home"...), so the
+  // title is the line just before "Vacant since", else the first line ending
+  // in a work rate ("Ski Lift Operator 100%"), else the first line.
+  const vacant = ls.findIndex(l => /Vacant since|Vakant seit|Vacant depuis|Ausgeschrieben seit|Publiée? le/i.test(l))
+  const first = (vacant > 0 ? ls[vacant - 1] : undefined) ?? ls.find(l => /^\D.{2,80}\d{2,3}\s*%$/.test(l)) ?? ls[0] ?? ''
+  const role = first.replace(/\d{2,3}\s*(-\s*\d{2,3}\s*)?%/, '').replace(/\s+-?\s*$/, '').trim()
 
   // "Company: Role" line (Job-Room repeats the title that way), else "Join the X team"
   let company = ''
