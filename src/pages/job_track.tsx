@@ -913,7 +913,7 @@ export default function JobTrack() {
                     const next = [...apps, { ...form, id }]
                     try {
                       localStorage.setItem(STORAGE, JSON.stringify(next))
-                      sessionStorage.setItem('kworld_jobtrack_handoff', JSON.stringify({ id, ad: adText, company: form.company, role: form.role, contact: form.contact ?? '' }))
+                      sessionStorage.setItem('kworld_jobtrack_handoff', JSON.stringify({ id, ad: adText, company: form.company, role: form.role, contact: form.contact ?? '', address: form.address ?? '' }))
                     } catch { /* storage blocked - the letter page still opens empty */ }
                     window.location.href = '/cl-gen'
                   }}>{t('ad.letter')}</button>
