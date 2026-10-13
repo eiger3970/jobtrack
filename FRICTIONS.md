@@ -7,5 +7,5 @@ Every friction the owner notes goes here, with its full-convenience fix. Status:
 - **Job-Room entry** - every search re-typed by hand into Job-Room. Fix: Job-Room view, one card per search, a Copy button next to each field in Job-Room's order. DONE
 - **ORP fields missing** - tracker had no address, contact person, phone, work rate, contact method, ORP result words. Fix: those fields, prefilled defaults (electronic, full time) so a normal entry is still 3 fields. DONE
 - **Paper forms** - ORP mails form 716.007 "Preuves de recherches" as Word files to print. Fix: one tap makes the filled 716.007 PDF for any month, or for "avant chômage" (the 3 months before registration). DONE
-- **Rejections out of date** - statuses only changed by pasting each email. Fix: keep paste-an-email; app-wide "results" sorting so pending ones older than 4 weeks are flagged for a check. TODO
+- **Rejections out of date** - statuses only changed by pasting each email. Fix: keep paste-an-email; app-wide "results" sorting so pending ones older than 4 weeks are flagged for a check. DONE
 - **Status words** - tracker said applied/rejected, ORP wants "en suspens / entretien / engagement / négatif". Fix: export maps statuses to ORP words automatically. DONE

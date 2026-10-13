@@ -28,6 +28,14 @@ function getStringVariant(key: string, lang: 'en' | 'de' | 'fr', seed: number): 
 
 type App = Application
 
+// 2026-10-13 owner friction: statuses go stale - still "applied" 4 weeks on
+// usually means a silent no. Flagged so it gets checked before the ORP form.
+const STALE_DAYS = 28
+function isStale(a: App): boolean {
+  if (a.status !== 'applied' && a.status !== 'screening') return false
+  return (Date.now() - new Date(a.date + 'T12:00:00').getTime()) / 86400000 > STALE_DAYS
+}
+
 const STATUSES = ['applied','screening','interview','technical','offer','accepted','rejected']
 const STORAGE = 'kworld_jobtrack'
 
@@ -826,7 +834,7 @@ export default function JobTrack() {
                 <tr key={a.id}>
                   <td>{a.company}{a.notes && <span className="jt-note">{a.notes.split('\n').filter(Boolean).pop()}</span>}</td>
                   <td>{a.role}</td>
-                  <td>{a.date}</td>
+                  <td>{a.date}{isStale(a) && <span className="jt-stale" title={t('stale.hint')}>{t('stale')}</span>}</td>
                   <td>
                     <label className={`status-badge status-select-wrap status-${a.status}`}>
                       <StatusIcon status={a.status} />

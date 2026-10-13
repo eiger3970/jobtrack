@@ -879,6 +879,16 @@
       "en": "Copied",
       "de": "Kopiert",
       "fr": "Copié"
+    },
+    "stale": {
+      "en": "check",
+      "de": "prüfen",
+      "fr": "à vérifier"
+    },
+    "stale.hint": {
+      "en": "No answer for 4+ weeks - any news? Update the status (or paste the email).",
+      "de": "Seit über 4 Wochen keine Antwort - Neuigkeiten? Status aktualisieren (oder E-Mail einfügen).",
+      "fr": "Pas de réponse depuis plus de 4 semaines - des nouvelles? Mettez à jour le statut (ou collez l'e-mail)."
     }
   }
 }
