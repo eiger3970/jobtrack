@@ -949,6 +949,11 @@
       "en": "In the job ad: press and hold the text -> Select All -> Copy. Here: tap, Paste.",
       "de": "Im Inserat: Text gedrückt halten -> Alles auswählen -> Kopieren. Hier: tippen, Einsetzen.",
       "fr": "Dans l'annonce: appui long sur le texte -> Tout sélectionner -> Copier. Ici: toucher, Coller."
+    },
+    "ad.letter": {
+      "en": "Save + write the cover letter",
+      "de": "Speichern + Bewerbungsschreiben verfassen",
+      "fr": "Enregistrer + rédiger la lettre"
     }
   }
 }

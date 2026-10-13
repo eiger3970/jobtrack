@@ -904,6 +904,20 @@ export default function JobTrack() {
                   setOrpOpen(true); setAdFilled(true)
                 }}>{t('ad.fill')}</button>
                 {adFilled && <p className="ad-done">{t('ad.check')}</p>}
+                {/* 2026-10-13 owner: "all of it needs more automation" - save the entry,
+                    then kworld's cover-letter writer opens with this ad and writes the
+                    letter; it records the letter on this same entry (no duplicate). */}
+                {adFilled && !isApp() && (
+                  <button type="button" className="btn btn-glow" disabled={!form.company || !form.role} onClick={() => {
+                    const id = Date.now()
+                    const next = [...apps, { ...form, id }]
+                    try {
+                      localStorage.setItem(STORAGE, JSON.stringify(next))
+                      sessionStorage.setItem('kworld_jobtrack_handoff', JSON.stringify({ id, ad: adText, company: form.company, role: form.role, contact: form.contact ?? '' }))
+                    } catch { /* storage blocked - the letter page still opens empty */ }
+                    window.location.href = '/cl-gen'
+                  }}>{t('ad.letter')}</button>
+                )}
               </div>
             )}
             <input type="text" placeholder={t('field.company')} value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} required />
