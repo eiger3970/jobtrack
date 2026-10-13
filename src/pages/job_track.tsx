@@ -7,7 +7,7 @@ import { type Application, type OrpMethod, ORP_DEFAULTS } from '../lib/orp'
 import OrpPanel from './orp_panel'
 import { planReminders } from '../lib/reminders'
 import { saveFile, stamp } from '../lib/save_file'
-import { Capacitor } from '@capacitor/core'
+import { isApp } from '../lib/platform'
 
 // same lookup pattern as home.tsx's getString - English fallback, then the raw key, never a blank string.
 function getString(key: string, lang: 'en' | 'de' | 'fr'): string {
@@ -740,7 +740,7 @@ export default function JobTrack() {
           </div>
           <div className="toolbar-tools">
             {/* app: a print window can't open inside iOS - ORP proofs makes the PDF there */}
-            {!Capacitor.isNativePlatform() && <button className="btn-secondary export-btn" onClick={exportPDF} title={t('export')}>
+            {!isApp() && <button className="btn-secondary export-btn" onClick={exportPDF} title={t('export')}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12" /><path d="M7 10l5 5 5-5" /><path d="M5 21h14" /></svg>
               <span className="export-btn-label">{t('export')}</span>
             </button>}
