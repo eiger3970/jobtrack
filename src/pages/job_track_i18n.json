@@ -811,14 +811,14 @@
       "fr": "Motif du refus"
     },
     "orp.button": {
-      "en": "Job-Room entries (ORP)",
-      "de": "Job-Room-Einträge (RAV)",
-      "fr": "Saisies Job-Room (ORP)"
+      "en": "Unemployment office job entries",
+      "de": "Einträge fürs Arbeitsamt",
+      "fr": "Saisies pour l'office du chômage"
     },
     "orp.title": {
-      "en": "Job-Room entries for the ORP",
-      "de": "Job-Room-Einträge für das RAV",
-      "fr": "Saisies Job-Room pour l'ORP"
+      "en": "Unemployment office job entries - Switzerland: Job-Room (ORP/RAV)",
+      "de": "Einträge fürs Arbeitsamt - Schweiz: Job-Room (RAV)",
+      "fr": "Saisies pour l'office du chômage - Suisse: Job-Room (ORP)"
     },
     "orp.name": {
       "en": "Name and first name (as on your ORP letters)",
