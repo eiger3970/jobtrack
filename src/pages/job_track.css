@@ -1,0 +1,275 @@
+.jobtrack-page { min-height: calc(100vh - 5rem); padding: 2rem; background: #03020a; color: #f0eeff; }
+.jobtrack-page .container { max-width: 1400px; margin: 0 auto; }
+/* 2026-09-15: real feedback, live - "why is the header darkened, make
+   the header bright and normal." The gradient-text-clip trick
+   (-webkit-background-clip: text + transparent fill) only had the
+   -webkit-prefixed properties, no standard fallback - browsers/
+   configs that don't apply the clip are left with transparent text
+   and no visible gradient showing through, reading as a dark/broken
+   header instead of the intended bright gradient. Plain solid bright
+   color instead - reliable everywhere, no clipping trick to fail. */
+.jobtrack-page h1 { font-size: 1.8rem; color: #f0eeff; margin-bottom: 0.5rem; }
+.jobtrack-page .subhead { color: #a0a0b0; margin-bottom: 1.5rem; font-size: 0.9rem; }
+
+.howto-strip { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem; padding: 1rem 1.25rem; background: #0f0d1a; border: 1px solid #2a2a3a; border-radius: 12px; }
+.howto-step { display: flex; align-items: center; gap: 0.5rem; color: #f0eeff; font-size: 0.82rem; white-space: nowrap; }
+.howto-step svg { width: 20px; height: 20px; color: #00ff41; flex-shrink: 0; }
+.howto-arrow { color: #2a2a3a; font-size: 1rem; }
+.howto-step-info { position: relative; }
+.info-btn {
+  width: 15px; height: 15px; border-radius: 50%; border: 1px solid #00ff41; background: none; color: #00ff41;
+  font-size: 0.6rem; line-height: 1; cursor: pointer; padding: 0; font-family: 'DM Mono', monospace; flex-shrink: 0;
+}
+.info-btn:hover { background: rgba(0,255,65,0.15); }
+.info-popover {
+  position: absolute; top: calc(100% + 0.5rem); left: 0; z-index: 20; width: min(360px, 85vw);
+  background: #1a1a2a; border: 1px solid #00ff41; border-radius: 8px; padding: 0.9rem 1.6rem 0.9rem 0.9rem;
+  font-size: 0.74rem; line-height: 1.5; color: #f0eeff; white-space: normal;
+}
+.info-popover-title { font-weight: 700; color: #00ff41; font-size: 0.75rem; margin-bottom: 0.6rem; }
+.info-popover-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.info-popover-list li { display: flex; align-items: flex-start; gap: 0.5rem; }
+.info-popover-list svg { width: 16px; height: 16px; color: #00ff41; flex-shrink: 0; margin-top: 0.1rem; }
+.import-btn-wrap { position: relative; display: flex; align-items: center; gap: 0.4rem; }
+.import-info-popover { left: auto; right: 0; }
+.info-popover-item-title { font-weight: 700; margin: 0 0 0.2rem; }
+.info-popover-item-sub { margin: 0 0 0.4rem; color: #d0d0e0; }
+.info-popover-sublist { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.info-popover-sublist li { display: flex; align-items: flex-start; gap: 0.4rem; }
+.info-popover-sublist svg { width: 14px; height: 14px; color: #00ff41; flex-shrink: 0; margin-top: 0.1rem; opacity: 0.85; }
+.info-popover-close { position: absolute; top: 0.4rem; right: 0.5rem; background: none; border: none; color: #a0a0b0; cursor: pointer; font-size: 0.7rem; padding: 0.2rem; }
+@media (max-width: 600px) {
+  .info-popover { left: auto; right: 0; }
+}
+@media (max-width: 600px) {
+  .howto-strip { flex-direction: column; align-items: flex-start; }
+  .howto-arrow { display: none; }
+}
+
+.queue-banner {
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+  padding: 0.85rem 1.25rem; background: rgba(0,255,65,0.06); border: 1px solid #00ff41; border-radius: 12px; font-size: 0.82rem;
+}
+.queue-banner > svg { width: 20px; height: 20px; color: #00ff41; flex-shrink: 0; }
+.queue-banner > span { flex: 1; min-width: 200px; }
+.queue-banner-actions { display: flex; gap: 0.5rem; }
+.btn-small { background: #00ff41; color: #03020a; border: none; padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 0.78rem; }
+.btn-small-ghost { background: none; color: #a0a0b0; border: 1px solid #2a2a3a; padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.78rem; }
+
+/* 2026-09-23: real feedback, live - "add a larger space to separate into sections" below the stats row and above the Privacy-first panel. */
+.stats { display: flex; gap: 1rem; margin-bottom: 3.5rem; flex-wrap: wrap; }
+.stat-card { background: #0f0d1a; border: 1px solid #2a2a3a; border-radius: 12px; padding: 1rem 1.5rem; flex: 1; text-align: center; min-width: 80px; }
+.stat-number { font-size: 2rem; font-weight: bold; color: #00ff41; }
+.stat-label { font-size: 0.7rem; color: #a0a0b0; }
+
+.quota-card { position: relative; min-width: 160px; border-color: #00ff41; }
+.quota-edit-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: none; border: none; color: #a0a0b0; cursor: pointer; padding: 0.2rem; }
+.quota-edit-btn:hover { color: #00ff41; }
+.quota-edit-btn svg { width: 14px; height: 14px; }
+.quota-bar { height: 6px; background: #1a1a2a; border-radius: 3px; margin-top: 0.6rem; overflow: hidden; }
+.quota-bar-fill { height: 100%; background: #00ff41; transition: width 0.3s; }
+.quota-milestone { font-size: 0.68rem; margin-top: 0.4rem; font-weight: 600; }
+
+.quota-celebrate {
+  min-width: 220px; overflow: hidden; background: rgba(0,255,65,0.08); border-color: #00ff41;
+  display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 1.5rem;
+}
+.quota-relax-icon { width: 28px; height: 28px; color: #00ff41; margin-bottom: 0.5rem; }
+.quota-celebrate-title { font-weight: 700; font-size: 0.82rem; margin: 0.5rem 0 0.25rem; color: #f0eeff; }
+.quota-celebrate-body { font-size: 0.72rem; color: #a0a0b0; margin: 0; line-height: 1.5; }
+.confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.confetti-piece {
+  position: absolute; top: -10px; width: 6px; height: 10px; opacity: 0.9;
+  background: #00ff41; animation: confetti-fall 2.6s linear infinite;
+}
+.confetti-piece:nth-child(1) { left: 4%; background: #00ff41; animation-delay: 0s; }
+.confetti-piece:nth-child(2) { left: 12%; background: #f1c40f; animation-delay: 0.3s; }
+.confetti-piece:nth-child(3) { left: 20%; background: #3b82f6; animation-delay: 0.6s; }
+.confetti-piece:nth-child(4) { left: 30%; background: #00ff41; animation-delay: 0.9s; }
+.confetti-piece:nth-child(5) { left: 40%; background: #f1c40f; animation-delay: 0.2s; }
+.confetti-piece:nth-child(6) { left: 50%; background: #3b82f6; animation-delay: 0.5s; }
+.confetti-piece:nth-child(7) { left: 60%; background: #00ff41; animation-delay: 0.8s; }
+.confetti-piece:nth-child(8) { left: 70%; background: #f1c40f; animation-delay: 0.1s; }
+.confetti-piece:nth-child(9) { left: 80%; background: #3b82f6; animation-delay: 0.4s; }
+.confetti-piece:nth-child(10) { left: 88%; background: #00ff41; animation-delay: 0.7s; }
+.confetti-piece:nth-child(11) { left: 95%; background: #f1c40f; animation-delay: 1s; }
+.confetti-piece:nth-child(12) { left: 65%; background: #3b82f6; animation-delay: 1.3s; }
+@keyframes confetti-fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(140px) rotate(360deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece { animation: none; opacity: 0; }
+}
+.quota-set-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem; cursor: pointer;
+  border: 1px dashed #2a2a3a; font-family: inherit; color: #a0a0b0;
+}
+.quota-set-btn:hover { border-color: #00ff41; color: #00ff41; }
+.quota-set-btn svg { width: 22px; height: 22px; }
+.quota-set-hint { font-size: 0.62rem; color: #6a6a8a; }
+.quota-editing { display: flex; flex-direction: column; gap: 0.5rem; min-width: 220px; }
+.quota-input { width: 100%; padding: 0.4rem; background: #1a1a2a; border: 1px solid #2a2a3a; border-radius: 6px; color: #f0eeff; font-family: inherit; text-align: center; }
+.quota-input-label { font-size: 0.68rem; color: #a0a0b0; }
+.quota-select { width: 100%; padding: 0.4rem; background: #1a1a2a; border: 1px solid #2a2a3a; border-radius: 6px; color: #f0eeff; font-family: inherit; font-size: 0.78rem; }
+.quota-edit-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+
+.toolbar { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+.toolbar-primary { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+.toolbar-tools { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-left: auto; }
+@media (max-width: 700px) {
+  .toolbar-tools { margin-left: 0; }
+  .export-btn-label { display: none; }
+}
+.jobtrack-page .btn { background: #00ff41; color: #03020a; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; }
+/* 2026-09-15: real feedback, live - "mouse over button Add
+   Application changes text to unreadable colour blue." own.css (a
+   totally different page) defines a global, unscoped .btn:hover in
+   blue - Vite bundles all page CSS together with no scoping, so it
+   leaks onto every ".btn" anywhere, including this one, which never
+   defined its own hover state to override it. Scoped selector here
+   (.jobtrack-page .btn:hover) is more specific than own.css's bare
+   .btn:hover, so it reliably wins regardless of file load order. */
+.jobtrack-page .btn:hover { background: #33ff66; color: #03020a; border-color: transparent; }
+.btn-glow { animation: btn-glow-pulse 2.2s ease-in-out infinite; }
+.btn-glow:hover { animation-play-state: paused; }
+@keyframes btn-glow-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(0,255,65,0.4), 0 0 0 rgba(0,255,65,0); }
+  50% { box-shadow: 0 0 16px rgba(0,255,65,0.9), 0 0 28px rgba(0,255,65,0.4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-glow { animation: none; box-shadow: 0 0 10px rgba(0,255,65,0.6); }
+}
+.jobtrack-page .btn-secondary { background: #2a2a3a; color: #f0eeff; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-family: inherit; }
+.export-btn { display: inline-flex; align-items: center; gap: 0.4rem; }
+.export-btn svg { width: 16px; height: 16px; color: #00ff41; flex-shrink: 0; }
+/* PARC: buttons fill the full row edge-to-edge (equal flex-basis) instead of
+   clumping left with dead space to the right border. */
+.filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.filter-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;
+  background: #1a1a2a; border: 1px solid #2a2a3a; padding: 0.3rem 0.8rem; border-radius: 20px;
+  cursor: pointer; font-size: 0.8rem; color: #f0eeff; font-family: inherit;
+  min-width: 108px; box-sizing: border-box; flex: 1 1 0;
+}
+.filter-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+.filter-btn.active { background: #00ff41; color: #03020a; border-color: #00ff41; }
+.filter-btn-wrap { position: relative; display: inline-flex; flex: 1 1 0; min-width: 108px; }
+.filter-btn-wrap .filter-btn { width: 100%; min-width: 0; }
+@media (max-width: 600px) {
+  /* flex:1 1 0 forces every button to the exact same tiny width regardless
+     of text length - fine on desktop with room to spare, but on a phone it
+     squeezes "Screening"/"Technical"/etc below their own text width, so the
+     label overflows and visually overlaps the next button. Switch to
+     content-based sizing so they wrap into rows instead of being squashed. */
+  .filter-btn, .filter-btn-wrap { flex: 0 1 auto; min-width: 0; }
+}
+
+.applications-table { width: 100%; border-collapse: separate; border-spacing: 0; background: #0f0d1a; border-radius: 12px; }
+.applications-table th { position: relative; }
+/* Soft corners on all four outer edges - border-collapse:collapse (used
+   before overflow:hidden was removed for the InfoTip popovers) doesn't let
+   individual cells carry a visible radius, so this needs "separate" instead. */
+.applications-table thead tr:first-child th:first-child { border-top-left-radius: 12px; }
+.applications-table thead tr:first-child th:last-child { border-top-right-radius: 12px; }
+.applications-table tbody tr:last-child td:first-child { border-bottom-left-radius: 12px; }
+.applications-table tbody tr:last-child td:last-child { border-bottom-right-radius: 12px; }
+.info-tip-wrap { position: relative; display: inline-block; margin-left: 0.3rem; }
+.info-tip-popover { top: calc(100% + 0.5rem); text-transform: none; font-weight: 400; letter-spacing: normal; display: flex; align-items: flex-start; gap: 0.5rem; }
+.info-tip-popover svg { width: 16px; height: 16px; color: #00ff41; flex-shrink: 0; margin-top: 0.1rem; }
+.applications-table th:last-child .info-tip-popover,
+.applications-table th:nth-last-child(2) .info-tip-popover { left: auto; right: 0; }
+.applications-table th, .applications-table td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #2a2a3a; font-size: 0.85rem; }
+.applications-table th { background: #1a1a2a; color: #00ff41; font-weight: 600; }
+.applications-table th > svg { width: 13px; height: 13px; vertical-align: -2px; margin-right: 0.35rem; }
+.status-badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+.status-select-wrap { cursor: pointer; position: relative; }
+.status-select-wrap:hover { filter: brightness(1.15); }
+.status-select-wrap::after {
+  content: ''; width: 0; height: 0; border-left: 3px solid transparent; border-right: 3px solid transparent;
+  border-top: 4px solid currentColor; opacity: 0.8; margin-left: 0.1rem;
+}
+.status-select {
+  position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: none; cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+}
+.status-select option { color: #03020a; background: #fff; }
+.status-badge svg { width: 12px; height: 12px; flex-shrink: 0; }
+.status-applied { background: #3b82f6; color: white; }
+.status-screening { background: #8b5cf6; color: white; }
+.status-interview { background: #f59e0b; color: white; }
+.status-technical { background: #06b6d4; color: white; }
+.status-offer { background: #10b981; color: white; }
+.status-accepted { background: #8b5cf6; color: white; }
+.status-rejected { background: #ef4444; color: white; }
+.action-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; margin: 0 0.1rem; }
+
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: #0f0d1a; border: 1px solid #2a2a3a; border-radius: 12px; padding: 1.5rem; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
+.modal-content h3 { margin-bottom: 1rem; color: #00ff41; font-family: 'Syne', sans-serif; }
+.modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 0.6rem; margin-bottom: 1rem; background: #1a1a2a; border: 1px solid #2a2a3a; border-radius: 6px; color: #f0eeff; font-family: inherit; font-size: 0.85rem; outline: none; }
+.modal-label { display: block; font-size: 0.72rem; color: #a0a0b0; margin-bottom: 0.35rem; }
+.bulk-instructions { font-size: 0.78rem; color: #a0a0b0; line-height: 1.5; margin-bottom: 0.75rem; }
+.bulk-textarea { font-family: 'DM Mono', monospace; font-size: 0.8rem; }
+.bulk-date-note { font-size: 0.68rem; color: #6a6a8a; margin-top: -0.5rem; margin-bottom: 1rem; }
+.modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus { border-color: #00ff41; }
+.modal-content select option { background: #1a1a2a; }
+.modal-buttons { display: flex; gap: 1rem; justify-content: flex-end; }
+
+.backup-panel { margin-top: 4rem; padding: 1rem; background: #0f0d1a; border: 1px solid #2a2a3a; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.85rem; color: #a0a0b0; }
+.backup-item { display: flex; align-items: center; gap: 0.5rem; }
+.backup-item svg { width: 18px; height: 18px; color: #00ff41; flex-shrink: 0; }
+
+.ad-strip { margin-top: 1rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.ad-card {
+  position: relative; display: block; text-decoration: none; padding: 1.25rem 1rem 1rem;
+  background: #0f0d1a; border: 1px solid #2a2a3a; border-radius: 12px; color: #f0eeff;
+  transition: border-color 0.2s;
+}
+.ad-card:hover { border-color: #00ff41; }
+.ad-card-open { border-style: dashed; }
+/* 2026-09-16: real Google AdSense unit, box 3 of 3 - solid border like
+   the other two real cards (was dashed for the old "open slot"
+   placeholder this replaced). min-height is a safety net only - an
+   unfilled ad (blocked, offline, or off the authorized kworld.space
+   domain, e.g. localhost) collapses to nothing otherwise, which would
+   look like a broken/missing third card rather than an empty ad. */
+.ad-label {
+  position: absolute; top: 0.6rem; right: 0.6rem; font-size: 0.6rem; letter-spacing: 0.1em;
+  color: #6a6a8a; border: 1px solid #2a2a3a; border-radius: 4px; padding: 0.1rem 0.35rem;
+}
+.ad-card > svg { width: 24px; height: 24px; color: #00ff41; margin-bottom: 0.6rem; }
+.ad-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.3rem; }
+.ad-desc { font-size: 0.75rem; color: #a0a0b0; margin-bottom: 0.6rem; }
+.ad-cta { font-size: 0.72rem; color: #00ff41; }
+@media (max-width: 700px) {
+  .ad-strip { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .jobtrack-page { padding: 1rem; }
+  .applications-table { font-size: 0.7rem; }
+  .applications-table th, .applications-table td { padding: 0.3rem; }
+}
+
+/* 2026-09-23: unsaved-changes reminder - records live only in this browser */
+.backup-reminder { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 0.8rem; margin: 0 0 1.25rem; padding: 0.8rem 1rem; border: 1px solid rgba(255,190,60,0.45); background: rgba(255,190,60,0.08); border-radius: 8px; color: #ffcf70; font-size: 0.85rem; line-height: 1.45; }
+.backup-reminder span { flex: 1 1 14rem; }
+.backup-reminder-btn { flex: 0 0 auto; }
+.info-popover-step-num { color: #00ff41; font-weight: 700; flex-shrink: 0; }
+.info-popover-steps li { white-space: normal; }
+.info-popover-list .info-inline-icon { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; margin: 0 2px; color: #00ff41; }
+.jt-note { display: block; font-size: 0.72rem; color: var(--text-dim, #a0a0b0); margin-top: 2px; font-weight: 400; }
+.jt-sortable { cursor: pointer; user-select: none; } .jt-sortable:hover { text-decoration: underline; }
+/* 2026-10-06: JobTrack Pro - what's working */
+.jt-pro { margin: -2rem 0 3.5rem; }
+.jt-pro-h { display: flex; align-items: center; gap: .6rem; font-size: 1.2rem; color: #f0eeff; margin: 0 0 1rem; }
+.jt-pro-tag { font-size: .75rem; color: #03020a; background: #ffb000; border-radius: 6px; padding: .1rem .45rem; font-weight: 800; }
+.jt-pro-cards { display: flex; gap: 1rem; flex-wrap: wrap; }
+.jt-pro-card { flex: 1; min-width: 140px; background: #0f0d1a; border: 1px solid rgba(255,176,0,.35); border-radius: 12px; padding: .9rem 1rem; text-align: center; }
+.jt-pro-k { color: #ffb000; font-size: .85rem; font-weight: 700; }
+.jt-pro-v { color: #f0eeff; font-size: 1.8rem; font-weight: 800; margin: .2rem 0; }
+.jt-pro-s { color: rgba(240,238,255,.6); font-size: .8rem; overflow-wrap: anywhere; }
+.jt-pro-locked .jt-pro-cards { filter: blur(5px); opacity: .6; pointer-events: none; user-select: none; }
+.jt-pro-cal { margin-top: 1rem; }
+.jt-pro-hint { color: rgba(240,238,255,.6); font-size: .85rem; margin: .5rem 0 0; }

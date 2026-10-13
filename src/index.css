@@ -1,0 +1,27 @@
+:root {
+  --void: #03020a;
+  --deep: #0a0718;
+  --nebula-purple: #6b21d6;
+  --nebula-violet: #9b4dca;
+  --nebula-pink: #e040a0;
+  --nebula-teal: #00ff41;
+  --nebula-blue: #4488ff;
+  --nebula-gold: #f5c518;
+  --star: #f0eeff;
+  --text-dim: rgba(240,238,255,0.5);
+  --text-mid: rgba(240,238,255,0.75);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--void);
+  color: var(--star);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a { color: inherit; }
