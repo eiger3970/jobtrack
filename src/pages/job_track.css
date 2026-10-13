@@ -291,3 +291,9 @@
 .orp-row-value { color: var(--star); overflow-wrap: anywhere; }
 .orp-copy { background: none; border: 1px solid #19b86a; color: #19b86a; border-radius: 8px; padding: .25rem .6rem; font-size: .8rem; cursor: pointer; }
 .jt-stale { display: inline-block; margin-left: .4rem; padding: .05rem .4rem; border-radius: 6px; background: rgba(255,176,0,.15); color: #ffb000; font-size: .75rem; }
+/* 2026-10-13: steps 1-4 are the buttons */
+.howto-go { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0,255,65,0.06); border: 1px solid rgba(0,255,65,0.35); border-radius: 10px; color: #f0eeff; font: inherit; font-size: 0.82rem; padding: 0.45rem 0.7rem; cursor: pointer; white-space: nowrap; }
+.howto-go:hover:not(:disabled) { background: rgba(0,255,65,0.14); border-color: #00ff41; }
+.howto-go:disabled { opacity: 0.45; cursor: default; }
+.howto-go svg { width: 20px; height: 20px; color: #00ff41; flex-shrink: 0; }
+.howto-go-main { border-color: #00ff41; box-shadow: 0 0 12px rgba(0,255,65,0.35); font-weight: 700; }

@@ -575,15 +575,21 @@ export default function JobTrack() {
           <span>{t('title')}</span>
         </h1>
 
+        {/* 2026-10-13 owner: "top header has 1. - 4., they could be the actual link
+            buttons" - the steps ARE the buttons now; their copies below are gone. */}
         <div className="howto-strip">
           <div className="howto-step">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg>
-            <span>{t('howto.add')}</span>
+            <button type="button" className="howto-go howto-go-main" onClick={openAdd}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg>
+              <span>{t('howto.add')}</span>
+            </button>
           </div>
           <div className="howto-arrow">→</div>
           <div className="howto-step howto-step-info" ref={emailInfoRef}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></svg>
-            <span>{t('howto.track')}</span>
+            <button type="button" className="howto-go" onClick={openEmailUpdate}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></svg>
+              <span>{t('howto.track')}</span>
+            </button>
             {/* 2026-09-23: real feedback, live - "does copy from need copying
                 too, then where to paste?" Copying an email grabs the body
                 only; the sender's address is a separate, optional copy. */}
@@ -602,13 +608,17 @@ export default function JobTrack() {
           </div>
           <div className="howto-arrow">→</div>
           <div className="howto-step">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="8" y1="13" x2="16" y2="13" /><line x1="8" y1="17" x2="13" y2="17" /></svg>
-            <span>{t('howto.export')}</span>
+            <button type="button" className="howto-go" onClick={isApp() ? () => setOrpPanel(true) : exportPDF}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="8" y1="13" x2="16" y2="13" /><line x1="8" y1="17" x2="13" y2="17" /></svg>
+              <span>{t('howto.export')}</span>
+            </button>
           </div>
           <div className="howto-arrow">→</div>
           <div className="howto-step howto-step-info" ref={infoRef}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg>
-            <span>{t('howto.private')}</span>
+            <button type="button" className="howto-go" onClick={exportBackup} disabled={apps.length === 0}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg>
+              <span>{t('howto.private')}</span>
+            </button>
             <button type="button" className="info-btn" aria-label={t('howto.private')} onClick={() => setShowStorageInfo(v => !v)}>i</button>
             {showStorageInfo && (
               <div className="info-popover">
@@ -723,7 +733,6 @@ export default function JobTrack() {
 
         <div className="toolbar">
           <div className="toolbar-primary">
-            <button className="btn btn-glow" onClick={openAdd}>{t('add')}</button>
             {/* 2026-10-13 owner: ORP proofs (716.007 PDF + Job-Room) in one tap */}
             <button className="btn-secondary export-btn orp-btn" onClick={() => setOrpPanel(true)}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><path d="M9 15l2 2 4-4" /></svg>
@@ -733,24 +742,11 @@ export default function JobTrack() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>
               {t('bulkAdd')}
             </button>
-            <button className="btn-secondary export-btn" onClick={openEmailUpdate} title="Paste a confirmation email's text to update that application's status - stays on your device, nothing is sent anywhere.">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16v16H4z" /><path d="M22 6l-10 7L2 6" /></svg>
-              {t('email.button')}
-            </button>
           </div>
           <div className="toolbar-tools">
-            {/* app: a print window can't open inside iOS - ORP proofs makes the PDF there */}
-            {!isApp() && <button className="btn-secondary export-btn" onClick={exportPDF} title={t('export')}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12" /><path d="M7 10l5 5 5-5" /><path d="M5 21h14" /></svg>
-              <span className="export-btn-label">{t('export')}</span>
-            </button>}
             <button className="btn-secondary export-btn" onClick={copyAsList} disabled={apps.length === 0} title={t('copyList')}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
               <span className="export-btn-label">{copiedList ? t('copyList.done') : t('copyList')}</span>
-            </button>
-            <button className="btn-secondary export-btn" onClick={exportBackup} disabled={apps.length === 0} title={t('backup.hint')}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-              <span className="export-btn-label">{t('backup.export')}</span>
             </button>
             <input type="file" accept="application/json" ref={backupInputRef} style={{ display: 'none' }} onChange={importBackup} />
             <div className="import-btn-wrap" ref={importInfoRef}>
