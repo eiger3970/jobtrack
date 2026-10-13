@@ -5,6 +5,7 @@ import './job_track.css'
 import JobTrackPro from './job_track_pro'
 import { type Application, type OrpMethod, ORP_DEFAULTS } from '../lib/orp'
 import OrpPanel from './orp_panel'
+import { parseAd } from '../lib/ad_parse'
 import { planReminders } from '../lib/reminders'
 import { saveFile, stamp } from '../lib/save_file'
 import { isApp } from '../lib/platform'
@@ -177,6 +178,8 @@ export default function JobTrack() {
   const [editing, setEditing] = useState<App | null>(null)
   const [form, setForm] = useState<Omit<App, 'id'>>({ company:'', role:'', date: new Date().toISOString().slice(0,10), status:'applied', cv:'', cover:'', nextDate:'', notes:'' })
   const [orpOpen, setOrpOpen] = useState(false)
+  const [adText, setAdText] = useState('')
+  const [adFilled, setAdFilled] = useState(false)
   const [orpPanel, setOrpPanel] = useState(false)
   const [showStorageInfo, setShowStorageInfo] = useState(false)
   const infoRef = useRef<HTMLDivElement>(null)
@@ -283,7 +286,7 @@ export default function JobTrack() {
   }
   const sortMark = (col: 'date' | 'company') => sortBy.col === col ? (sortBy.asc ? ' ▲' : ' ▼') : ''
 
-  function openAdd() { setEditing(null); setOrpOpen(false); setForm({ company:'',role:'',date:new Date().toISOString().slice(0,10),status:'applied',cv:'',cover:'',nextDate:'',notes:'', ...ORP_DEFAULTS }); setModal(true) }
+  function openAdd() { setEditing(null); setOrpOpen(false); setAdText(''); setAdFilled(false); setForm({ company:'',role:'',date:new Date().toISOString().slice(0,10),status:'applied',cv:'',cover:'',nextDate:'',notes:'', ...ORP_DEFAULTS }); setModal(true) }
   function openEdit(a: App) { const { id: _id, ...rest } = a; setEditing(a); setOrpOpen(false); setForm({ ...ORP_DEFAULTS, ...rest }); setModal(true) }
   function save() {
     if (!form.company || !form.role) return
@@ -888,6 +891,19 @@ export default function JobTrack() {
         <div className="modal" onClick={() => setModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h3>{editing ? t('modal.editTitle') : t('modal.addTitle')}</h3>
+            {/* 2026-10-13 owner: "trouble entering data" - paste the ad, the fields fill themselves */}
+            {!editing && (
+              <div className="ad-paste">
+                <textarea rows={3} placeholder={t('ad.paste')} value={adText} onChange={e => { setAdText(e.target.value); setAdFilled(false) }} />
+                <button type="button" className="btn" disabled={!adText.trim()} onClick={() => {
+                  const ad = parseAd(adText)
+                  setForm(f => ({ ...f, role: ad.role || f.role, company: ad.company || f.company, address: ad.address || f.address,
+                    contact: ad.contact || f.contact, rate: ad.rate ?? f.rate, notes: [f.notes, ad.notes].filter(Boolean).join(' · ') }))
+                  setOrpOpen(true); setAdFilled(true)
+                }}>{t('ad.fill')}</button>
+                {adFilled && <p className="ad-done">{t('ad.check')}</p>}
+              </div>
+            )}
             <input type="text" placeholder={t('field.company')} value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} required />
             <input type="text" placeholder={t('field.role')} value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} required />
             <label className="modal-label">{t('field.dateApplied')}</label>

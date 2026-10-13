@@ -924,6 +924,21 @@
       "en": "3 months before registering, asked once",
       "de": "3 Monate vor der Anmeldung, einmal verlangt",
       "fr": "3 mois avant l'inscription, demandés une fois"
+    },
+    "ad.paste": {
+      "en": "Paste the job ad here (in the ad: select all text, Copy)",
+      "de": "Stelleninserat hier einfügen (im Inserat: alles markieren, Kopieren)",
+      "fr": "Collez l'annonce ici (dans l'annonce: tout sélectionner, Copier)"
+    },
+    "ad.fill": {
+      "en": "Fill in from the ad",
+      "de": "Aus dem Inserat ausfüllen",
+      "fr": "Remplir depuis l'annonce"
+    },
+    "ad.check": {
+      "en": "Filled in - check, then Save.",
+      "de": "Ausgefüllt - prüfen, dann Speichern.",
+      "fr": "Rempli - vérifiez, puis Enregistrer."
     }
   }
 }
