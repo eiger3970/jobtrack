@@ -493,3 +493,10 @@
 .orp-date-btn { background: #1a1a2a; border: 1px solid #2a2a3a; border-radius: 6px; color: #00ff41; padding: 0.5rem; cursor: pointer; }
 .jr-flow { margin: 0.5rem 0 0; padding-left: 1.2rem; font-size: 0.82rem; color: #d0d0e0; display: flex; flex-direction: column; gap: 0.3rem; }
 .jr-flow b { color: #f0eeff; } .jr-flow .jr-month { color: #00ff41; }
+/* 2026-10-14 one-click fill set-up: pop-up until first use, then a small link */
+.jr-bm-start { display: block; width: 100%; margin: 0 0 0.6rem; padding: 0.55rem; border: 1.5px solid #00ff41; border-radius: 8px; background: rgba(0,255,65,0.08); color: #00ff41; font: inherit; font-weight: 700; cursor: pointer; }
+.jr-bm-again { background: none; border: 0; color: #8a86a8; font: inherit; font-size: 0.75rem; text-decoration: underline; cursor: pointer; margin: 0 0 0.4rem; padding: 0; }
+.jr-setup { border: 2px solid #00ff41; border-radius: 10px; padding: 0.8rem 0.9rem; margin: 0 0 0.8rem; background: #0f0d1c; box-shadow: 0 0 24px rgba(0,255,65,0.25); }
+.jr-setup-title { color: #00ff41; font-weight: 700; margin: 0 0 0.4rem; }
+.jr-setup p { color: #d0d0e0; font-size: 0.85rem; }
+.jr-setup-btns { margin-top: 0.7rem; text-align: right; }

@@ -1259,6 +1259,16 @@
       "en": "below, on this job's card: Entered in Job-Room -> the next job opens",
       "de": "unten, auf der Karte dieser Stelle: In Job-Room erfasst -> die nächste Stelle öffnet sich",
       "fr": "en bas, sur la carte de ce poste: Saisie dans Job-Room -> le poste suivant s'ouvre"
+    },
+    "jr.bm.again": {
+      "en": "One-click fill is set up - set up again",
+      "de": "Ein-Klick-Ausfüllen eingerichtet - neu einrichten",
+      "fr": "Remplissage en un clic installé - réinstaller"
+    },
+    "jr.bm.done": {
+      "en": "Done",
+      "de": "Fertig",
+      "fr": "Terminé"
     }
   }
 }
