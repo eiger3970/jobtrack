@@ -483,3 +483,6 @@
 .jts-step-pic { display: flex; gap: 0.6rem; align-items: center; }
 .jts-step-pic svg { flex-shrink: 0; }
 .jts-steps { list-style: none; padding-left: 0; } .jts-num { color: #00ff41; margin-right: 0.2rem; }
+/* 2026-10-14 owner: the counts under Status use the same colours as the status badges/buttons */
+.jt-sc-applied { color: #3b82f6; } .jt-sc-screening { color: #8b5cf6; } .jt-sc-interview { color: #f59e0b; }
+.jt-sc-technical { color: #06b6d4; } .jt-sc-offer { color: #10b981; } .jt-sc-accepted { color: #8b5cf6; } .jt-sc-rejected { color: #ef4444; }
