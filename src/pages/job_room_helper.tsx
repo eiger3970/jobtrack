@@ -112,8 +112,9 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
         <p className="jr-progress"><b>{done}</b> / {rows.length} {t('jr.entered')}</p>
         <div className="jr-bar"><div style={{ width: `${(done / rows.length) * 100}%` }} /></div>
         <ol className="jr-flow">
+          {/* 2026-10-14 owner: 1 = here (this window), 2 = Job-Room next */}
+          <li><b>{t('jr.here')}</b> {t('jr.flow2')}</li>
           <li><b>Job-Room:</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{t('jr.flow1').split('{month}')[1] ?? ''}</li>
-          <li><b>JobTrack:</b> {t('jr.flow2')}</li>
         </ol>
       </div>
       <div className="jr-dots" role="tablist">
