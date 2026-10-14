@@ -1296,9 +1296,44 @@
       "fr": "Aucun vide - rien à compléter"
     },
     "jr.noBookmark": {
-      "en": "JobTrack fill not in your bookmarks bar yet? Add it here (once)",
-      "de": "JobTrack fill noch nicht in der Lesezeichenleiste? Hier hinzufügen (einmal)",
-      "fr": "JobTrack fill pas encore dans vos favoris? Ajoutez-le ici (une fois)"
+      "en": "JobTrack fill not in your bookmarks bar? Back to step 2",
+      "de": "JobTrack fill nicht in der Lesezeichenleiste? Zurück zu Schritt 2",
+      "fr": "JobTrack fill pas dans vos favoris? Retour à l'étape 2"
+    },
+    "orp.step1of3": {
+      "en": "Step 1 of 3",
+      "de": "Schritt 1 von 3",
+      "fr": "Étape 1 sur 3"
+    },
+    "orp.step2of3": {
+      "en": "Step 2 of 3",
+      "de": "Schritt 2 von 3",
+      "fr": "Étape 2 sur 3"
+    },
+    "orp.step3of3": {
+      "en": "Step 3 of 3",
+      "de": "Schritt 3 von 3",
+      "fr": "Étape 3 sur 3"
+    },
+    "jr.bm.big": {
+      "en": "Put JobTrack fill in your bookmarks bar",
+      "de": "JobTrack fill in die Lesezeichenleiste legen",
+      "fr": "Mettez JobTrack fill dans la barre de favoris"
+    },
+    "jr.bm.bar": {
+      "en": "Bookmarks bar",
+      "de": "Lesezeichenleiste",
+      "fr": "Barre de favoris"
+    },
+    "jr.bm.how": {
+      "en": "Press and hold the green button below, drag it up into the bookmarks bar, let go. No bar? Press Ctrl+Shift+B.",
+      "de": "Den grünen Knopf unten gedrückt halten, nach oben in die Lesezeichenleiste ziehen, loslassen. Keine Leiste? Ctrl+Shift+B drücken.",
+      "fr": "Maintenez le bouton vert ci-dessous, glissez-le dans la barre de favoris, relâchez. Pas de barre? Ctrl+Maj+B."
+    },
+    "jr.bm.done2": {
+      "en": "Done - it's in my bookmarks bar",
+      "de": "Fertig - es ist in meiner Lesezeichenleiste",
+      "fr": "Fait - il est dans ma barre de favoris"
     }
   }
 }

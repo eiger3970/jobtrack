@@ -34,8 +34,7 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
   const [mode, setMode] = useState<'month' | 'before'>('month')
   const [busy, setBusy] = useState(false)
   const [info, setInfo] = useState(false)
-  const fillUsed = (() => { try { return !!localStorage.getItem('kworld_jobtrack_fill_used') } catch { return false } })()
-  const [step, setStep] = useState<'ask' | 'setup' | 'work'>('ask')
+  const [step, setStep] = useState<'ask' | 'setup' | 'work'>(() => (import.meta.env.DEV && window.location.search.includes('setup') ? 'setup' : 'ask'))
   const bm = useRef<HTMLAnchorElement>(null)
   useEffect(() => { bm.current?.setAttribute('href', bookmarklet(window.location.origin)) }, [step])
   const [regText, setRegText] = useState(() => (loadProfile().registered ? swissDate(loadProfile().registered) : ''))
@@ -97,6 +96,7 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
         {/* 2026-10-14 owner: "too confusing where to start" - three steps: the question, the
             one-time set-up, then only the squares and the card. Numbers go into Details. */}
         {step === 'ask' && (<>
+          <p className="orp-stepno">{t('orp.step1of3')}</p>
           <p className="orp-q">{t('orp.which')}</p>
           <div className="orp-tabs">
             <button className={mode === 'month' ? 'btn' : 'btn-secondary'} onClick={() => setMode('month')}>{t('orp.month')}</button>
@@ -121,19 +121,34 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
         </>)}
 
           <button className="btn btn-glow orp-next" disabled={mode === 'before' && !profile.registered}
-            onClick={() => setStep(fillUsed ? 'work' : 'setup')}>{t('orp.next')}</button>
+            onClick={() => setStep('setup')}>{t('orp.next')}</button>
         </>)}
 
         {step === 'setup' && (
-          <div className="jr-setup">
-            <p className="jr-setup-title">{t('jr.bm.title')}</p>
-            <p>{t('jr.bm.once')}</p>
-            <a ref={bm} className="jr-bm-link" onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }} title={t('jr.bm.drag')}>JobTrack fill</a>
-            <div className="jr-setup-btns"><button type="button" className="btn" onClick={() => setStep('work')}>{t('jr.bm.done')}</button></div>
+          <div className="orp-setup-big">
+            <p className="orp-stepno">{t('orp.step2of3')}</p>
+            <p className="orp-setup-h">{t('jr.bm.big')}</p>
+            {/* picture: the green button dragged up into the browser's bookmarks bar */}
+            <svg viewBox="0 0 320 120" className="orp-setup-pic" aria-hidden="true">
+              <rect x="6" y="6" width="308" height="108" rx="8" fill="#0f0d1c" stroke="#2a2a3a" />
+              <rect x="6" y="6" width="308" height="22" rx="8" fill="#1a1a2a" />
+              <text x="16" y="21" fontSize="10" fill="#8a86a8">{t('jr.bm.bar')}</text>
+              <rect x="150" y="10" width="78" height="14" rx="4" fill="none" stroke="#00ff41" strokeDasharray="3 2" />
+              <text x="189" y="21" fontSize="9" textAnchor="middle" fill="#00ff41">JobTrack fill</text>
+              <rect x="40" y="76" width="96" height="26" rx="6" fill="#00ff41" />
+              <text x="88" y="93" fontSize="11" textAnchor="middle" fill="#03020a" fontWeight="700">JobTrack fill</text>
+              <path d="M112 74 C 140 40, 160 38, 182 30" fill="none" stroke="#f0eeff" strokeWidth="2" strokeDasharray="5 4" />
+              <path d="M176 26 L184 29 L178 35" fill="none" stroke="#f0eeff" strokeWidth="2" />
+              <path d="M120 88 l0 14 l4 -4 l3 6 l3 -1 l-3 -6 l5 0 z" fill="#f0eeff" stroke="#03020a" strokeWidth="0.8" />
+            </svg>
+            <p className="orp-setup-how">{t('jr.bm.how')}</p>
+            <a ref={bm} className="jr-bm-link orp-setup-btn" onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }} title={t('jr.bm.drag')}>JobTrack fill</a>
+            <button type="button" className="btn btn-glow orp-next" onClick={() => setStep('work')}>{t('jr.bm.done2')}</button>
           </div>
         )}
 
         {step === 'work' && (<>
+          <p className="orp-stepno">{t('orp.step3of3')}</p>
           <p className="orp-choice">{mode === 'before' ? `${t('orp.before')} - ${swissDate(profile.registered)}` : jobRoomMonth}
             {' '}<button type="button" className="jr-bm-again" onClick={() => setStep('ask')}>{t('orp.change')}</button>
             {' · '}<button type="button" className="jr-bm-again" onClick={() => setStep('setup')}>{t('jr.bm.title')}</button></p>

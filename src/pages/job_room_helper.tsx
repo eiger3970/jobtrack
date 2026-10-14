@@ -121,7 +121,7 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
       </div>
       <p className="jr-step"><b className="jts-num">3.</b> <b>Job-Room:</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[0]}<b className="jr-bmname">JobTrack fill</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[1] ?? ''}
         {/* 2026-10-14 owner: the bookmark step must stay findable */}
-        {onSetup && <><br /><button type="button" className="jr-bm-again" onClick={onSetup}>{t('jr.noBookmark')}</button></>}</p>
+        {onSetup && <><br /><button type="button" className="btn-secondary jr-bm-back" onClick={onSetup}>{t('jr.noBookmark')}</button></>}</p>
       <div className="jr-card" key={a.id}>
         <p className="jr-head">{idx + 1}. {a.company}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}</p>
         {missing.length > 0 && <p className="jr-warn">{t('jr.missing')}</p>}
