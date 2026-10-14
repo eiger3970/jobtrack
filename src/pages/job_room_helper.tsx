@@ -104,8 +104,9 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
         {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}
         {gaps.length > 0 ? (
           // 2026-10-14 owner: only push when Job-Room NEEDS something; optional gaps stay a quiet fold
-          <>{missing.length === 0 && <p className="jr-nogaps">{ICON_CHECK}{t('jr.allNeeded')}</p>}
-          <details className={'jr-fill' + (missing.length ? ' jr-fill-need' : ' jr-fill-opt')} open={missing.length > 0}>
+          // 2026-10-14 owner: all required there -> only the green tick, nothing else to decide
+          missing.length === 0 ? <p className="jr-nogaps">{ICON_CHECK}{t('jr.allNeeded')}</p> : <>
+          <details className="jr-fill jr-fill-need" open>
             <summary className="jr-fill-title">{missing.length ? `${t('jr.fill')} (${gaps.join(', ')})` : `${t('jr.optionalMore')} (${gaps.join(', ')})`}</summary>
             <textarea className="jr-ad" rows={3} placeholder={t('jr.adPaste')} value={ad} onChange={ev => setAd(ev.target.value)} />
             <button type="button" className="btn-secondary" disabled={!ad.trim()} onClick={fillFromAd}>{t('jr.adFill')}</button>
