@@ -90,14 +90,8 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
 
   return (
     <div className="jr">
-      {/* 2026-10-14 owner: set-up first and small; then two lines, each saying WHERE you are */}
-      <div className="jr-top">
-        <ol className="jr-flow">
-          {/* 2026-10-14 owner: 1 = here (this window), 2 = Job-Room next */}
-          <li><b>{t('jr.here')}</b> {t('jr.flow2')}</li>
-          <li><b>Job-Room:</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{t('jr.flow1').split('{month}')[1] ?? ''}</li>
-        </ol>
-      </div>
+      {/* 2026-10-14 owner: 3 steps in the order you do them - 1 pick here, 2 fill gaps here, 3 Job-Room */}
+      <p className="jr-step"><b className="jts-num">1.</b> <b>{t('jr.here')}</b> {t('jr.flow2')}</p>
       <div className="jr-dots" role="tablist">
         {rows.map((r, n) => (
           <button key={r.id} type="button" role="tab" aria-selected={n === idx} aria-label={`${n + 1}. ${r.company}`}
@@ -106,11 +100,9 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
         ))}
       </div>
 
-      <div className="jr-card" key={a.id}>
-        <p className="jr-head">{idx + 1}. {a.company}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}</p>
-        {missing.length > 0 && <p className="jr-warn">{t('jr.missing')}</p>}
+      <div className="jr-step2"><b className="jts-num">2.</b> {a.company}
         {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}
-        {gaps.length > 0 && (
+        {gaps.length > 0 ? (
           <details className="jr-fill" open={missing.length > 0}>
             <summary>{t('jr.fill')} ({gaps.join(', ')})</summary>
             <textarea className="jr-ad" rows={3} placeholder={t('jr.adPaste')} value={ad} onChange={ev => setAd(ev.target.value)} />
@@ -124,7 +116,12 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
               <a href={`https://duckduckgo.com/?q=${encodeURIComponent(`${a.company} ${a.role}`)}`} target="_blank" rel="noopener noreferrer">{t('jr.other')}</a>
             </div>
           </details>
-        )}
+        ) : <p className="jr-nogaps">{ICON_CHECK}{t('jr.nogaps')}</p>}
+      </div>
+      <p className="jr-step"><b className="jts-num">3.</b> <b>Job-Room:</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[0]}<b className="jr-bmname">JobTrack fill</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[1] ?? ''}</p>
+      <div className="jr-card" key={a.id}>
+        <p className="jr-head">{idx + 1}. {a.company}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}</p>
+        {missing.length > 0 && <p className="jr-warn">{t('jr.missing')}</p>}
 
         <p className="jr-q">{Q.when}</p>
         <Val k="date" label="Date" value={e.date} required />

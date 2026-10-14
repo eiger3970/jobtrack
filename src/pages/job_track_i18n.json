@@ -1251,14 +1251,14 @@
       "fr": "{n} semaines avec moins de 2 recherches"
     },
     "jr.flow1": {
-      "en": "work-efforts -> {month} -> +Enter -> click JobTrack fill (bookmarks bar) -> check -> Save (red, bottom right) -> then back here: Entered in Job-Room",
-      "de": "work-efforts -> {month} -> +Enter -> JobTrack fill klicken (Lesezeichenleiste) -> prüfen -> Speichern (rot, unten rechts) -> dann hier: In Job-Room erfasst",
-      "fr": "work-efforts -> {month} -> +Enter -> cliquez JobTrack fill (favoris) -> vérifiez -> Enregistrer (rouge, en bas à droite) -> puis ici: Saisie dans Job-Room"
+      "en": "work-efforts -> {month} -> +Enter -> click the JobTrack fill bookmark -> check -> Save (red, bottom right) -> then here: Entered in Job-Room (bottom of the card)",
+      "de": "work-efforts -> {month} -> +Enter -> Lesezeichen JobTrack fill klicken -> prüfen -> Speichern (rot, unten rechts) -> dann hier: In Job-Room erfasst (unten auf der Karte)",
+      "fr": "work-efforts -> {month} -> +Enter -> cliquez le favori JobTrack fill -> vérifiez -> Enregistrer (rouge, en bas à droite) -> puis ici: Saisie dans Job-Room (en bas de la carte)"
     },
     "jr.flow2": {
-      "en": "the job's card is below (the big box) - it's what JobTrack fill sends",
-      "de": "die Karte der Stelle ist unten (das grosse Feld) - die schickt JobTrack fill",
-      "fr": "la carte du poste est en dessous (le grand cadre) - c'est elle que JobTrack fill envoie"
+      "en": "tap a square below for the job to fill in",
+      "de": "unten ein Feld für die Stelle antippen",
+      "fr": "touchez un carré ci-dessous pour le poste à saisir"
     },
     "jr.bm.again": {
       "en": "One-click fill is set up - set up again",
@@ -1289,6 +1289,11 @@
       "en": "Details (counts, weeks, paper form)",
       "de": "Details (Zahlen, Wochen, Papierformular)",
       "fr": "Détails (chiffres, semaines, formulaire papier)"
+    },
+    "jr.nogaps": {
+      "en": "No gaps - nothing to fill",
+      "de": "Keine Lücken - nichts zu ergänzen",
+      "fr": "Aucun vide - rien à compléter"
     }
   }
 }
