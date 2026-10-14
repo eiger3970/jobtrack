@@ -5,7 +5,7 @@ import './job_track.css'
 import JobTrackPro from './job_track_pro'
 import { type Application, type OrpMethod, ORP_DEFAULTS, jobRoomEntry } from '../lib/orp'
 import OrpPanel from './orp_panel'
-import JobTrackSync from './job_track_sync'
+import JobTrackSync, { clearComputer } from './job_track_sync'
 import BackupBar from './job_track_backup'
 import { linkFromHash, merge } from '../lib/jobtrack_sync'
 import { parseAd } from '../lib/ad_parse'
@@ -745,7 +745,7 @@ export default function JobTrack() {
         </div>
 
         {/* 2026-10-14 owner: computers get the choices bar (phone recommended), visible without scrolling */}
-        {!phoneDevice && <BackupBar lang={lang} apps={apps} snapshot={backupSnapshot} onSync={() => setSyncOpen(true)} onExport={exportBackup} />}
+        {!phoneDevice && <BackupBar lang={lang} apps={apps} snapshot={backupSnapshot} onSync={() => setSyncOpen(true)} onExport={exportBackup} onClear={() => { setApps([]); setTimeout(() => clearComputer(false), 0) }} />}
         <div className="stats">
           {quota && !editingQuota && (() => {
             const count = countInPeriod(apps, quota.period)

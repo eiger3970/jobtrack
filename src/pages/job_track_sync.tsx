@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { type Application } from '../lib/orp'
 import { isApp } from '../lib/platform'
@@ -40,7 +40,7 @@ function Points({ L }: { L: Tx }) {
     <ul className="jts-points">
       {/* 2026-10-14 owner: "Keep both, what does this mean ... Key, I don't understand" - plain words */}
       <li><b>{L('Changed on both devices?', 'Auf beiden Geräten geändert?', 'Modifié sur les deux appareils?')}</b> {L('Merged automatically into one entry. If the same detail differs, the other value is written into the notes - nothing is lost, no duplicates to hunt for.', 'Automatisch zu einem Eintrag zusammengeführt. Weicht dieselbe Angabe ab, steht der andere Wert in den Notizen - nichts geht verloren, keine Doppelten zu suchen.', "Fusionné automatiquement en une entrée. Si le même détail diffère, l'autre valeur est notée - rien n'est perdu, aucun doublon à chercher.")}</li>
-      <li><b>{L('The lock key', 'Der Schlüssel', 'La clé')}</b> {L('travels only from this screen to your phone camera, inside the QR code - never over the internet. Nobody else can open your list.', 'reist nur von diesem Bildschirm zur Handykamera, im QR-Code - nie übers Internet. Niemand sonst kann Ihre Liste öffnen.', "passe seulement de cet écran à la caméra du téléphone, dans le code QR - jamais par internet. Personne d'autre ne peut ouvrir votre liste.")}</li>
+      <li><b>{L('The padlock', 'Das Vorhängeschloss', 'Le cadenas')}</b> {L('(middle of the picture): only your phone and this computer can open it. Its key travels inside the QR code, from this screen to your phone camera - never over the internet.', '(Mitte des Bildes): nur Ihr Telefon und dieser Computer können es öffnen. Sein Schlüssel reist im QR-Code, von diesem Bildschirm zur Handykamera - nie übers Internet.', "(au milieu de l'image): seuls votre téléphone et cet ordinateur peuvent l'ouvrir. Sa clé voyage dans le code QR, de cet écran à la caméra du téléphone - jamais par internet.")}</li>
       <li><b>{L('Our server', 'Unser Server', 'Notre serveur')}</b> {L('passes on the locked list, sees only that 2 devices linked, keeps nothing.', 'reicht die verschlossene Liste weiter, sieht nur 2 verbundene Geräte, speichert nichts.', 'transmet la liste verrouillée, voit seulement 2 appareils liés, ne garde rien.')}</li>
     </ul>
   )
@@ -108,11 +108,38 @@ const onPhone = () => isApp() || /iPhone|iPod|Android/i.test(navigator.userAgent
 
 // 2026-10-14 owner: library computer -> sync to the phone, then clear it.
 // JobTrack only by default; the CV page's data isn't synced, so it's a separate tick.
-function clearComputer(withCv: boolean) {
+export function clearComputer(withCv: boolean) {
   try {
     for (const k of Object.keys(localStorage)) if (k.startsWith('kworld_jobtrack') || (withCv && k.startsWith('cvgen-'))) localStorage.removeItem(k)
     sessionStorage.clear()
   } catch { /* private mode - nothing stored anyway */ }
+}
+
+// 2026-10-14 owner: the Clear button "could wipe hours of work" - amber, with a
+// warning, and a confirm step that says what is safe where. Also offered on the
+// main screen after a sync (job_track_backup.tsx), where it can't be missed.
+export const SYNCED_KEY = 'kworld_jobtrack_synced'
+export function lastSync(): { at: number; n: number } | null {
+  try { return JSON.parse(sessionStorage.getItem(SYNCED_KEY) || 'null') } catch { return null }
+}
+const WARN = <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" /></svg>
+
+export function ClearBox({ L, n, at, onClear, extra }: { L: Tx; n: number; at: number; onClear: () => void; extra?: React.ReactNode }) {
+  const [ask, setAsk] = useState(false)
+  const time = new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return ask ? (
+    <div className="jts-confirm">
+      <p className="jts-confirm-title">{WARN}{L('Delete JobTrack from this computer?', 'JobTrack von diesem Computer löschen?', 'Effacer JobTrack de cet ordinateur?')}</p>
+      <p>{L(`Your ${n} entries are safe on your phone (synced ${time}). Only this computer's copy is deleted.`, `Ihre ${n} Einträge sind sicher auf Ihrem Telefon (synchronisiert ${time}). Nur die Kopie auf diesem Computer wird gelöscht.`, `Vos ${n} entrées sont en sécurité sur votre téléphone (synchro ${time}). Seule la copie de cet ordinateur est effacée.`)}</p>
+      {extra}
+      <div className="jts-confirm-btns">
+        <button className="btn-secondary" onClick={() => setAsk(false)}>{L('Keep it', 'Behalten', 'Garder')}</button>
+        <button className="jts-clear-amber" onClick={onClear}>{WARN}{L('Yes, clear this computer', 'Ja, Computer leeren', 'Oui, vider cet ordinateur')}</button>
+      </div>
+    </div>
+  ) : (
+    <button className="jts-clear-amber" onClick={() => setAsk(true)}>{WARN}{L('Clear JobTrack from this computer', 'JobTrack von diesem Computer löschen', 'Effacer JobTrack de cet ordinateur')}</button>
+  )
 }
 
 export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onClose }: Props) {
@@ -162,6 +189,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
           adoptProfile(body.profile)
           void l?.send('result', { r, quota: quotaRef.current ?? body.quota ?? null, profile: readKey(ORP_PROFILE) })
           setResult(r); setState('done')
+          try { sessionStorage.setItem(SYNCED_KEY, JSON.stringify({ at: Date.now(), n: r.apps.length })) } catch { /* private mode */ }
         }
         if (phone && kind === 'result') {
           const r: MergeResult = body.r
@@ -207,8 +235,8 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
     <Done r={result} L={L} />
     {!phone && <div className="jts-shared">
       <p className="jts-step">{L('Shared or library computer? Clear it now:', 'Fremder oder Bibliotheks-Computer? Jetzt leeren:', 'Ordinateur partagé ou de bibliothèque? Videz-le maintenant:')}</p>
-      {hasCv && <label className="jts-check"><input type="checkbox" checked={withCv} onChange={e => setWithCv(e.target.checked)} />{L('Also my CV from the CV page (not synced - download it first)', 'Auch meinen Lebenslauf von der CV-Seite (nicht synchronisiert - zuerst herunterladen)', 'Aussi mon CV de la page CV (non synchronisé - téléchargez-le avant)')}</label>}
-      <button className="btn btn-glow" onClick={clearHere}>{L('Clear JobTrack from this computer', 'JobTrack von diesem Computer löschen', 'Effacer JobTrack de cet ordinateur')}</button>
+      <ClearBox L={L} n={result.apps.length} at={Date.now()} onClear={clearHere}
+        extra={hasCv && <label className="jts-check"><input type="checkbox" checked={withCv} onChange={e => setWithCv(e.target.checked)} />{L('Also my CV from the CV page (not synced - download it first)', 'Auch meinen Lebenslauf von der CV-Seite (nicht synchronisiert - zuerst herunterladen)', 'Aussi mon CV de la page CV (non synchronisé - téléchargez-le avant)')}</label>} />
     </div>}
   </>)
   else if (state === 'lost') body = (
@@ -237,7 +265,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
     {qr ? <img className="jts-qr" src={qr} alt={L('QR code to sync', 'QR-Code zum Synchronisieren', 'Code QR pour synchroniser')} /> : <div className="jts-qr" />}
     {state === 'syncing' && <p className="jts-wait"><span className="jts-spin" />{L('Syncing...', 'Synchronisiere...', 'Synchronisation...')}</p>}
     {/* 2026-10-14 owner: "where is this infernal one tap" - always in sight, unlocks after the sync */}
-    <button className="btn-secondary jts-clear-wait" disabled>{L('Clear JobTrack from this computer - after the sync', 'JobTrack von diesem Computer löschen - nach dem Sync', 'Effacer JobTrack de cet ordinateur - après la synchro')}</button>
+    <button className="jts-clear-amber jts-clear-wait" disabled>{L('Clear JobTrack from this computer - after the sync', 'JobTrack von diesem Computer löschen - nach dem Sync', 'Effacer JobTrack de cet ordinateur - après la synchro')}</button>
   </>)
 
   return (

@@ -414,3 +414,12 @@
 .jts-or { font-size: 0.7em; }
 .jts-words { display: block; text-align: center; font-size: 1.05rem; margin-top: 0.3rem; }
 .jts-clear-wait { display: block; width: 100%; margin: 0.2rem 0 0.6rem; opacity: 0.55; font-size: 0.8rem; }
+/* 2026-10-14 owner: Clear wipes this computer's list - amber, with a confirm step */
+.jts-clear-amber { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; width: 100%; padding: 0.6rem 0.8rem; border: 1.5px solid #ffbe3c; border-radius: 8px; background: rgba(255,190,60,0.12); color: #ffbe3c; font: inherit; font-weight: 700; cursor: pointer; }
+.jts-clear-amber:hover:not(:disabled) { background: rgba(255,190,60,0.22); }
+.jts-clear-amber:disabled { opacity: 0.45; cursor: default; font-weight: 400; }
+.jts-confirm { border: 1.5px solid #ffbe3c; border-radius: 8px; padding: 0.7rem 0.8rem; background: rgba(255,190,60,0.06); }
+.jts-confirm-title { display: flex; align-items: center; gap: 0.4rem; color: #ffbe3c; font-weight: 700; margin: 0 0 0.4rem; }
+.jts-confirm-btns { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+.jts-confirm-btns .jts-clear-amber { flex: 1; }
+.jtb-synced .jts-clear-amber, .jtb-synced .jts-confirm { max-width: 32rem; }

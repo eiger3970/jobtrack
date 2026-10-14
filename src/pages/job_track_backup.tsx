@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { type Application } from '../lib/orp'
 import { baseOf, key } from '../lib/jobtrack_sync'
-import { loadBase } from './job_track_sync'
+import { loadBase, lastSync, ClearBox } from './job_track_sync'
 
 // 2026-10-14 owner: "2 entries not backed up" + the choices, each with how
 // easy it is. Owner's ranking: this browser is easiest but fails on public
@@ -66,7 +66,7 @@ function Choices({ L, onSync, onExport, onKeep }: { L: Tx; onSync: () => void; o
   )
 }
 
-export default function BackupBar({ lang, apps, snapshot, onSync, onExport }: { lang: 'en' | 'de' | 'fr'; apps: Application[]; snapshot: string | null; onSync: () => void; onExport: () => void }) {
+export default function BackupBar({ lang, apps, snapshot, onSync, onExport, onClear }: { lang: 'en' | 'de' | 'fr'; apps: Application[]; snapshot: string | null; onSync: () => void; onExport: () => void; onClear: () => void }) {
   const L: Tx = (en, de, fr) => (lang === 'de' ? de : lang === 'fr' ? fr : en)
   const [, bump] = useState(0)
   const n = notBackedUp(apps, snapshot)
@@ -103,6 +103,18 @@ export default function BackupBar({ lang, apps, snapshot, onSync, onExport }: { 
     return () => window.removeEventListener('beforeunload', warn)
   }, [n])
 
+  // 2026-10-14 owner: after a sync, the Clear button where it can't be missed
+  const synced = lastSync()
+  const [cleared, setCleared] = useState(false)
+  if (cleared) return (
+    <div className="backup-reminder jtb-bar jtb-synced"><p className="jtb-head">{L('This computer is clear - last step: close this browser window.', 'Dieser Computer ist leer - letzter Schritt: Browserfenster schliessen.', 'Cet ordinateur est vidé - dernière étape: fermez la fenêtre du navigateur.')}</p></div>
+  )
+  if (n === 0 && synced && apps.length > 0) return (
+    <div className="backup-reminder jtb-bar jtb-synced">
+      <p className="jtb-head">{L(`Synced to your phone at ${new Date(synced.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. Shared or library computer?`, `Um ${new Date(synced.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} mit dem Telefon synchronisiert. Fremder oder Bibliotheks-Computer?`, `Synchronisé avec votre téléphone à ${new Date(synced.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. Ordinateur partagé ou de bibliothèque?`)}</p>
+      <ClearBox L={L} n={synced.n} at={synced.at} onClear={() => { onClear(); setCleared(true) }} />
+    </div>
+  )
   if (n === 0) return null
   const keep = () => { try { localStorage.setItem(KEPT, JSON.stringify(baseOf(apps))) } catch { /* private mode */ } setIdle(false); bump(x => x + 1) }
   const sync = () => { setIdle(false); onSync() }
