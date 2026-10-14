@@ -356,3 +356,7 @@
   .jt-min .howto-strip:hover .howto-go > span, .jt-min .toolbar:hover .export-btn-label, .jt-min .filter-bar:hover .jt-lbl { position: static; width: auto; height: auto; clip: auto; overflow: visible; }
 }
 @media (max-width: 600px) { .jt-min-toggle span { display: none; } }
+.jt-min .jt-note { display: none; }
+.jt-min .jt-one { display: block; max-width: 22rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jt-min .jt-cell-company .jt-one { max-width: 14rem; }
+@media (max-width: 700px) { .jt-min .jt-one { max-width: 11rem; } .jt-min .jt-cell-company .jt-one { max-width: 8rem; } }
