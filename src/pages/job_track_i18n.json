@@ -1059,6 +1059,11 @@
       "en": "duplicates joined",
       "de": "Doppelte zusammengelegt",
       "fr": "doublons réunis"
+    },
+    "stale.legend": {
+      "en": "Amber date = applied 4+ weeks ago and still \"Applied\" - usually a silent no. Check it, then change the status. White = recent.",
+      "de": "Oranges Datum = vor 4+ Wochen beworben und noch \"Beworben\" - meist eine stille Absage. Prüfen, dann Status ändern. Weiss = neu.",
+      "fr": "Date orange = candidature il y a 4+ semaines, toujours \"Postulé\" - souvent un non silencieux. Vérifiez, puis changez le statut. Blanc = récent."
     }
   }
 }

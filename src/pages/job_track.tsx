@@ -301,7 +301,7 @@ export default function JobTrack() {
     return () => document.removeEventListener('mousedown', onClickOutside)
   }, [])
 
-  // 2026-10-14 owner: columns left to right Date, Company, Role, Status, Cover, CV.
+  // 2026-10-14 owner: columns left to right Date, Company, Role, Cover, Status, CV.
   // 2026-09-25: user - "can the Company column be sorted by a-z to find?"
   // Company and Date headers sort the list; tap again to reverse.
   const [sortBy, setSortBy] = useState<{ col: 'date' | 'company'; asc: boolean }>({ col: 'date', asc: false })
@@ -873,11 +873,11 @@ export default function JobTrack() {
         <div style={{ overflowX: 'auto' }}>
           <table className="applications-table">
             <thead><tr>
-              <th className={sortCls('date')} aria-sort={sortBy.col === 'date' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}</th>
+              <th className={sortCls('date')} aria-sort={sortBy.col === 'date' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}<InfoTip text={t('stale.legend')} label={t('stale.legend')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} /></th>
               <th className={sortCls('company')} aria-sort={sortBy.col === 'company' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('company')} title="Sort A-Z"><HeaderIcon col="company" />{t('table.company')}{sortMark('company')}</th>
               <th><HeaderIcon col="role" />{t('table.role')}</th>
-              <th><HeaderIcon col="status" />{t('table.status')}</th>
               <th><HeaderIcon col="cover" />{t('table.cover')}</th>
+              <th><HeaderIcon col="status" />{t('table.status')}</th>
               <th><HeaderIcon col="cv" />{t('table.cv')}</th>
               <th><HeaderIcon col="next" />{t('table.next')}<InfoTip text={t('table.next.hint')} label={t('table.next.hint')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} /></th>
               <th><HeaderIcon col="actions" />{t('table.actions')}<InfoTip text={t('table.actions.hint')} label={t('table.actions.hint')} icon={<><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z" /></>} /></th>
@@ -890,6 +890,7 @@ export default function JobTrack() {
                   {/* 2026-10-14 owner: Minimal = one line per cell (full text on hover), notes hidden */}
                   <td className={'jt-cell-company' + (sortBy.col === 'company' ? ' jt-sorted-cell' : '')} title={a.company}><span className="jt-one">{a.company}</span>{a.notes && <span className="jt-note">{a.notes.split('\n').filter(Boolean).pop()}</span>}</td>
                   <td className="jt-cell-role" title={a.role}><span className="jt-one">{a.role}</span></td>
+                  <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.cover || '-'}</td>
                   <td>
                     <label className={`status-badge status-select-wrap status-${a.status}`}>
                       <StatusIcon status={a.status} />
@@ -899,7 +900,6 @@ export default function JobTrack() {
                       </select>
                     </label>
                   </td>
-                  <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.cover || '-'}</td>
                   <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.cv || '-'}</td>
                   <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.nextDate || '-'}</td>
                   <td>
