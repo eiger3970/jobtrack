@@ -340,3 +340,4 @@
 .jtb-why { font-size: 0.8rem; color: #d0d0e0; }
 .jtb-best .jtb-why { color: #00ff41; }
 .jtb-why a { color: #00ff41; }
+.jtb-warn { display: inline-flex; align-items: center; gap: 0.3rem; color: #ffbe3c; font-weight: 700; }

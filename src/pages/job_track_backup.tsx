@@ -35,15 +35,19 @@ function Ease({ n, L }: { n: 1 | 2 | 3; L: Tx }) {
   )
 }
 
-// 2026-10-14 owner order: phone first in all cases; a cloud drive only ranks
-// well once the cloud account + passphrase are already set up (digital life
-// in order); this browser last - not with you on the go, lost on public computers.
+// 2026-10-14 owner: phone on top (recommended), then easiest to hardest -
+// browser auto storage (amber warning: lost on public computers), cloud drive (only
+// once account + passphrase are set up), USB stick.
 function Choices({ L, onSync, onExport, onKeep }: { L: Tx; onSync: () => void; onExport: () => void; onKeep: () => void }) {
   return (
     <ul className="jtb-choices">
       <li className="jtb-best">
         <button className="btn btn-glow" onClick={onSync}>{L('Phone - scan a QR', 'Telefon - QR scannen', 'Téléphone - scanner un QR')}</button>
         <Ease n={3} L={L} /><span className="jtb-why">{L('Recommended - with you on the go, works on any computer, no login', 'Empfohlen - unterwegs dabei, geht an jedem Computer, ohne Login', 'Recommandé - avec vous partout, marche sur tout ordinateur, sans connexion')}</span>
+      </li>
+      <li>
+        <button className="btn-secondary" onClick={onKeep}>{L('Browser auto storage', 'Browser-Autospeicher', 'Stockage auto du navigateur')}</button>
+        <Ease n={3} L={L} /><span className="jtb-why"><b className="jtb-warn"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" /></svg>{L('Lost on public or library computers.', 'Verloren an öffentlichen oder Bibliotheks-Computern.', 'Perdu sur un ordinateur public ou de bibliothèque.')}</b>{' '}{L('Not with you on the go.', 'Unterwegs nicht dabei.', 'Pas avec vous en déplacement.')}</span>
       </li>
       <li>
         <button className="btn-secondary" onClick={onExport}>{L('Cloud drive - save a file', 'Cloud-Speicher - Datei speichern', 'Cloud - enregistrer un fichier')}</button>
@@ -55,10 +59,6 @@ function Choices({ L, onSync, onExport, onKeep }: { L: Tx; onSync: () => void; o
       <li>
         <button className="btn-secondary" onClick={onExport}>{L('USB stick - save a file', 'USB-Stick - Datei speichern', 'Clé USB - enregistrer un fichier')}</button>
         <Ease n={1} L={L} /><span className="jtb-why">{L('Needs a USB stick with you', 'Braucht einen USB-Stick dabei', 'Il faut une clé USB sur vous')}</span>
-      </li>
-      <li>
-        <button className="btn-secondary" onClick={onKeep}>{L('Keep in this browser', 'In diesem Browser behalten', 'Garder dans ce navigateur')}</button>
-        <Ease n={3} L={L} /><span className="jtb-why">{L('Not with you on the go, lost on public or library computers', 'Unterwegs nicht dabei, verloren an öffentlichen oder Bibliotheks-Computern', 'Pas avec vous en déplacement, perdu sur un ordinateur public ou de bibliothèque')}</span>
       </li>
     </ul>
   )
