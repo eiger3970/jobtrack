@@ -81,21 +81,28 @@ export function fillJobRoom(d: FillPayload): Promise<string[]> {
     if (box) { if (!box.checked) box.click() } else mark(null, 'Vorstellungsgespräch')
   }
 
-  // Postal code / City is a lookup: type the postal code, then pick the matching suggestion
+  // Postal code / City is a lookup: type the postal code WITHOUT leaving the field (leaving
+  // closed the suggestion list - owner's test 2026-10-14: "1820" left red), wait for the
+  // list, click the matching city. No list in time -> cursor left in the field to pick by hand.
   return new Promise(resolve => {
     const city = q('postal-code')
     if (!city || !(d.postal || d.city)) { resolve(missed); return }
-    type('postal-code', d.postal || d.city, 'Postal code / City')
+    city.focus()
+    const v = d.postal || d.city
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(city, v)
+    city.dispatchEvent(new Event('input', { bubbles: true }))
+    city.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: v.slice(-1) }))
     let tries = 0
     const pick = () => {
-      const opts = [...document.querySelectorAll<HTMLElement>('[role="option"], .dropdown-item')]
+      const opts = [...document.querySelectorAll<HTMLElement>('[role="option"], ngb-typeahead-window .dropdown-item, .dropdown-menu .dropdown-item')]
+        .filter(o => o.offsetParent !== null)
       const want = (d.city || '').toLowerCase()
       const hit = opts.find(o => (o.textContent || '').toLowerCase().includes(want) && (!d.postal || (o.textContent || '').includes(d.postal))) ?? opts[0]
-      if (hit) { hit.click(); resolve(missed) }
-      else if (++tries < 20) setTimeout(pick, 150)
-      else { mark(city, 'Postal code / City'); resolve(missed) }
+      if (hit) { hit.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); hit.click(); resolve(missed) }
+      else if (++tries < 40) setTimeout(pick, 200)
+      else { mark(city, 'Postal code / City - pick the city from the list'); city.focus(); resolve(missed) }
     }
-    setTimeout(pick, 300)
+    setTimeout(pick, 400)
   })
 }
 
