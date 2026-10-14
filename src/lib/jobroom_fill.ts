@@ -106,5 +106,7 @@ if(!t||t.indexOf('"jobtrack"')<0)t=prompt('JobTrack: paste the copied entry (Ctr
 if(t.indexOf('"jobtrack"')<0){alert('JobTrack: copy an entry first (Job-Room helper -> Copy for Job-Room)');return}
 const d=JSON.parse(t);const fill=${fillJobRoom.toString()};
 const m=await fill(d);alert(m.length?'JobTrack filled the form. Check these (amber): '+m.join(', ')+'. Then Save.':'JobTrack filled the form. Check it, then Save.')})()`
-  return 'javascript:' + encodeURIComponent(body.replace(/\n/g, ''))
+  // void(...): a javascript: link that returns a value (the async function's Promise) makes
+  // the browser treat it as leaving the page - Job-Room then asked "Formular verlassen?" (owner's test 2026-10-14)
+  return 'javascript:void(' + encodeURIComponent(body.replace(/\n/g, '')) + ')'
 }
