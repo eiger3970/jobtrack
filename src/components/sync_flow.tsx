@@ -10,11 +10,11 @@
 const PHONE_D = 'M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z'
 const PC_D = 'M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z'
 
-// small padlock for the relay paths
-const MiniLock = ({ x, y }: { x: number; y: number }) => (
+// small padlock sealing an envelope (relay: the list travels inside, locked)
+const SealLock = ({ x, y }: { x: number; y: number }) => (
   <g>
-    <rect x={x} y={y + 4} width="14" height="11" rx="2" fill="#00ff41" />
-    <path d={`M${x + 3} ${y + 5}v-2.5a4 4 0 0 1 8 0v2.5`} fill="none" stroke="#00ff41" strokeWidth="1.8" />
+    <rect x={x} y={y + 3} width="9" height="7" rx="1.5" fill="#00ff41" stroke="#03020a" strokeWidth="0.8" />
+    <path d={`M${x + 2} ${y + 3.5}v-1.6a2.5 2.5 0 0 1 5 0v1.6`} fill="none" stroke="#00ff41" strokeWidth="1.3" />
   </g>
 )
 
@@ -52,14 +52,13 @@ export default function SyncFlow({ variant, label, lockTip, onLock, lockExpanded
         <rect x="139" y="15" width="22" height="8" rx="1.5" /><rect x="139" y="25" width="22" height="8" rx="1.5" />
       </g>
       <circle cx="143.5" cy="19" r="1.2" fill="#00ff41" /><circle cx="143.5" cy="29" r="1.2" fill="#00ff41" />
-      {variant === 'relay' && <MiniLock x={157} y={22} />}
       <path d="M44 81L131 38M262 86L169 38" stroke="#8a86a8" strokeWidth="1.6" strokeDasharray="4 4" />
-      {variant === 'direct' ? (<>
-        <rect x="70" y="50" width="16" height="11" rx="2" fill="#03020a" stroke="#8a86a8" strokeWidth="1.4" /><path d="M70 51l8 5 8-5" fill="none" stroke="#8a86a8" strokeWidth="1.2" />
-        <rect x="214" y="50" width="16" height="11" rx="2" fill="#03020a" stroke="#8a86a8" strokeWidth="1.4" /><path d="M214 51l8 5 8-5" fill="none" stroke="#8a86a8" strokeWidth="1.2" />
-      </>) : (<>
-        <MiniLock x={71} y={46} />
-        <MiniLock x={215} y={46} />
+      {/* envelopes on the way up: /transfer = the introduction note; JobTrack = the list, sealed with a lock */}
+      <rect x="70" y="50" width="16" height="11" rx="2" fill="#03020a" stroke="#8a86a8" strokeWidth="1.4" /><path d="M70 51l8 5 8-5" fill="none" stroke="#8a86a8" strokeWidth="1.2" />
+      <rect x="214" y="50" width="16" height="11" rx="2" fill="#03020a" stroke="#8a86a8" strokeWidth="1.4" /><path d="M214 51l8 5 8-5" fill="none" stroke="#8a86a8" strokeWidth="1.2" />
+      {variant === 'relay' && (<>
+        <SealLock x={80} y={55} />
+        <SealLock x={224} y={55} />
       </>)}
       <svg x="16" y="80" width="40" height="40" viewBox="0 0 24 24"><path fill="#00ff41" d={PHONE_D} /></svg>
       <svg x="244" y="80" width="40" height="40" viewBox="0 0 24 24"><path fill="#4488ff" d={PC_D} /></svg>
