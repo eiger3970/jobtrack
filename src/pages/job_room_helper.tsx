@@ -1,5 +1,9 @@
 import { useState } from 'react'
 import { type Application, type JobRoomEntry, JR_METHOD, jobRoomEntry, jobRoomMissing } from '../lib/orp'
+import { parseAd } from '../lib/ad_parse'
+
+// 2026-10-14: the date Job-Room's ENTER form was last checked against these fields
+const FORM_CHECKED = '14.10.2026'
 
 // 2026-10-14 owner: "build a proper complex product, with super simple user
 // UX ... as many details as possible to reduce kafkaesque bureaucracy push
@@ -30,11 +34,24 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
   const [i, setI] = useState(firstOpen)
   const [copied, setCopied] = useState('')
   const done = rows.filter(a => a.jobroomDone).length
+  const [ad, setAd] = useState('')
   if (rows.length === 0) return null
   const idx = Math.min(i, rows.length - 1)
   const a = rows[idx]
   const e = jobRoomEntry(a)
   const missing = jobRoomMissing(e)
+  // empty fields Job-Room asks for (required or not) - the ones worth finding
+  const gaps = ([['street', e.street], ['postal', e.postal], ['city', e.city], ['contactPerson', e.contactPerson], ['email', e.email], ['phone', e.phone], ['link', e.link]] as const)
+    .filter(([, v]) => !v).map(([k]) => t('jr.f.' + k))
+  function fillFromAd() {
+    const p = parseAd(ad)
+    const patch: Partial<Application> = {}
+    const put = (k: keyof Application, v: string | undefined, have: string) => { if (v && !have) (patch as any)[k] = v }
+    put('street', p.street, e.street); put('streetNo', p.streetNo, e.streetNo); put('postal', p.postal, e.postal); put('city', p.city, e.city)
+    put('contactPerson', p.contactPerson, e.contactPerson); put('email', p.email, e.email); put('phone', p.phone, e.phone); put('link', p.link, e.link)
+    if (Object.keys(patch).length) onUpdate(a.id, patch)
+    setAd('')
+  }
 
   async function copy(key: string, value: string) {
     try { await navigator.clipboard.writeText(value); setCopied(key); setTimeout(() => setCopied(''), 1200) } catch { /* no clipboard */ }
@@ -85,6 +102,20 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
       <div className="jr-card" key={a.id}>
         <p className="jr-head">{idx + 1}. {a.company}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}</p>
         {missing.length > 0 && <p className="jr-warn">{t('jr.missing')}</p>}
+        {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}
+        {gaps.length > 0 && (
+          <details className="jr-fill" open={missing.length > 0}>
+            <summary>{t('jr.fill')} ({gaps.join(', ')})</summary>
+            <textarea className="jr-ad" rows={3} placeholder={t('jr.adPaste')} value={ad} onChange={ev => setAd(ev.target.value)} />
+            <button type="button" className="btn-secondary" disabled={!ad.trim()} onClick={fillFromAd}>{t('jr.adFill')}</button>
+            <div className="jr-find">
+              <a href={`https://www.zefix.ch/en/search/entity/list?mainSearch=${encodeURIComponent(a.company)}`} target="_blank" rel="noopener noreferrer">{t('jr.zefix')}</a>
+              <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(a.company)}`} target="_blank" rel="noopener noreferrer">{t('jr.map')}</a>
+              <button type="button" className="jr-copy" onClick={() => copy('sent', a.company)}>{copied === 'sent' ? ICON_CHECK : t('jr.sent')}</button>
+              <a href="https://www.job-room.ch/job-search" target="_blank" rel="noopener noreferrer">{t('jr.search')}</a>
+            </div>
+          </details>
+        )}
 
         <p className="jr-q">{Q.when}</p>
         <Val k="date" label="Date" value={e.date} required />
@@ -120,6 +151,9 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
         <button type="button" className="btn-secondary" disabled={idx === rows.length - 1} onClick={() => setI(idx + 1)}>{t('jr.next')}</button>
       </div>
       {done === rows.length && <p className="jr-all">{ICON_CHECK}{t('jr.all')}</p>}
+      {/* 2026-10-14 owner: "what happens when the gov changes a field?" - the fields live in one place; a changed form is one tap away */}
+      <p className="jr-form-check">{t('jr.formChecked').replace('{date}', FORM_CHECKED)}{' '}
+        <a target="_blank" rel="noopener noreferrer" href={'/contact?service=' + encodeURIComponent('JobTrack') + '&msg=' + encodeURIComponent("Job-Room's ENTER form has changed. Field: ")}>{t('jr.formTell')}</a></p>
     </div>
   )
 }

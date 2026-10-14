@@ -450,3 +450,11 @@
   .applications-table td[colspan] { grid-column: 1 / -1; }
   .applications-table tbody tr:last-child td { border-radius: 0; }
 }
+/* 2026-10-14 fill the gaps on a Job-Room card */
+.jr-fill { margin: 0.4rem 0 0.2rem; border: 1px dashed #ffb000; border-radius: 8px; padding: 0.4rem 0.6rem; }
+.jr-fill summary { cursor: pointer; color: #ffb000; font-size: 0.82rem; font-weight: 700; }
+.modal-content .jr-ad { margin: 0.5rem 0 0.4rem; font-size: 0.78rem; }
+.jr-find { display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; margin-top: 0.5rem; font-size: 0.78rem; align-items: center; }
+.jr-find a { color: #00ff41; }
+.jr-form-check { font-size: 0.72rem; color: #8a86a8; margin-top: 0.8rem; }
+.jr-form-check a { color: #00ff41; }

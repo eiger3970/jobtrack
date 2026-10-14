@@ -1079,6 +1079,86 @@
       "en": "8 columns - scroll the table sideways for more",
       "de": "8 Spalten - Tabelle seitlich scrollen",
       "fr": "8 colonnes - faites défiler le tableau sur le côté"
+    },
+    "jr.fill": {
+      "en": "Fill the gaps",
+      "de": "Lücken füllen",
+      "fr": "Combler les vides"
+    },
+    "jr.adPaste": {
+      "en": "Paste the job ad here (open the ad -> Ctrl+A -> Ctrl+C)",
+      "de": "Inserat hier einfügen (Inserat öffnen -> Ctrl+A -> Ctrl+C)",
+      "fr": "Collez l'annonce ici (ouvrir l'annonce -> Ctrl+A -> Ctrl+C)"
+    },
+    "jr.adFill": {
+      "en": "Fill from the ad",
+      "de": "Aus dem Inserat füllen",
+      "fr": "Remplir depuis l'annonce"
+    },
+    "jr.zefix": {
+      "en": "Address: company register (Zefix)",
+      "de": "Adresse: Handelsregister (Zefix)",
+      "fr": "Adresse: registre du commerce (Zefix)"
+    },
+    "jr.map": {
+      "en": "Map",
+      "de": "Karte",
+      "fr": "Carte"
+    },
+    "jr.sent": {
+      "en": "Copy name - search your Sent mail",
+      "de": "Name kopieren - Gesendete Mails durchsuchen",
+      "fr": "Copier le nom - chercher dans vos mails envoyés"
+    },
+    "jr.search": {
+      "en": "Find the ad on Job-Room",
+      "de": "Inserat auf Job-Room suchen",
+      "fr": "Trouver l'annonce sur Job-Room"
+    },
+    "jr.formChecked": {
+      "en": "Matches Job-Room's ENTER form as of {date}. A field looks different?",
+      "de": "Entspricht dem ENTER-Formular von Job-Room, Stand {date}. Ein Feld sieht anders aus?",
+      "fr": "Correspond au formulaire ENTER de Job-Room au {date}. Un champ a changé?"
+    },
+    "jr.formTell": {
+      "en": "Tell us in one tap",
+      "de": "Mit einem Tipp melden",
+      "fr": "Dites-le en un geste"
+    },
+    "jr.f.street": {
+      "en": "street",
+      "de": "Strasse",
+      "fr": "rue"
+    },
+    "jr.f.postal": {
+      "en": "postal code",
+      "de": "PLZ",
+      "fr": "NPA"
+    },
+    "jr.f.city": {
+      "en": "city",
+      "de": "Ort",
+      "fr": "localité"
+    },
+    "jr.f.contactPerson": {
+      "en": "contact",
+      "de": "Kontakt",
+      "fr": "contact"
+    },
+    "jr.f.email": {
+      "en": "email",
+      "de": "E-Mail",
+      "fr": "e-mail"
+    },
+    "jr.f.phone": {
+      "en": "phone",
+      "de": "Telefon",
+      "fr": "téléphone"
+    },
+    "jr.f.link": {
+      "en": "link",
+      "de": "Link",
+      "fr": "lien"
     }
   }
 }
