@@ -187,9 +187,9 @@
       "fr": "CV"
     },
     "table.cover": {
-      "en": "Cover",
-      "de": "Anschreiben",
-      "fr": "Lettre"
+      "en": "Cover letter",
+      "de": "Motivationsschreiben",
+      "fr": "Lettre de motivation"
     },
     "table.next": {
       "en": "Next",
