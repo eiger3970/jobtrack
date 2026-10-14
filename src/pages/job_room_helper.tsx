@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { type Application, type JobRoomEntry, JR_METHOD, jobRoomEntry, jobRoomMissing } from '../lib/orp'
 import { parseAd } from '../lib/ad_parse'
-import { bookmarklet, fillPayload } from '../lib/jobroom_fill'
+import { bookmarklet, fillPayload, FILL_KEY } from '../lib/jobroom_fill'
 
 // 2026-10-14: the date Job-Room's ENTER form was last checked against these fields
 const FORM_CHECKED = '14.10.2026'
@@ -37,12 +37,14 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
   const done = rows.filter(a => a.jobroomDone).length
   const [ad, setAd] = useState('')
   const bm = useRef<HTMLAnchorElement>(null)
-  useEffect(() => { bm.current?.setAttribute('href', bookmarklet()) }, [rows.length])
+  useEffect(() => { bm.current?.setAttribute('href', bookmarklet(window.location.origin)) }, [rows.length])
   if (rows.length === 0) return null
   const idx = Math.min(i, rows.length - 1)
   const a = rows[idx]
   const e = jobRoomEntry(a)
   const missing = jobRoomMissing(e)
+  // the card on screen is what JobTrack fill (on Job-Room) picks up
+  try { localStorage.setItem(FILL_KEY, JSON.stringify(fillPayload(a))) } catch { /* private mode */ }
   // empty fields Job-Room asks for (required or not) - the ones worth finding
   const gaps = ([['street', e.street], ['postal', e.postal], ['city', e.city], ['contactPerson', e.contactPerson], ['email', e.email], ['phone', e.phone], ['link', e.link]] as const)
     .filter(([, v]) => !v).map(([k]) => t('jr.f.' + k))

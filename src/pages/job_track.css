@@ -486,3 +486,8 @@
 /* 2026-10-14 owner: the counts under Status use the same colours as the status badges/buttons */
 .jt-sc-applied { color: #3b82f6; } .jt-sc-screening { color: #8b5cf6; } .jt-sc-interview { color: #f59e0b; }
 .jt-sc-technical { color: #06b6d4; } .jt-sc-offer { color: #10b981; } .jt-sc-accepted { color: #8b5cf6; } .jt-sc-rejected { color: #ef4444; }
+.info-btn-amber { color: #ffb000; border-color: #ffb000; }
+.orp-date { display: flex; gap: 0.4rem; align-items: center; position: relative; }
+.modal-content .orp-date input[type="text"] { margin: 0; flex: 1; }
+.orp-date-native { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; right: 0; bottom: 0; }
+.orp-date-btn { background: #1a1a2a; border: 1px solid #2a2a3a; border-radius: 6px; color: #00ff41; padding: 0.5rem; cursor: pointer; }

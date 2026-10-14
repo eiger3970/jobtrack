@@ -6,6 +6,7 @@ import JobTrackPro from './job_track_pro'
 import { type Application, type OrpMethod, ORP_DEFAULTS, jobRoomEntry } from '../lib/orp'
 import OrpPanel from './orp_panel'
 import JobTrackSync, { clearComputer } from './job_track_sync'
+import { FILL_KEY } from '../lib/jobroom_fill'
 import BackupBar, { notBackedUp } from './job_track_backup'
 import { linkFromHash, merge } from '../lib/jobtrack_sync'
 import { parseAd } from '../lib/ad_parse'
@@ -250,6 +251,15 @@ export default function JobTrack() {
   }
 
   useEffect(() => { localStorage.setItem(STORAGE, JSON.stringify(apps)) }, [apps])
+  // 2026-10-14: opened by the JobTrack fill bookmark on Job-Room - hand over the card, close
+  useEffect(() => {
+    if (!new URLSearchParams(window.location.search).has('fill') || !window.opener) return
+    try {
+      const d = localStorage.getItem(FILL_KEY)
+      if (d) window.opener.postMessage(JSON.parse(d), 'https://www.job-room.ch')
+    } catch { /* nothing to hand over */ }
+    setTimeout(() => window.close(), 300)
+  }, [])
   // 2026-10-13: ORP reminders (1st, 4th, short weeks) re-planned with the real counts
   useEffect(() => { void planReminders(apps).catch(() => {}) }, [apps])
 
@@ -636,7 +646,7 @@ export default function JobTrack() {
             buttons" - the steps ARE the buttons now; their copies below are gone. */}
         <div className="howto-strip">
           <div className="howto-step">
-            <button type="button" className="howto-go howto-go-main" onClick={openAdd}>
+            <button type="button" className={'howto-go' + (apps.length === 0 ? ' howto-go-main' : '')} onClick={openAdd}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg>
               <span>{t('howto.add')}</span>
             </button>

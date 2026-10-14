@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { type Application, inRange, monthRange, swissDate } from '../lib/orp'
 import { buildOrpPdf, type OrpProfile } from '../lib/orp_pdf'
 import JobRoomHelper from './job_room_helper'
@@ -33,6 +33,8 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
   const [mode, setMode] = useState<'month' | 'before'>('month')
   const [busy, setBusy] = useState(false)
   const [info, setInfo] = useState(false)
+  const [regText, setRegText] = useState(() => (loadProfile().registered ? swissDate(loadProfile().registered) : ''))
+  const pickRef = useRef<HTMLInputElement>(null)
 
   function update(p: Partial<Saved>) {
     const next = { ...profile, ...p }
@@ -96,10 +98,19 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
         {mode === 'month' && <input type="month" value={month} onChange={e => setMonth(e.target.value)} />}
         {mode === 'before' && (<>
           <label className="modal-label orp-label-info">{t('orp.registered')}
-            <button type="button" className="info-btn" aria-label={t('orp.info.title')} onClick={() => setInfo(v => !v)}>i</button>
+            <button type="button" className="info-btn info-btn-amber" aria-label={t('orp.info.title')} onClick={() => setInfo(v => !v)}>i</button>
           </label>
           {info && <p className="orp-before-tip">{t('orp.beforeTip')}</p>}
-          <input type="date" value={profile.registered} onChange={e => update({ registered: e.target.value })} />
+          {/* 2026-10-14 owner: Swiss date format DD.MM.YYYY (the browser's own picker showed MM.DD.YYYY) */}
+          <div className="orp-date">
+            <input type="text" inputMode="numeric" placeholder="DD.MM.YYYY" value={regText}
+              onChange={e => { const v = e.target.value.replace(/[^0-9.]/g, ''); setRegText(v); const m = v.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); if (m) update({ registered: `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` }) }} />
+            <input ref={pickRef} type="date" lang="de-CH" className="orp-date-native" value={profile.registered} tabIndex={-1} aria-hidden="true"
+              onChange={e => { update({ registered: e.target.value }); setRegText(swissDate(e.target.value)) }} />
+            <button type="button" className="orp-date-btn" aria-label="Calendar" onClick={() => { try { pickRef.current?.showPicker() } catch { pickRef.current?.focus() } }}>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+            </button>
+          </div>
         </>)}
 
         {(mode === 'month' || profile.registered) && <p className="orp-count"><b>{rows.length}</b> {t('orp.searches')} · {swissDate(from)} - {swissDate(to)}</p>}

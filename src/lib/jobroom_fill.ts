@@ -106,14 +106,19 @@ export function fillJobRoom(d: FillPayload): Promise<string[]> {
   })
 }
 
-// The bookmark: reads JobTrack's copied entry (clipboard, or a paste box), fills, reports.
-export function bookmarklet(): string {
-  const body = `(async()=>{let t='';try{t=await navigator.clipboard.readText()}catch(e){}
-if(!t||t.indexOf('"jobtrack"')<0)t=prompt('JobTrack: paste the copied entry (Ctrl+V)')||'';
-if(t.indexOf('"jobtrack"')<0){alert('JobTrack: copy an entry first (Job-Room helper -> Copy for Job-Room)');return}
-const d=JSON.parse(t);const fill=${fillJobRoom.toString()};
-const m=await fill(d);alert(m.length?'JobTrack filled the form. Check these (amber): '+m.join(', ')+'. Then Save.':'JobTrack filled the form. Check it, then Save.')})()`
-  // void(...): a javascript: link that returns a value (the async function's Promise) makes
-  // the browser treat it as leaving the page - Job-Room then asked "Formular verlassen?" (owner's test 2026-10-14)
+// The bookmark (2026-10-14, owner's test: the clipboard came back empty and Firefox's
+// Paste prompts confused): it opens a small JobTrack window, which hands over the card
+// that is open in JobTrack and closes itself. Clipboard / paste box only as a fallback.
+export const FILL_KEY = 'kworld_jobtrack_fill_next'
+export function bookmarklet(origin: string): string {
+  const body = `(async()=>{const fill=${fillJobRoom.toString()};
+const done=async d=>{const m=await fill(d);alert(m.length?'JobTrack filled the form. Check these (amber): '+m.join(', ')+'. Then Save.':'JobTrack filled the form. Check it, then Save.')};
+let got=false;const on=e=>{if(e.origin!=='${origin}'||!e.data||!e.data.jobtrack||got)return;got=true;removeEventListener('message',on);done(e.data)};
+addEventListener('message',on);
+const w=open('${origin}/jobtrack?fill=1','jobtrackfill','width=360,height=200');
+setTimeout(async()=>{if(got)return;removeEventListener('message',on);try{w&&w.close()}catch(e){}
+let t='';try{t=await navigator.clipboard.readText()}catch(e){}
+if(!t||t.indexOf('"jobtrack"')<0)t=prompt('JobTrack: open JobTrack in another tab with the card showing, then try again - or paste a copied entry here (Ctrl+V)')||'';
+if(t.indexOf('"jobtrack"')<0)return;done(JSON.parse(t))},5000)})()`
   return 'javascript:void(' + encodeURIComponent(body.replace(/\n/g, '')) + ')'
 }

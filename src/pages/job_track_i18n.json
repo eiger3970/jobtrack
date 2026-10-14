@@ -1181,19 +1181,19 @@
       "fr": "Glissez-moi dans les favoris"
     },
     "jr.bm.s1": {
-      "en": "Here: Copy for Job-Room",
-      "de": "Hier: Für Job-Room kopieren",
-      "fr": "Ici: Copier pour Job-Room"
+      "en": "Here: open the card of the job (the big box below the numbers)",
+      "de": "Hier: die Karte der Stelle öffnen (das grosse Feld unter den Nummern)",
+      "fr": "Ici: ouvrez la carte du poste (le grand cadre sous les numéros)"
     },
     "jr.bm.s2": {
-      "en": "Job-Room -> work-efforts -> ENTER -> click JobTrack fill in the bookmarks bar",
-      "de": "Job-Room -> work-efforts -> ENTER -> in der Lesezeichenleiste JobTrack fill klicken",
-      "fr": "Job-Room -> work-efforts -> ENTER -> cliquez JobTrack fill dans les favoris"
+      "en": "Job-Room -> work-efforts -> ENTER -> close its notice -> click JobTrack fill in the bookmarks bar (a small window opens and closes by itself)",
+      "de": "Job-Room -> work-efforts -> ENTER -> Hinweis schliessen -> in der Lesezeichenleiste JobTrack fill klicken (ein kleines Fenster öffnet und schliesst sich)",
+      "fr": "Job-Room -> work-efforts -> ENTER -> fermez sa notice -> cliquez JobTrack fill dans les favoris (une petite fenêtre s'ouvre et se ferme seule)"
     },
     "jr.bm.s3": {
-      "en": "Check the form (anything amber needs you), Save, then Entered in Job-Room here",
-      "de": "Formular prüfen (Oranges braucht Sie), Speichern, dann hier In Job-Room erfasst",
-      "fr": "Vérifiez (l'orange a besoin de vous), Enregistrer, puis ici Saisie dans Job-Room"
+      "en": "Check the form (amber needs you), Save in Job-Room, then here: Entered in Job-Room",
+      "de": "Formular prüfen (Oranges braucht Sie), in Job-Room speichern, dann hier: In Job-Room erfasst",
+      "fr": "Vérifiez (l'orange a besoin de vous), Enregistrer dans Job-Room, puis ici: Saisie dans Job-Room"
     },
     "jr.copyFill": {
       "en": "Copy for Job-Room",
@@ -1216,9 +1216,9 @@
       "fr": "recherches"
     },
     "orp.beforeTip": {
-      "en": "Important: the office also counts your job searches from the 3 months BEFORE you registered. Enter them too - missing ones can cost days of benefits, and nobody may warn you.",
-      "de": "Wichtig: Das Amt zählt auch Ihre Bewerbungen der 3 Monate VOR der Anmeldung. Tragen Sie sie ein - fehlende können Taggelder kosten, und niemand warnt Sie vielleicht.",
-      "fr": "Important: l'office compte aussi vos recherches des 3 mois AVANT votre inscription. Saisissez-les - celles qui manquent peuvent coûter des jours d'indemnités, et personne ne vous préviendra peut-être."
+      "en": "Important: the office also counts your job searches from the 3 months BEFORE you registered. Enter them too - missing ones can cost days of benefits or delay your first payment, and nobody may warn you.",
+      "de": "Wichtig: Das Amt zählt auch Ihre Bewerbungen der 3 Monate VOR der Anmeldung. Tragen Sie sie ein - fehlende können Taggelder kosten oder die erste Zahlung verzögern, und niemand warnt Sie vielleicht.",
+      "fr": "Important: l'office compte aussi vos recherches des 3 mois AVANT votre inscription. Saisissez-les - celles qui manquent peuvent coûter des jours d'indemnités ou retarder le premier paiement, et personne ne vous préviendra peut-être."
     },
     "dk.white": {
       "en": "this period - counts for your quota",
