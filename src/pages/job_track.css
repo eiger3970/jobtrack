@@ -405,3 +405,8 @@
    column - there it goes under the button instead */
 .jts-panel .jtb-choices li { grid-template-columns: 1fr auto; }
 .jts-panel .jtb-why { grid-column: 1 / -1; margin-bottom: 0.3rem; }
+/* 2026-10-14 owner: which column drives the sort */
+.jt-sort-ic { vertical-align: -2px; margin-left: 0.25rem; opacity: 0.35; }
+.jt-sort-ic.on { opacity: 1; color: #00ff41; }
+.applications-table th.jt-sorted { background: rgba(0,255,65,0.12); box-shadow: inset 0 -2px 0 #00ff41; }
+.applications-table td.jt-sorted-cell { background: rgba(0,255,65,0.04); }

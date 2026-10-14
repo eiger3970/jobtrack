@@ -309,7 +309,14 @@ export default function JobTrack() {
   function sortOn(col: 'date' | 'company') {
     setSortBy(s => s.col === col ? { col, asc: !s.asc } : { col, asc: col === 'company' })
   }
-  const sortMark = (col: 'date' | 'company') => sortBy.col === col ? (sortBy.asc ? ' ▲' : ' ▼') : ''
+  // 2026-10-14 owner: make it clear which column drives the sort - the active one is
+  // highlighted with a solid arrow; the other sortable one shows a faint up/down hint.
+  const sortMark = (col: 'date' | 'company') => (
+    <svg className={'jt-sort-ic' + (sortBy.col === col ? ' on' : '')} viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+      <path fill="currentColor" d={sortBy.col !== col ? 'M12 5l4 5H8zm0 14l-4-5h8z' : sortBy.asc ? 'M12 6l6 8H6z' : 'M12 18l-6-8h12z'} />
+    </svg>
+  )
+  const sortCls = (col: 'date' | 'company') => 'jt-sortable' + (sortBy.col === col ? ' jt-sorted' : '')
 
   function openAdd() { setEditing(null); setOrpOpen(false); setAdText(''); setAdFilled(false); setForm({ company:'',role:'',date:new Date().toISOString().slice(0,10),status:'applied',cv:'',cover:'',nextDate:'',notes:'', ...ORP_DEFAULTS }); setModal(true) }
   function openEdit(a: App) {
@@ -863,9 +870,9 @@ export default function JobTrack() {
         <div style={{ overflowX: 'auto' }}>
           <table className="applications-table">
             <thead><tr>
-              <th className="jt-sortable" onClick={() => sortOn('company')} title="Sort A-Z"><HeaderIcon col="company" />{t('table.company')}{sortMark('company')}</th>
+              <th className={sortCls('company')} aria-sort={sortBy.col === 'company' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('company')} title="Sort A-Z"><HeaderIcon col="company" />{t('table.company')}{sortMark('company')}</th>
               <th><HeaderIcon col="role" />{t('table.role')}</th>
-              <th className="jt-sortable" onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}</th>
+              <th className={sortCls('date')} aria-sort={sortBy.col === 'date' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}</th>
               <th><HeaderIcon col="status" />{t('table.status')}</th>
               <th><HeaderIcon col="cv" />{t('table.cv')}</th>
               <th><HeaderIcon col="cover" />{t('table.cover')}</th>
@@ -877,9 +884,9 @@ export default function JobTrack() {
               {filtered.map(a => (
                 <tr key={a.id}>
                   {/* 2026-10-14 owner: Minimal = one line per cell (full text on hover), notes hidden */}
-                  <td className="jt-cell-company" title={a.company}><span className="jt-one">{a.company}</span>{a.notes && <span className="jt-note">{a.notes.split('\n').filter(Boolean).pop()}</span>}</td>
+                  <td className={'jt-cell-company' + (sortBy.col === 'company' ? ' jt-sorted-cell' : '')} title={a.company}><span className="jt-one">{a.company}</span>{a.notes && <span className="jt-note">{a.notes.split('\n').filter(Boolean).pop()}</span>}</td>
                   <td className="jt-cell-role" title={a.role}><span className="jt-one">{a.role}</span></td>
-                  <td className={isStale(a) ? 'jt-stale-date' : undefined} title={isStale(a) ? t('stale.hint') : undefined}>{a.date}{isStale(a) && <span className="jt-stale" title={t('stale.hint')}>{t('stale')}</span>}</td>
+                  <td className={[isStale(a) ? 'jt-stale-date' : '', sortBy.col === 'date' ? 'jt-sorted-cell' : ''].filter(Boolean).join(' ') || undefined} title={isStale(a) ? t('stale.hint') : undefined}>{a.date}{isStale(a) && <span className="jt-stale" title={t('stale.hint')}>{t('stale')}</span>}</td>
                   <td>
                     <label className={`status-badge status-select-wrap status-${a.status}`}>
                       <StatusIcon status={a.status} />
