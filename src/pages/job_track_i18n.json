@@ -1006,9 +1006,9 @@
       "fr": "saisies dans Job-Room"
     },
     "jr.where": {
-      "en": "Job-Room -> work-efforts -> {month} -> + Enter -> click JobTrack fill in the bookmarks bar",
-      "de": "Job-Room -> work-efforts -> {month} -> + Enter -> JobTrack fill in der Lesezeichenleiste klicken",
-      "fr": "Job-Room -> work-efforts -> {month} -> + Enter -> cliquez JobTrack fill dans les favoris"
+      "en": "Job-Room -> work-efforts -> {month} -> +Enter -> click JobTrack fill in the bookmarks bar",
+      "de": "Job-Room -> work-efforts -> {month} -> +Enter -> JobTrack fill in der Lesezeichenleiste klicken",
+      "fr": "Job-Room -> work-efforts -> {month} -> +Enter -> cliquez JobTrack fill dans les favoris"
     },
     "jr.missing": {
       "en": "Amber = Job-Room needs it - fill it in below first",
@@ -1186,9 +1186,9 @@
       "fr": "Ici: ouvrez la carte du poste (le grand cadre sous les numéros)"
     },
     "jr.bm.s2": {
-      "en": "Job-Room -> work-efforts -> + Enter -> click JobTrack fill in the bookmarks bar (a small window flashes and closes by itself)",
-      "de": "Job-Room -> work-efforts -> + Enter -> in der Lesezeichenleiste JobTrack fill klicken (ein kleines Fenster blinkt kurz auf)",
-      "fr": "Job-Room -> work-efforts -> + Enter -> cliquez JobTrack fill dans les favoris (une petite fenêtre s'ouvre et se ferme seule)"
+      "en": "Job-Room -> work-efforts -> +Enter -> click JobTrack fill in the bookmarks bar (a small window flashes and closes by itself)",
+      "de": "Job-Room -> work-efforts -> +Enter -> in der Lesezeichenleiste JobTrack fill klicken (ein kleines Fenster blinkt kurz auf)",
+      "fr": "Job-Room -> work-efforts -> +Enter -> cliquez JobTrack fill dans les favoris (une petite fenêtre s'ouvre et se ferme seule)"
     },
     "jr.bm.s3": {
       "en": "Check the form (amber needs you) -> Save (red button, bottom right) -> here: Entered in Job-Room",
