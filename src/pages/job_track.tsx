@@ -783,7 +783,7 @@ export default function JobTrack() {
             <input type="file" accept="application/json" ref={backupInputRef} style={{ display: 'none' }} onChange={importBackup} />
             <div className="import-btn-wrap" ref={importInfoRef}>
               <button className="btn-secondary export-btn" onClick={() => backupInputRef.current?.click()} title={t('backup.hint')}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                 <span className="export-btn-label">{backupImported ? t('backup.imported') : t('backup.import')}</span>
               </button>
               <button type="button" className="info-btn" aria-label={t('backup.importInfo.title')} onClick={() => setShowImportInfo(v => !v)}>i</button>
