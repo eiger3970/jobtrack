@@ -115,7 +115,7 @@ export function bookmarklet(origin: string): string {
 const done=async d=>{const m=await fill(d);alert(m.length?'JobTrack filled the form. Check these (amber): '+m.join(', ')+'. Then Save.':'JobTrack filled the form. Check it, then Save.')};
 let got=false;const on=e=>{if(e.origin!=='${origin}'||!e.data||!e.data.jobtrack||got)return;got=true;removeEventListener('message',on);done(e.data)};
 addEventListener('message',on);
-const w=open('${origin}/jobtrack?fill=1','jobtrackfill','width=360,height=200');
+const w=open('${origin}/jobtrack_fill.html','jobtrackfill','width=360,height=200');
 setTimeout(async()=>{if(got)return;removeEventListener('message',on);try{w&&w.close()}catch(e){}
 let t='';try{t=await navigator.clipboard.readText()}catch(e){}
 if(!t||t.indexOf('"jobtrack"')<0)t=prompt('JobTrack: open JobTrack in another tab with the card showing, then try again - or paste a copied entry here (Ctrl+V)')||'';
