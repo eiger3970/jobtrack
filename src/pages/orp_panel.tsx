@@ -61,10 +61,11 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
   const jobRoomMonth = useMemo(() => {
     if (mode === 'before' && profile.registered) {
       const d = new Date(profile.registered + 'T12:00:00'); d.setDate(1); d.setMonth(d.getMonth() - 1)
-      return `${MONTHS_FR[d.getMonth()]} ${d.getFullYear()}`
+      return d.toLocaleString(document.documentElement.lang || 'en', { month: 'long', year: 'numeric' })
     }
-    return label
-  }, [mode, profile.registered, label])
+    const [y, m] = month.split('-').map(Number)
+    return new Date(y, m - 1, 15).toLocaleString(document.documentElement.lang || 'en', { month: 'long', year: 'numeric' })
+  }, [mode, profile.registered, month])
 
   // weeks in the period with fewer than 2 searches (ORP minimum)
   const shortWeeks = useMemo(() => {

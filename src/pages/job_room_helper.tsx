@@ -95,7 +95,8 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
       <div className="jr-top">
         <p className="jr-progress"><b>{done}</b> / {rows.length} {t('jr.entered')}</p>
         <div className="jr-bar"><div style={{ width: `${(done / rows.length) * 100}%` }} /></div>
-        <p className="jr-where">{t('jr.where')} <b>{monthLabel}</b></p>
+        {/* 2026-10-14 owner: one line with the month - not repeated in the steps below */}
+        <p className="jr-where">{t('jr.where').split('{month}')[0]}<b>{monthLabel}</b>{t('jr.where').split('{month}')[1] ?? ''}</p>
       </div>
       {/* 2026-10-14 owner: Bitwarden-style fill - one bookmark, then one click per job on Job-Room */}
       <details className="jr-bm">
@@ -104,7 +105,6 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
         <a ref={bm} className="jr-bm-link" onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }} title={t('jr.bm.drag')}>JobTrack fill</a>
         <ol>
           <li>{t('jr.bm.s1')}</li>
-          <li>{t('jr.bm.s2')}</li>
           <li>{t('jr.bm.s3')}</li>
         </ol>
       </details>

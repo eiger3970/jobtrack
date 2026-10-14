@@ -1006,9 +1006,9 @@
       "fr": "saisies dans Job-Room"
     },
     "jr.where": {
-      "en": "Job-Room -> job-room.ch/work-efforts -> ENTER, in the month:",
-      "de": "Job-Room -> job-room.ch/work-efforts -> ENTER, im Monat:",
-      "fr": "Job-Room -> job-room.ch/work-efforts -> ENTER, dans le mois:"
+      "en": "Job-Room -> work-efforts -> {month} -> + Enter -> click JobTrack fill in the bookmarks bar",
+      "de": "Job-Room -> work-efforts -> {month} -> + Enter -> JobTrack fill in der Lesezeichenleiste klicken",
+      "fr": "Job-Room -> work-efforts -> {month} -> + Enter -> cliquez JobTrack fill dans les favoris"
     },
     "jr.missing": {
       "en": "Amber = Job-Room needs it - fill it in below first",
