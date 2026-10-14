@@ -28,8 +28,8 @@ const Q = {
 
 const ICON_CHECK = <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
 
-export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
-  rows: Application[]; monthLabel: string; onUpdate: (id: number, patch: Patch) => void; t: (k: string) => string
+export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }: {
+  rows: Application[]; monthLabel: string; onUpdate: (id: number, patch: Patch) => void; t: (k: string) => string; onSetup?: () => void
 }) {
   const firstOpen = Math.max(0, rows.findIndex(a => !a.jobroomDone))
   const [i, setI] = useState(firstOpen)
@@ -119,7 +119,9 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
           </div>
         ) : <p className="jr-nogaps">{ICON_CHECK}{t('jr.nogaps')}</p>}
       </div>
-      <p className="jr-step"><b className="jts-num">3.</b> <b>Job-Room:</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[0]}<b className="jr-bmname">JobTrack fill</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[1] ?? ''}</p>
+      <p className="jr-step"><b className="jts-num">3.</b> <b>Job-Room:</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[0]}<b className="jr-bmname">JobTrack fill</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[1] ?? ''}
+        {/* 2026-10-14 owner: the bookmark step must stay findable */}
+        {onSetup && <><br /><button type="button" className="jr-bm-again" onClick={onSetup}>{t('jr.noBookmark')}</button></>}</p>
       <div className="jr-card" key={a.id}>
         <p className="jr-head">{idx + 1}. {a.company}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}</p>
         {missing.length > 0 && <p className="jr-warn">{t('jr.missing')}</p>}

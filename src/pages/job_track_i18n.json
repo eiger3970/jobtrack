@@ -1294,6 +1294,11 @@
       "en": "No gaps - nothing to fill",
       "de": "Keine Lücken - nichts zu ergänzen",
       "fr": "Aucun vide - rien à compléter"
+    },
+    "jr.noBookmark": {
+      "en": "JobTrack fill not in your bookmarks bar yet? Add it here (once)",
+      "de": "JobTrack fill noch nicht in der Lesezeichenleiste? Hier hinzufügen (einmal)",
+      "fr": "JobTrack fill pas encore dans vos favoris? Ajoutez-le ici (une fois)"
     }
   }
 }

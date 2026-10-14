@@ -137,7 +137,7 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
           <p className="orp-choice">{mode === 'before' ? `${t('orp.before')} - ${swissDate(profile.registered)}` : jobRoomMonth}
             {' '}<button type="button" className="jr-bm-again" onClick={() => setStep('ask')}>{t('orp.change')}</button>
             {' · '}<button type="button" className="jr-bm-again" onClick={() => setStep('setup')}>{t('jr.bm.title')}</button></p>
-          <JobRoomHelper rows={rows} monthLabel={jobRoomMonth} onUpdate={onUpdate} t={t} />
+          <JobRoomHelper rows={rows} monthLabel={jobRoomMonth} onUpdate={onUpdate} t={t} onSetup={() => setStep('setup')} />
           <details className="orp-details">
             <summary>{t('orp.details2')}</summary>
             <p className="orp-count"><b>{rows.filter(a => a.jobroomDone).length}</b> / {rows.length} {t('jr.entered')} · {swissDate(from)} - {swissDate(to)}</p>
