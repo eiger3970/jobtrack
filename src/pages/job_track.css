@@ -521,3 +521,5 @@
 .jr-fill-opt .jr-fill-title { color: #8a86a8; font-weight: 400; cursor: pointer; }
 .jr-fill-need .jr-fill-title { cursor: pointer; }
 .jr-fill > .jr-nogaps { margin: 0 0 0.3rem; }
+/* 2026-10-14 owner didn't notice the step labels - bigger, green */
+.orp-stepno { font-size: 0.85rem; color: #00ff41; font-weight: 700; letter-spacing: 0.1em; }
