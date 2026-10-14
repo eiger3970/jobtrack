@@ -1251,9 +1251,9 @@
       "fr": "{n} semaines avec moins de 2 recherches"
     },
     "jr.flow1": {
-      "en": "work-efforts -> {month} -> +Enter -> click the JobTrack fill bookmark -> check -> Save (red, bottom right) -> then here: Entered in Job-Room (bottom of the card)",
-      "de": "work-efforts -> {month} -> +Enter -> Lesezeichen JobTrack fill klicken -> prüfen -> Speichern (rot, unten rechts) -> dann hier: In Job-Room erfasst (unten auf der Karte)",
-      "fr": "work-efforts -> {month} -> +Enter -> cliquez le favori JobTrack fill -> vérifiez -> Enregistrer (rouge, en bas à droite) -> puis ici: Saisie dans Job-Room (en bas de la carte)"
+      "en": "Efforts to find work (Arbeitsbemühungen / Recherches d'emploi) -> {month} -> +Enter -> tap JobTrack fill bookmark -> tap OK -> check -> tap Save (red, bottom right) -> then here: tap Entered in Job-Room (bottom of the card)",
+      "de": "Arbeitsbemühungen (Efforts to find work / Recherches d'emploi) -> {month} -> +Enter -> Lesezeichen JobTrack fill tippen -> OK tippen -> prüfen -> Speichern tippen (rot, unten rechts) -> dann hier: In Job-Room erfasst tippen (unten auf der Karte)",
+      "fr": "Recherches d'emploi (Arbeitsbemühungen / Efforts to find work) -> {month} -> +Enter -> touchez le favori JobTrack fill -> touchez OK -> vérifiez -> touchez Enregistrer (rouge, en bas à droite) -> puis ici: touchez Saisie dans Job-Room (en bas de la carte)"
     },
     "jr.flow2": {
       "en": "tap a square below for the job to fill in",
