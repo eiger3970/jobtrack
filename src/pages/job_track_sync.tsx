@@ -27,9 +27,26 @@ const ORP_PROFILE = 'kworld_jobtrack_orp_profile'
 function readKey(k: string): string | null { try { return localStorage.getItem(k) } catch { return null } }
 function adoptProfile(p: unknown) { if (typeof p === 'string' && p && !readKey(ORP_PROFILE)) try { localStorage.setItem(ORP_PROFILE, p) } catch { /* private mode */ } }
 
-const words = (room: string) => room.split('0').map((w, i) => (i === 0 ? w[0].toUpperCase() + w.slice(1) : w)).join('-')
+// 2026-10-14 owner: shown like a real passphrase - Capital + number on the first
+// word (Scorn5-most-ozone-frisk). The number comes from the room, so both screens match.
+const words = (room: string) => {
+  const n = [...room].reduce((a, c) => a + c.charCodeAt(0), 0) % 10
+  return room.split('0').map((w, i) => (i === 0 ? w[0].toUpperCase() + w.slice(1) + n : w)).join('-')
+}
 const PHONE_D = 'M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z'
 const PC_D = 'M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z'
+
+// Green padlock with the passphrase symbol (4 blocks, 3 hyphens - components/passphrase_icon.tsx)
+function Lock({ x, y, L }: { x: number; y: number; L: Tx }) {
+  return (
+    <a href="/passphrase#why" target="_blank" rel="noopener" aria-label={L('What a passphrase is', 'Was eine Passphrase ist', "Ce qu'est une phrase de passe")}>
+      <title>{L('Locked with a passphrase - tap to learn more', 'Mit Passphrase verschlossen - tippen für mehr', 'Verrouillé par une phrase de passe - touchez pour en savoir plus')}</title>
+      <rect x={x} y={y + 6} width="26" height="20" rx="3" fill="#00ff41" />
+      <path d={`M${x + 5} ${y + 7}v-4a8 8 0 0 1 16 0v4`} fill="none" stroke="#00ff41" strokeWidth="2.6" />
+      <svg x={x + 3} y={y + 11.5} width="20" height="10" viewBox="0 0 32 16" fill="none" stroke="#03020a" strokeWidth="2.6" strokeLinecap="round"><rect x="0.8" y="4" width="4.9" height="8" rx="1.8" /><rect x="9.3" y="4" width="4.9" height="8" rx="1.8" /><rect x="17.8" y="4" width="4.9" height="8" rx="1.8" /><rect x="26.3" y="4" width="4.9" height="8" rx="1.8" /><path d="M6.8 8h1.4M15.3 8h1.4M23.8 8h1.4" /></svg>
+    </a>
+  )
+}
 
 // Same look as /transfer's picture: phone and computer, the locked list passing
 // through our server, which sees only a locked box and two linked devices.
@@ -47,8 +64,9 @@ function SyncPicture({ L }: { L: Tx }) {
       <svg x="244" y="84" width="40" height="40" viewBox="0 0 24 24"><path fill="#f0eeff" d={PC_D} /></svg>
       <text x="36" y="136" textAnchor="middle" fontSize="9" fill="#8a86a8">{L('unlocked', 'offen', 'ouvert')}</text>
       <text x="264" y="136" textAnchor="middle" fontSize="9" fill="#8a86a8">{L('unlocked', 'offen', 'ouvert')}</text>
-      <rect x="70" y="60" width="14" height="12" rx="2" fill="#00ff41" /><path d="M73 61v-3a4 4 0 0 1 8 0v3" fill="none" stroke="#00ff41" strokeWidth="1.8" />
-      <rect x="216" y="60" width="14" height="12" rx="2" fill="#00ff41" /><path d="M219 61v-3a4 4 0 0 1 8 0v3" fill="none" stroke="#00ff41" strokeWidth="1.8" />
+      {/* 2026-10-14 owner: the passphrase symbol in each lock, tap -> what a passphrase is */}
+      <Lock x={64} y={56} L={L} />
+      <Lock x={210} y={56} L={L} />
     </svg>
   )
 }
@@ -247,7 +265,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
   else body = (<>
     {/* 2026-10-14 owner: a clear hint - sync first, then clear the shared computer */}
     <ol className="jts-steps">
-      <li>{L('Phone -> scan this QR: Camera app (phone browser) or JobTrack app -> Sync -> Scan the QR code', 'Telefon -> diesen QR scannen: Kamera-App (Telefon-Browser) oder JobTrack-App -> Sync -> QR-Code scannen', 'Téléphone -> scannez ce QR: app Appareil photo (navigateur) ou app JobTrack -> Sync -> Scanner le code QR')}</li>
+      <li>{L('Phone -> Camera -> point at this QR -> tap the link', 'Telefon -> Kamera -> auf diesen QR richten -> Link tippen', 'Téléphone -> Appareil photo -> visez ce QR -> touchez le lien')}<br /><span className="jts-or">{L('or JobTrack app -> Sync phone + computer -> Scan the QR code', 'oder JobTrack-App -> Sync Telefon + Computer -> QR-Code scannen', 'ou app JobTrack -> Sync téléphone + ordinateur -> Scanner le code QR')}</span></li>
       <li>{L('Shared or library computer: after the sync, tap Clear JobTrack from this computer', 'Fremder oder Bibliotheks-Computer: nach dem Sync auf JobTrack von diesem Computer löschen tippen', 'Ordinateur partagé ou de bibliothèque: après la synchro, touchez Effacer JobTrack de cet ordinateur')}</li>
     </ol>
     {qr ? <img className="jts-qr" src={qr} alt={L('QR code to sync', 'QR-Code zum Synchronisieren', 'Code QR pour synchroniser')} /> : <div className="jts-qr" />}
@@ -259,7 +277,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
       <div className="modal-content jts-panel" onClick={e => e.stopPropagation()}>
         <h2 className="jts-title">{title}</h2>
         {body}
-        {link && state !== 'done' && state !== 'lost' && state !== 'cleared' && <p className="jts-match">{L('Same words on both screens = your devices', 'Gleiche Wörter auf beiden Bildschirmen = Ihre Geräte', 'Mêmes mots sur les deux écrans = vos appareils')}: <code>{words(link.room)}</code></p>}
+        {link && state !== 'done' && state !== 'lost' && state !== 'cleared' && <p className="jts-match">{L('Same words on both screens = your devices are linked, secure and encrypted', 'Gleiche Wörter auf beiden Bildschirmen = Ihre Geräte sind verbunden, sicher und verschlüsselt', 'Mêmes mots sur les deux écrans = vos appareils sont liés, sécurisés et chiffrés')}: <code>{words(link.room)}</code></p>}
         {state !== 'cleared' && <><SyncPicture L={L} /><Points L={L} /></>}
         <div className="modal-buttons"><button className="btn-secondary" onClick={close}>{L('Close', 'Schliessen', 'Fermer')}</button></div>
       </div>

@@ -343,3 +343,4 @@
 .jtb-warn { display: inline-flex; align-items: center; gap: 0.3rem; color: #ffbe3c; font-weight: 700; }
 .jtb-flash { animation: jtb-flash 1.2s ease-in-out 4; }
 @keyframes jtb-flash { 50% { box-shadow: 0 0 0 3px #ffbe3c, 0 0 28px rgba(255,190,60,0.6); } }
+.jts-or { font-weight: 400; color: #d0d0e0; }
