@@ -40,7 +40,7 @@ function Points({ L }: { L: Tx }) {
     <ul className="jts-points">
       {/* 2026-10-14 owner: "Keep both, what does this mean ... Key, I don't understand" - plain words */}
       <li><b>{L('Changed on both devices?', 'Auf beiden Geräten geändert?', 'Modifié sur les deux appareils?')}</b> {L('Merged automatically into one entry. If the same detail differs, the other value is written into the notes - nothing is lost, no duplicates to hunt for.', 'Automatisch zu einem Eintrag zusammengeführt. Weicht dieselbe Angabe ab, steht der andere Wert in den Notizen - nichts geht verloren, keine Doppelten zu suchen.', "Fusionné automatiquement en une entrée. Si le même détail diffère, l'autre valeur est notée - rien n'est perdu, aucun doublon à chercher.")}</li>
-      <li><b>{L('The padlock', 'Das Vorhängeschloss', 'Le cadenas')}</b> {L('(middle of the picture): only your phone and this computer can open it. Its key travels inside the QR code, from this screen to your phone camera - never over the internet.', '(Mitte des Bildes): nur Ihr Telefon und dieser Computer können es öffnen. Sein Schlüssel reist im QR-Code, von diesem Bildschirm zur Handykamera - nie übers Internet.', "(au milieu de l'image): seuls votre téléphone et cet ordinateur peuvent l'ouvrir. Sa clé voyage dans le code QR, de cet écran à la caméra du téléphone - jamais par internet.")}</li>
+      <li><b>{L('The key', 'Der Schlüssel', 'La clé')}</b> {L('(middle of the picture): one secret key, made on this computer and handed to your phone inside the QR code - never over the internet. Only these two can open the locked list.', '(Mitte des Bildes): ein geheimer Schlüssel, auf diesem Computer erstellt und im QR-Code ans Telefon übergeben - nie übers Internet. Nur diese zwei öffnen die verschlossene Liste.', "(au milieu de l'image): une clé secrète, créée sur cet ordinateur et remise au téléphone dans le code QR - jamais par internet. Seuls ces deux peuvent ouvrir la liste verrouillée.")}</li>
       <li><b>{L('Our server', 'Unser Server', 'Notre serveur')}</b> {L('passes on the locked list, sees only that 2 devices linked, keeps nothing.', 'reicht die verschlossene Liste weiter, sieht nur 2 verbundene Geräte, speichert nichts.', 'transmet la liste verrouillée, voit seulement 2 appareils liés, ne garde rien.')}</li>
     </ul>
   )
@@ -278,7 +278,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
           {/* 2026-10-14 owner: same picture as /transfer - shared component, relay variant */}
           <SyncFlow variant="relay" className="trx-flow jts-flow"
             label={L('The lock key lives only on your phone and computer. Our server passes the list on, locked, and sees only that two devices linked.', 'Der Schlüssel liegt nur auf Telefon und Computer. Unser Server reicht die Liste verschlossen weiter und sieht nur, dass zwei Geräte verbunden sind.', "La clé n'existe que sur votre téléphone et votre ordinateur. Notre serveur transmet la liste verrouillée et voit seulement que deux appareils sont liés.")}
-            lockTip={L('Locked with a passphrase - tap to learn more', 'Mit Passphrase verschlossen - tippen für mehr', 'Verrouillé par une phrase de passe - touchez pour en savoir plus')}
+            lockTip={L('The secret key - tap to learn about passphrases', 'Der geheime Schlüssel - tippen, mehr über Passphrasen', 'La clé secrète - touchez pour en savoir plus')}
             onLock={() => window.open('/passphrase#why', '_blank', 'noopener')} />
           <Points L={L} />
         </>}

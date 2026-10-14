@@ -19,11 +19,11 @@ const SealLock = ({ x, y }: { x: number; y: number }) => (
 )
 
 // a page whose "text" is rows of passphrase blocks (short first line, longer ones below)
-function LockedList({ x, y }: { x: number; y: number }) {
-  const rows = [4, 7, 5, 6]
+function LockedList({ x, y, small = false }: { x: number; y: number; small?: boolean }) {
+  const rows = small ? [3, 5, 4] : [4, 7, 5, 6]
   return (
     <g>
-      <path d={`M${x} ${y}h16l5 5v22h-21z`} fill="#03020a" stroke="#f0eeff" strokeWidth="1.4" strokeLinejoin="round" />
+      <path d={small ? `M${x} ${y}h12l4 4v15h-16z` : `M${x} ${y}h16l5 5v22h-21z`} fill="#03020a" stroke={small ? '#8a86a8' : '#f0eeff'} strokeWidth="1.4" strokeLinejoin="round" />
       {rows.map((n, r) => (
         <g key={r}>
           {/* the hyphen line joining the blocks, like the passphrase symbol */}
@@ -54,11 +54,16 @@ export default function SyncFlow({ variant, label, lockTip, onLock, lockExpanded
       <circle cx="143.5" cy="19" r="1.2" fill="#00ff41" /><circle cx="143.5" cy="29" r="1.2" fill="#00ff41" />
       <path d="M44 81L131 38M262 86L169 38" stroke="#8a86a8" strokeWidth="1.6" strokeDasharray="4 4" />
       {/* envelopes on the way up: /transfer = the introduction note; JobTrack = the list, sealed with a lock */}
-      <rect x="70" y="50" width="16" height="11" rx="2" fill="#03020a" stroke="#8a86a8" strokeWidth="1.4" /><path d="M70 51l8 5 8-5" fill="none" stroke="#8a86a8" strokeWidth="1.2" />
-      <rect x="214" y="50" width="16" height="11" rx="2" fill="#03020a" stroke="#8a86a8" strokeWidth="1.4" /><path d="M214 51l8 5 8-5" fill="none" stroke="#8a86a8" strokeWidth="1.2" />
-      {variant === 'relay' && (<>
-        <SealLock x={80} y={55} />
-        <SealLock x={224} y={55} />
+      {variant === 'direct' ? (<>
+        {/* /transfer: the setup note - how phone and computer reach each other, no files */}
+        <rect x="70" y="50" width="16" height="11" rx="2" fill="#03020a" stroke="#8a86a8" strokeWidth="1.4" /><path d="M70 51l8 5 8-5" fill="none" stroke="#8a86a8" strokeWidth="1.2" />
+        <rect x="214" y="50" width="16" height="11" rx="2" fill="#03020a" stroke="#8a86a8" strokeWidth="1.4" /><path d="M214 51l8 5 8-5" fill="none" stroke="#8a86a8" strokeWidth="1.2" />
+      </>) : (<>
+        {/* JobTrack: the server only ever carries the list, locked */}
+        <LockedList x={68} y={44} small />
+        <SealLock x={80} y={58} />
+        <LockedList x={212} y={44} small />
+        <SealLock x={224} y={58} />
       </>)}
       <svg x="16" y="80" width="40" height="40" viewBox="0 0 24 24"><path fill="#00ff41" d={PHONE_D} /></svg>
       <svg x="244" y="80" width="40" height="40" viewBox="0 0 24 24"><path fill="#4488ff" d={PC_D} /></svg>
@@ -67,13 +72,17 @@ export default function SyncFlow({ variant, label, lockTip, onLock, lockExpanded
         onClick={onLock} onKeyDown={e => { if (onLock && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onLock() } }}>
         <title>{lockTip}</title>
         <rect x="128" y="80" width="44" height="40" fill="transparent" />
-        <rect x="139" y="95" width="22" height="18" rx="3" fill="#00ff41" /><path d="M143 96v-5a7 7 0 0 1 14 0v5" fill="none" stroke="#00ff41" strokeWidth="2.6" />
-        {/* the passphrase symbol inside the lock (4 blocks, 3 hyphens - components/passphrase_icon.tsx) */}
-        <svg x="141.5" y="99.5" width="17" height="8.5" viewBox="0 0 32 16" fill="none" stroke="#03020a" strokeWidth="2.6" strokeLinecap="round"><rect x="0.8" y="4" width="4.9" height="8" rx="1.8" /><rect x="9.3" y="4" width="4.9" height="8" rx="1.8" /><rect x="17.8" y="4" width="4.9" height="8" rx="1.8" /><rect x="26.3" y="4" width="4.9" height="8" rx="1.8" /><path d="M6.8 8h1.4M15.3 8h1.4M23.8 8h1.4" /></svg>
+        {/* 2026-10-14 owner: a KEY, not a padlock - one shared secret key, handed over in the QR code;
+            its teeth are passphrase blocks */}
+        <circle cx="140" cy="104" r="8" fill="none" stroke="#00ff41" strokeWidth="3.2" />
+        <circle cx="140" cy="104" r="2.6" fill="#00ff41" />
+        <path d="M148 104H171" stroke="#00ff41" strokeWidth="3.4" strokeLinecap="round" />
+        {[153, 158.5, 164].map(x => <rect key={x} x={x} y="105.5" width="3.6" height="6" rx="1.2" fill="#00ff41" />)}
       </g>
       {/* 2026-10-14 owner: the list itself, locked - lines of mini passphrase blocks instead of text */}
-      <LockedList x={90} y={90} />
-      <LockedList x={186} y={90} />
+      {/* /transfer only: the files go straight along the bottom line, locked. JobTrack's list
+          never goes direct - there the line only means "these two share the key". */}
+      {variant === 'direct' && <><LockedList x={90} y={90} /><LockedList x={186} y={90} /></>}
     </svg>
   )
 }
