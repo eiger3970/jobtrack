@@ -17,7 +17,8 @@ export const SIGNAL = import.meta.env.DEV && new URLSearchParams(window.location
 // it was right after its last sync (its "base"). Per entry:
 //  - same on both sides -> one
 //  - only one side changed it since its last sync -> that side's version
-//  - both changed it -> Keep Both (the phone's copy gets a new id)
+//  - both changed it -> merged field by field against the last sync (2026-10-14 owner:
+//    "can this be auto merged?"); Keep Both only when the SAME field changed differently
 //  - one side deleted it, the other didn't touch it -> deleted
 //  - one side deleted it, the other changed it -> kept
 export type Base = Record<number, string>
@@ -27,14 +28,37 @@ export function key(a: Application): string {
   return JSON.stringify(Object.keys(a).sort().map(k => [k, (a as any)[k] ?? '']).filter(([, v]) => v !== ''))
 }
 
-export interface MergeResult { apps: Application[]; fromPhone: number; fromComputer: number; both: number; removed: number }
+export interface MergeResult { apps: Application[]; fromPhone: number; fromComputer: number; both: number; removed: number; merged: number }
+
+// the entry as it was at the last sync (key() is sorted [field, value] pairs)
+function unkey(k: string | undefined): Record<string, unknown> | null {
+  if (k === undefined) return null
+  try { return Object.fromEntries(JSON.parse(k)) } catch { return null }
+}
+
+// 3-way per field: one side changed it -> take that side; both changed it the same way -> fine;
+// both changed it differently -> null (caller keeps both)
+function fieldMerge(base: Record<string, unknown>, p: Application, q: Application): Application | null {
+  const out: Record<string, unknown> = {}
+  const keys = new Set([...Object.keys(base), ...Object.keys(p), ...Object.keys(q)])
+  for (const k of keys) {
+    const b = base[k] ?? '', pv = (p as any)[k] ?? '', qv = (q as any)[k] ?? ''
+    const same = (x: unknown, y: unknown) => JSON.stringify(x) === JSON.stringify(y)
+    if (same(pv, qv)) out[k] = pv
+    else if (same(pv, b)) out[k] = qv
+    else if (same(qv, b)) out[k] = pv
+    else return null
+  }
+  for (const k of Object.keys(out)) if (out[k] === '') delete out[k]
+  return { ...(out as unknown as Application), id: p.id }
+}
 
 export function merge(pc: Application[], pcBase: Base, phone: Application[], phoneBase: Base): MergeResult {
   const P = new Map(pc.map(a => [a.id, a]))
   const Q = new Map(phone.map(a => [a.id, a]))
   const ids = [...new Set([...P.keys(), ...Q.keys()])]
   const out: Application[] = []
-  let fromPhone = 0, fromComputer = 0, both = 0, removed = 0
+  let fromPhone = 0, fromComputer = 0, both = 0, removed = 0, merged = 0
   let nextId = Math.max(Date.now(), ...ids) + 1
   for (const id of ids) {
     const p = P.get(id), q = Q.get(id)
@@ -44,7 +68,13 @@ export function merge(pc: Application[], pcBase: Base, phone: Application[], pho
       if (key(p) === key(q)) out.push(p)
       else if (!pChanged) { out.push(q); fromPhone++ }
       else if (!qChanged) { out.push(p); fromComputer++ }
-      else { out.push(p, { ...q, id: nextId++ }); both++ }
+      else {
+        // a common starting point is needed to tell who changed what
+        const base = pcBase[id] !== undefined && pcBase[id] === phoneBase[id] ? unkey(pcBase[id]) : null
+        const m = base ? fieldMerge(base, p, q) : null
+        if (m) { out.push(m); merged++ }
+        else { out.push(p, { ...q, id: nextId++ }); both++ }
+      }
     } else if (p) {
       // the phone had it and deleted it, the computer didn't touch it -> gone
       if (id in phoneBase && !pChanged) removed++
@@ -54,7 +84,7 @@ export function merge(pc: Application[], pcBase: Base, phone: Application[], pho
       else { out.push(q); if (!(id in pcBase)) fromPhone++ }
     }
   }
-  return { apps: out, fromPhone, fromComputer, both, removed }
+  return { apps: out, fromPhone, fromComputer, both, removed, merged }
 }
 
 // ── Link ──
