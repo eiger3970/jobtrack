@@ -1164,6 +1164,41 @@
       "en": "Search this job on other sites",
       "de": "Diese Stelle auf anderen Seiten suchen",
       "fr": "Chercher ce poste sur d'autres sites"
+    },
+    "jr.bm.title": {
+      "en": "Fill Job-Room in one click (set up once)",
+      "de": "Job-Room mit einem Klick ausfüllen (einmal einrichten)",
+      "fr": "Remplir Job-Room en un clic (à installer une fois)"
+    },
+    "jr.bm.once": {
+      "en": "Once: drag this green button to your bookmarks bar (Firefox: Ctrl+Shift+B shows the bar).",
+      "de": "Einmal: diesen grünen Knopf in die Lesezeichenleiste ziehen (Firefox: Ctrl+Shift+B zeigt die Leiste).",
+      "fr": "Une fois: glissez ce bouton vert dans la barre de favoris (Firefox: Ctrl+Maj+B affiche la barre)."
+    },
+    "jr.bm.drag": {
+      "en": "Drag me to the bookmarks bar",
+      "de": "In die Lesezeichenleiste ziehen",
+      "fr": "Glissez-moi dans les favoris"
+    },
+    "jr.bm.s1": {
+      "en": "Here: Copy for Job-Room",
+      "de": "Hier: Für Job-Room kopieren",
+      "fr": "Ici: Copier pour Job-Room"
+    },
+    "jr.bm.s2": {
+      "en": "Job-Room -> work-efforts -> ENTER -> click JobTrack fill in the bookmarks bar",
+      "de": "Job-Room -> work-efforts -> ENTER -> in der Lesezeichenleiste JobTrack fill klicken",
+      "fr": "Job-Room -> work-efforts -> ENTER -> cliquez JobTrack fill dans les favoris"
+    },
+    "jr.bm.s3": {
+      "en": "Check the form (anything amber needs you), Save, then Entered in Job-Room here",
+      "de": "Formular prüfen (Oranges braucht Sie), Speichern, dann hier In Job-Room erfasst",
+      "fr": "Vérifiez (l'orange a besoin de vous), Enregistrer, puis ici Saisie dans Job-Room"
+    },
+    "jr.copyFill": {
+      "en": "Copy for Job-Room",
+      "de": "Für Job-Room kopieren",
+      "fr": "Copier pour Job-Room"
     }
   }
 }

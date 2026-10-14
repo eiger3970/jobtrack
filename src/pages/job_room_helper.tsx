@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { type Application, type JobRoomEntry, JR_METHOD, jobRoomEntry, jobRoomMissing } from '../lib/orp'
 import { parseAd } from '../lib/ad_parse'
+import { bookmarklet, fillPayload } from '../lib/jobroom_fill'
 
 // 2026-10-14: the date Job-Room's ENTER form was last checked against these fields
 const FORM_CHECKED = '14.10.2026'
@@ -35,6 +36,8 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
   const [copied, setCopied] = useState('')
   const done = rows.filter(a => a.jobroomDone).length
   const [ad, setAd] = useState('')
+  const bm = useRef<HTMLAnchorElement>(null)
+  useEffect(() => { bm.current?.setAttribute('href', bookmarklet()) }, [rows.length])
   if (rows.length === 0) return null
   const idx = Math.min(i, rows.length - 1)
   const a = rows[idx]
@@ -92,6 +95,17 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
         <div className="jr-bar"><div style={{ width: `${(done / rows.length) * 100}%` }} /></div>
         <p className="jr-where">{t('jr.where')} <b>{monthLabel}</b></p>
       </div>
+      {/* 2026-10-14 owner: Bitwarden-style fill - one bookmark, then one click per job on Job-Room */}
+      <details className="jr-bm">
+        <summary>{t('jr.bm.title')}</summary>
+        <p>{t('jr.bm.once')}</p>
+        <a ref={bm} className="jr-bm-link" onClick={ev => ev.preventDefault()} title={t('jr.bm.drag')}>JobTrack fill</a>
+        <ol>
+          <li>{t('jr.bm.s1')}</li>
+          <li>{t('jr.bm.s2')}</li>
+          <li>{t('jr.bm.s3')}</li>
+        </ol>
+      </details>
       <div className="jr-dots" role="tablist">
         {rows.map((r, n) => (
           <button key={r.id} type="button" role="tab" aria-selected={n === idx} aria-label={`${n + 1}. ${r.company}`}
@@ -150,7 +164,10 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
         <button type="button" className="btn-secondary" disabled={idx === 0} onClick={() => setI(idx - 1)}>{t('jr.back')}</button>
         {a.jobroomDone
           ? <button type="button" className="btn-secondary" onClick={() => onUpdate(a.id, { jobroomDone: undefined })}>{t('jr.undo')}</button>
-          : <button type="button" className="btn btn-glow jr-entered" onClick={entered}>{ICON_CHECK}{t('jr.enteredBtn')}</button>}
+          : <>
+              <button type="button" className="btn-secondary jr-copyfill" onClick={() => copy('fill', JSON.stringify(fillPayload(a)))}>{copied === 'fill' ? ICON_CHECK : t('jr.copyFill')}</button>
+              <button type="button" className="btn btn-glow jr-entered" onClick={entered}>{ICON_CHECK}{t('jr.enteredBtn')}</button>
+            </>}
         <button type="button" className="btn-secondary" disabled={idx === rows.length - 1} onClick={() => setI(idx + 1)}>{t('jr.next')}</button>
       </div>
       {done === rows.length && <p className="jr-all">{ICON_CHECK}{t('jr.all')}</p>}
