@@ -12,6 +12,7 @@ import { parseAd } from '../lib/ad_parse'
 import { planReminders } from '../lib/reminders'
 import { saveFile, stamp } from '../lib/save_file'
 import { isApp } from '../lib/platform'
+import jobTrackIcon from '../assets/jobtrack_icon.svg'
 
 // same lookup pattern as home.tsx's getString - English fallback, then the raw key, never a blank string.
 function getString(key: string, lang: 'en' | 'de' | 'fr'): string {
@@ -583,10 +584,8 @@ export default function JobTrack() {
             glyph instead of the actual emoji colors. A real <svg> icon
             outside the clipped text isn't affected by that at all. */}
         <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="#00ff41" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '1.4rem', height: '1.4rem', flexShrink: 0 }}>
-            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-            <rect x="8" y="2" width="8" height="4" rx="1" />
-          </svg>
+          {/* 2026-10-14 owner: the app icon (clipboard + check + confetti) everywhere */}
+          <img src={jobTrackIcon} alt="" style={{ width: '2.4rem', height: '2.4rem', borderRadius: '22%', flexShrink: 0 }} />
           <span>{t('title')}</span>
         </h1>
 
