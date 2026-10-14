@@ -721,9 +721,9 @@
       "fr": "Uniquement dans ce navigateur, sur cet appareil - pas de compte cloud"
     },
     "info.point2": {
-      "en": "Not synced anywhere - a different browser or device won't see it",
-      "de": "Wird nirgendwo synchronisiert - ein anderer Browser oder ein anderes Gerät sieht es nicht",
-      "fr": "Pas de synchronisation - un autre navigateur ou appareil ne le verra pas"
+      "en": "Not synced on its own - Sync phone + computer puts the same list on your phone",
+      "de": "Nicht von selbst synchronisiert - Sync Telefon + Computer bringt dieselbe Liste aufs Telefon",
+      "fr": "Pas synchronisé tout seul - Sync téléphone + ordinateur met la même liste sur votre téléphone"
     },
     "info.point3": {
       "en": "Room for thousands of entries - no effect on speed or memory",
