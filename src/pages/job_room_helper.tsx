@@ -103,9 +103,10 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
       <div className="jr-step2"><b className="jts-num">2.</b> {a.company}
         {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}
         {gaps.length > 0 ? (
-          // 2026-10-14 owner: always open - the paste box must be seen straight away
-          <div className="jr-fill">
-            <p className="jr-fill-title">{t('jr.fill')} ({gaps.join(', ')})</p>
+          // 2026-10-14 owner: only push when Job-Room NEEDS something; optional gaps stay a quiet fold
+          <>{missing.length === 0 && <p className="jr-nogaps">{ICON_CHECK}{t('jr.allNeeded')}</p>}
+          <details className={'jr-fill' + (missing.length ? ' jr-fill-need' : ' jr-fill-opt')} open={missing.length > 0}>
+            <summary className="jr-fill-title">{missing.length ? `${t('jr.fill')} (${gaps.join(', ')})` : `${t('jr.optionalMore')} (${gaps.join(', ')})`}</summary>
             <textarea className="jr-ad" rows={3} placeholder={t('jr.adPaste')} value={ad} onChange={ev => setAd(ev.target.value)} />
             <button type="button" className="btn-secondary" disabled={!ad.trim()} onClick={fillFromAd}>{t('jr.adFill')}</button>
             <div className="jr-find">
@@ -116,7 +117,7 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
               {/* 2026-10-14 owner: a Jobup link was 404 - the same job was still live on ostjob.ch */}
               <a href={`https://duckduckgo.com/?q=${encodeURIComponent(`${a.company} ${a.role}`)}`} target="_blank" rel="noopener noreferrer">{t('jr.other')}</a>
             </div>
-          </div>
+          </details></>
         ) : <p className="jr-nogaps">{ICON_CHECK}{t('jr.nogaps')}</p>}
       </div>
       <p className="jr-step"><b className="jts-num">3.</b> <b>Job-Room:</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[0]}<b className="jr-bmname">JobTrack fill</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[1] ?? ''}

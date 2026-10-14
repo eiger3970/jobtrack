@@ -1334,6 +1334,16 @@
       "en": "Done - it's in my bookmarks bar",
       "de": "Fertig - es ist in meiner Lesezeichenleiste",
       "fr": "Fait - il est dans ma barre de favoris"
+    },
+    "jr.allNeeded": {
+      "en": "Everything Job-Room needs is here",
+      "de": "Alles, was Job-Room braucht, ist da",
+      "fr": "Tout ce dont Job-Room a besoin est là"
+    },
+    "jr.optionalMore": {
+      "en": "Add optional details",
+      "de": "Optionale Angaben ergänzen",
+      "fr": "Ajouter des détails facultatifs"
     }
   }
 }

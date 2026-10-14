@@ -517,3 +517,7 @@
 .orp-setup-how { color: #d0d0e0; font-size: 0.95rem; margin: 0 0 1rem; }
 .orp-setup-btn { font-size: 1.2rem; padding: 0.8rem 2rem !important; margin-bottom: 1.2rem; }
 .jr-bm-back { margin-top: 0.4rem; font-size: 0.8rem; }
+.jr-fill.jr-fill-opt { border-color: #2a2a3a; border-style: solid; }
+.jr-fill-opt .jr-fill-title { color: #8a86a8; font-weight: 400; cursor: pointer; }
+.jr-fill-need .jr-fill-title { cursor: pointer; }
+.jr-fill > .jr-nogaps { margin: 0 0 0.3rem; }
