@@ -87,13 +87,27 @@ export default function BackupBar({ lang, apps, snapshot, onSync, onExport }: { 
     return () => { document.title = document.title.replace(/^\(\d+\) /, '') }
   }, [n])
 
+  // 2026-10-14 owner: "Leave site?" only while something isn't backed up. The
+  // browser shows its own text (no custom words allowed), so the bar lights
+  // up at the same moment - Cancel lands right on the choices.
+  const [flash, setFlash] = useState(false)
+  useEffect(() => {
+    if (n === 0) return
+    const warn = (e: BeforeUnloadEvent) => {
+      // Save + write the cover letter: the entry is saved first, no warning (owner 2026-10-13)
+      if ((window as unknown as { kworldLeaving?: boolean }).kworldLeaving) return
+      e.preventDefault(); e.returnValue = ''; setFlash(true); window.scrollTo({ top: 0 }) }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [n])
+
   if (n === 0) return null
   const keep = () => { try { localStorage.setItem(KEPT, JSON.stringify(baseOf(apps))) } catch { /* private mode */ } setIdle(false); bump(x => x + 1) }
   const sync = () => { setIdle(false); onSync() }
   const exp = () => { setIdle(false); onExport() }
   const head = n === 1 ? L('1 entry not backed up', '1 Eintrag nicht gesichert', '1 entrée non sauvegardée') : L(`${n} entries not backed up`, `${n} Einträge nicht gesichert`, `${n} entrées non sauvegardées`)
   return (<>
-    <div className="backup-reminder jtb-bar" role="status">
+    <div className={'backup-reminder jtb-bar' + (flash ? ' jtb-flash' : '')} role="status" onAnimationEnd={() => setFlash(false)}>
       <p className="jtb-head">{head}</p>
       <Choices L={L} onSync={sync} onExport={exp} onKeep={keep} />
     </div>
