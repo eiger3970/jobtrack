@@ -59,6 +59,17 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
     setAd('')
   }
 
+  // the date is shown DD.MM.YYYY but stored YYYY-MM-DD; a date that doesn't parse is ignored
+  function save(field: keyof Application, v: string) {
+    if (field === 'date') {
+      const m = v.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/)
+      if (!m) return
+      v = `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`
+    }
+    if ((field === 'company' || field === 'role') && !v) return
+    onUpdate(a.id, { [field]: v } as Patch)
+  }
+
   async function copy(key: string, value: string) {
     try { await navigator.clipboard.writeText(value); setCopied(key); setTimeout(() => setCopied(''), 1200) } catch { /* no clipboard */ }
   }
@@ -70,19 +81,19 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
       {value && field && editKey === k
         ? <input className="jr-input" autoFocus defaultValue={value}
             onKeyDown={ev => { if (ev.key === 'Enter') (ev.target as HTMLInputElement).blur() }}
-            onBlur={ev => { onUpdate(a.id, { [field]: ev.target.value.trim() } as Patch); setEditKey('') }} />
+            onBlur={ev => { save(field, ev.target.value.trim()); setEditKey('') }} />
         : value
         // 2026-10-14 owner: tap the text itself to edit - no pencil step
         ? <span className={'jr-value' + (field ? ' jr-tapedit' : '')} role={field ? 'button' : undefined} tabIndex={field ? 0 : undefined}
             onClick={field ? () => setEditKey(k) : undefined} onKeyDown={field ? ev => { if (ev.key === 'Enter') setEditKey(k) } : undefined}>{value}</span>
         : field
           ? <input className="jr-input" placeholder={required ? t('jr.needed') : t('jr.optional')} defaultValue=""
-              onBlur={ev => { const v = ev.target.value.trim(); if (v) onUpdate(a.id, { [field]: v } as Patch) }} />
+              onBlur={ev => { const v = ev.target.value.trim(); if (v) save(field, v) }} />
           : <span className="jr-value jr-empty">-</span>}
       {value && editKey !== k && <span className="jr-acts">
         <button type="button" className="jr-copy" onClick={() => copy(k, value)}>{copied === k ? ICON_CHECK : t('orp.copy')}</button>
         {/* 2026-10-14 owner: a quick delete as well as edit */}
-        {field && <button type="button" className="jr-del" aria-label={t('action.delete')} title={t('action.delete')} onClick={() => onUpdate(a.id, { [field]: '' } as Patch)}>
+        {field && !['date', 'company', 'role'].includes(field) && <button type="button" className="jr-del" aria-label={t('action.delete')} title={t('action.delete')} onClick={() => onUpdate(a.id, { [field]: '' } as Patch)}>
           <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" /></svg></button>}
       </span>}
     </div>
@@ -142,11 +153,11 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
         {missing.length > 0 && <p className="jr-warn">{t('jr.missing')}</p>}
 
         <p className="jr-q">{Q.when}</p>
-        <Val k="date" label="Date" value={e.date} required />
+        <Val k="date" label="Date" field="date" value={e.date} required />
         <p className="jr-q">{Q.how}</p>
         <Pick label="" options={['Elektronisch', 'Brieflich', 'Persönlich', 'Telefonisch']} chosen={JR_METHOD[e.method]} />
         <p className="jr-q">{Q.where}</p>
-        <Val k="biz" label="Business" value={e.business} required />
+        <Val k="biz" label="Business" field="company" value={e.business} required />
         <Val k="street" label="Street" field="street" value={e.street} />
         <Val k="no" label="No." field="streetNo" value={e.streetNo} />
         <Val k="po" label="PO box no." field="poBox" value={e.poBox} />
@@ -157,7 +168,7 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
         <Val k="email" label="Email" field="email" value={e.email} />
         <Val k="phone" label="Phone number" field="phone" value={e.phone} />
         <p className="jr-q">{Q.job}</p>
-        <Val k="job" label="Job title" value={e.jobTitle} required />
+        <Val k="job" label="Job title" field="role" value={e.jobTitle} required />
         <Val k="link" label="Link zum Online-Formular" field="link" value={e.link} />
         <p className="jr-q">{Q.rav}</p>
         <Pick label="" options={['No', 'Yes']} chosen={e.assigned ? 'Yes' : 'No'} />
