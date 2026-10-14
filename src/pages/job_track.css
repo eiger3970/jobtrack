@@ -527,3 +527,5 @@
 .jr-bm-link.orp-setup-btn { font-size: 0.85rem; padding: 0.25rem 0.7rem !important; border-radius: 5px; }
 .orp-glow { animation: orp-glow 1.4s ease-in-out infinite; }
 @keyframes orp-glow { 50% { box-shadow: 0 0 0 4px rgba(0,255,65,0.35), 0 0 18px rgba(0,255,65,0.7); } }
+.jr-acts { display: inline-flex; gap: 0.3rem; }
+.jr-edit { border: 1px solid #2a2a3a; background: #1a1a2a; color: #00ff41; border-radius: 6px; padding: 0.25rem 0.4rem; cursor: pointer; }
