@@ -24,9 +24,15 @@ function LockedList({ x, y }: { x: number; y: number }) {
   return (
     <g>
       <path d={`M${x} ${y}h16l5 5v22h-21z`} fill="#03020a" stroke="#f0eeff" strokeWidth="1.4" strokeLinejoin="round" />
-      {rows.map((n, r) => Array.from({ length: n }, (_, i) => (
-        <rect key={`${r}-${i}`} x={x + 2.6 + i * 2.25} y={y + 6.5 + r * 5} width="1.5" height="2.6" rx="0.5" fill="#00ff41" />
-      )))}
+      {rows.map((n, r) => (
+        <g key={r}>
+          {/* the hyphen line joining the blocks, like the passphrase symbol */}
+          <path d={`M${x + 3.3} ${y + 7.8 + r * 5}h${(n - 1) * 2.25}`} stroke="#00ff41" strokeWidth="0.45" />
+          {Array.from({ length: n }, (_, i) => (
+            <rect key={i} x={x + 2.6 + i * 2.25} y={y + 6.5 + r * 5} width="1.4" height="2.6" rx="0.5" fill="#00ff41" />
+          ))}
+        </g>
+      ))}
     </g>
   )
 }
@@ -47,7 +53,7 @@ export default function SyncFlow({ variant, label, lockTip, onLock, lockExpanded
       </g>
       <circle cx="143.5" cy="19" r="1.2" fill="#00ff41" /><circle cx="143.5" cy="29" r="1.2" fill="#00ff41" />
       {variant === 'relay' && <MiniLock x={157} y={22} />}
-      <path d="M44 80L131 38M256 80L169 38" stroke="#8a86a8" strokeWidth="1.6" strokeDasharray="4 4" />
+      <path d="M44 81L131 38M262 86L169 38" stroke="#8a86a8" strokeWidth="1.6" strokeDasharray="4 4" />
       {variant === 'direct' ? (<>
         <rect x="70" y="50" width="16" height="11" rx="2" fill="#03020a" stroke="#8a86a8" strokeWidth="1.4" /><path d="M70 51l8 5 8-5" fill="none" stroke="#8a86a8" strokeWidth="1.2" />
         <rect x="214" y="50" width="16" height="11" rx="2" fill="#03020a" stroke="#8a86a8" strokeWidth="1.4" /><path d="M214 51l8 5 8-5" fill="none" stroke="#8a86a8" strokeWidth="1.2" />
