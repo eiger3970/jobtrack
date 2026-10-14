@@ -122,9 +122,9 @@
       "fr": "Ce qui est accepté"
     },
     "backup.importInfo.point1": {
-      "en": "Only a JobTrack backup file - the .json from \"Save backup\", made on this or another device",
-      "de": "Nur eine JobTrack-Sicherungsdatei - die .json aus \"Backup speichern\", auf diesem oder einem anderen Gerät erstellt",
-      "fr": "Seulement un fichier de sauvegarde JobTrack - le .json de \"Sauvegarder\", fait sur cet appareil ou un autre"
+      "en": "Only a JobTrack backup file - the .json from \"Save backup file\", made on this or another device",
+      "de": "Nur eine JobTrack-Sicherungsdatei - die .json aus \"Sicherungsdatei speichern\", auf diesem oder einem anderen Gerät erstellt",
+      "fr": "Seulement un fichier de sauvegarde JobTrack - le .json de \"Enregistrer la sauvegarde\", fait sur cet appareil ou un autre"
     },
     "backup.importInfo.point2": {
       "en": "Not a CV, cover letter, spreadsheet, or any other JSON file",
@@ -676,14 +676,14 @@
       "fr": "Mettre à jour depuis un e-mail"
     },
     "howto.private": {
-      "en": "4. Save backup",
-      "de": "4. Backup speichern",
-      "fr": "4. Sauvegarder"
+      "en": "4. Save backup file",
+      "de": "4. Sicherungsdatei speichern",
+      "fr": "4. Enregistrer la sauvegarde"
     },
     "howto.export": {
-      "en": "3. Export report",
-      "de": "3. Bericht exportieren",
-      "fr": "3. Exporter le rapport"
+      "en": "3. Report for the office (PDF)",
+      "de": "3. Bericht fürs Amt (PDF)",
+      "fr": "3. Rapport pour l'office (PDF)"
     },
     "close": {
       "en": "Close",
