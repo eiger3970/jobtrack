@@ -142,7 +142,7 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
               <path d="M120 88 l0 14 l4 -4 l3 6 l3 -1 l-3 -6 l5 0 z" fill="#f0eeff" stroke="#03020a" strokeWidth="0.8" />
             </svg>
             <p className="orp-setup-how">{t('jr.bm.how').split('\n').map((l, i) => <span key={i}>{i > 0 && <br />}{l}</span>)}</p>
-            <a ref={bm} className="jr-bm-link orp-setup-btn" onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }} title={t('jr.bm.drag')}>JobTrack fill</a>
+            <a ref={bm} className="jr-bm-link orp-setup-btn" onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }}>JobTrack fill</a>
             <button type="button" className="btn btn-glow orp-next" onClick={() => setStep('work')}>{t('jr.bm.done2')}</button>
           </div>
         )}
@@ -151,7 +151,7 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
           <p className="orp-stepno">{t('orp.step3of3')}</p>
           <p className="orp-choice">{mode === 'before' ? `${t('orp.before')} - ${swissDate(profile.registered)}` : jobRoomMonth}
             {' '}<button type="button" className="jr-bm-again" onClick={() => setStep('ask')}>{t('orp.change')}</button>
-            {' · '}<button type="button" className="jr-bm-again" onClick={() => setStep('setup')}>{t('jr.bm.title')}</button></p>
+</p>
           <JobRoomHelper rows={rows} monthLabel={jobRoomMonth} onUpdate={onUpdate} t={t} onSetup={() => setStep('setup')} />
           <details className="orp-details">
             <summary>{t('orp.details2')}</summary>
