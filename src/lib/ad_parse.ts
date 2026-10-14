@@ -58,7 +58,12 @@ export function parseAd(text: string): ParsedAd {
 
   const start = after(ls, /^(Employment start|Stellenantritt|Entrée en fonction)$/i)
   const duration = after(ls, /^(Employment duration|Anstellungsdauer|Durée de l'engagement)$/i)
-  const notes = [housing ? 'Staff housing offered' : '', start && `Start: ${start}`, duration].filter(Boolean).join(' · ')
+  // 2026-10-14 owner's real paste: Job-Room shows other sites' ads ("Jobup Vacant since : 09.10.2026",
+  // "found on an external website") - then the contact, email and apply link are on that site
+  const source = text.match(/^\s*([A-Za-z][\w.-]{1,30})\s+Vacant since/m)?.[1] ?? ''
+  const external = /found on an external website|auf einer externen Webseite|sur un site externe/i.test(text)
+  const notes = [housing ? 'Staff housing offered' : '', start && `Start: ${start}`, duration,
+    external && source ? `Ad from ${source} - contact, email and apply link are on ${source}` : ''].filter(Boolean).join(' · ')
 
   // a full address anywhere in the ad beats the bare work location ("Bahnhofstr. 1, 3954 Leukerbad")
   const fullAddr = text.match(/[A-ZÄÖÜ][\wäöüéèà.'-]+(?:\s[\wäöüéèà.'-]+)*\s\d+\s?[a-z]?,?\s+\d{4}\s+[A-ZÄÖÜ][\wäöüéèà' -]+/)?.[0] ?? ''
