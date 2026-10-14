@@ -74,10 +74,14 @@ export default function SyncFlow({ variant, label, lockTip, onLock, lockExpanded
         <rect x="128" y="80" width="44" height="40" fill="transparent" />
         {/* 2026-10-14 owner: a KEY, not a padlock - one shared secret key, handed over in the QR code;
             its teeth are passphrase blocks */}
-        <circle cx="140" cy="104" r="8" fill="none" stroke="#00ff41" strokeWidth="3.2" />
-        <circle cx="140" cy="104" r="2.6" fill="#00ff41" />
-        <path d="M148 104H171" stroke="#00ff41" strokeWidth="3.4" strokeLinecap="round" />
-        {[153, 158.5, 164].map(x => <rect key={x} x={x} y="105.5" width="3.6" height="6" rx="1.2" fill="#00ff41" />)}
+        {/* tip angled slightly up (owner 2026-10-14) */}
+        <g transform="rotate(-28 155 104)">
+          <circle cx="140" cy="104" r="8" fill="#0f0d1c" stroke="#00ff41" strokeWidth="3.2" />
+          <circle cx="140" cy="104" r="2.6" fill="#00ff41" />
+          <path d="M148 104H174" stroke="#00ff41" strokeWidth="3.4" strokeLinecap="round" />
+          {/* 4 teeth = the 4 blocks of the passphrase symbol */}
+          {[151.5, 157, 162.5, 168].map(x => <rect key={x} x={x} y="105.5" width="3.6" height="6" rx="1.2" fill="#00ff41" />)}
+        </g>
       </g>
       {/* 2026-10-14 owner: the list itself, locked - lines of mini passphrase blocks instead of text */}
       {/* /transfer only: the files go straight along the bottom line, locked. JobTrack's list
