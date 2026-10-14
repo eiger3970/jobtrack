@@ -51,7 +51,7 @@ function Choices({ L, onSync, onExport, onKeep }: { L: Tx; onSync: () => void; o
       </li>
       <li>
         <button className="btn-secondary" onClick={onExport}>{L('Cloud drive - save a file', 'Cloud-Speicher - Datei speichern', 'Cloud - enregistrer un fichier')}</button>
-        <Ease n={2} L={L} /><span className="jtb-why">{L('Only if your cloud account and passphrase are already set up - then upload the file. Not yet?', 'Nur wenn Cloud-Konto und Passphrase schon eingerichtet sind - dann die Datei hochladen. Noch nicht?', 'Seulement si votre compte cloud et votre phrase de passe sont déjà prêts - puis téléversez le fichier. Pas encore?')}{' '}
+        <Ease n={2} L={L} /><span className="jtb-why">{L('Cloud account and passphrase ready - then upload the file. Not yet?', 'Cloud-Konto und Passphrase bereit - dann die Datei hochladen. Noch nicht?', 'Compte cloud et phrase de passe prêts - puis téléversez le fichier. Pas encore?')}{' '}
           <a href="/security/personal#digital-life" target="_blank" rel="noopener">{L('Digital life in order', 'Digitaler Alltag im Griff', 'Vie numérique en ordre')}</a>{' + '}
           <a href="/passphrase" target="_blank" rel="noopener">{L('Passphrase', 'Passphrase', 'Phrase de passe')}</a>
         </span>
