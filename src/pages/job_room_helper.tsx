@@ -158,7 +158,6 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
         {a.jobroomDone
           ? <button type="button" className="btn-secondary" onClick={() => onUpdate(a.id, { jobroomDone: undefined })}>{t('jr.undo')}</button>
           : <>
-              <button type="button" className="btn-secondary jr-copyfill" onClick={() => copy('fill', JSON.stringify(fillPayload(a)))}>{copied === 'fill' ? ICON_CHECK : t('jr.copyFill')}</button>
               <button type="button" className="btn btn-glow jr-entered" onClick={entered}>{ICON_CHECK}{t('jr.enteredBtn')}</button>
             </>}
         <button type="button" className="btn-secondary" disabled={idx === rows.length - 1} onClick={() => setI(idx + 1)}>{t('jr.next')}</button>
