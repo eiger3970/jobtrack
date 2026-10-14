@@ -339,3 +339,4 @@
 .jtb-ease { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: #d0d0e0; }
 .jtb-why { font-size: 0.8rem; color: #d0d0e0; }
 .jtb-best .jtb-why { color: #00ff41; }
+.jtb-why a { color: #00ff41; }

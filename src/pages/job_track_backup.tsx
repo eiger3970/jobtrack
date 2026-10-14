@@ -5,7 +5,7 @@ import { loadBase } from './job_track_sync'
 
 // 2026-10-14 owner: "2 entries not backed up" + the choices, each with how
 // easy it is. Owner's ranking: this browser is easiest but fails on public
-// computers; a cloud account needs a login (hard when life is disorganised);
+// computers; a cloud account needs a login + passphrase set up (hard when life is disorganised);
 // a USB stick is often not at hand - so the phone (scan a QR) is the easiest
 // that really works. Plus a reminder after a few idle minutes.
 // Computers only - the phone keeps its own export banner.
@@ -35,20 +35,30 @@ function Ease({ n, L }: { n: 1 | 2 | 3; L: Tx }) {
   )
 }
 
+// 2026-10-14 owner order: phone first in all cases; a cloud drive only ranks
+// well once the cloud account + passphrase are already set up (digital life
+// in order); this browser last - not with you on the go, lost on public computers.
 function Choices({ L, onSync, onExport, onKeep }: { L: Tx; onSync: () => void; onExport: () => void; onKeep: () => void }) {
   return (
     <ul className="jtb-choices">
       <li className="jtb-best">
         <button className="btn btn-glow" onClick={onSync}>{L('Phone - scan a QR', 'Telefon - QR scannen', 'Téléphone - scanner un QR')}</button>
-        <Ease n={3} L={L} /><span className="jtb-why">{L('Recommended - works on any computer, no login', 'Empfohlen - geht an jedem Computer, ohne Login', 'Recommandé - marche sur tout ordinateur, sans connexion')}</span>
+        <Ease n={3} L={L} /><span className="jtb-why">{L('Recommended - with you on the go, works on any computer, no login', 'Empfohlen - unterwegs dabei, geht an jedem Computer, ohne Login', 'Recommandé - avec vous partout, marche sur tout ordinateur, sans connexion')}</span>
       </li>
       <li>
-        <button className="btn-secondary" onClick={onKeep}>{L('Keep in this browser', 'In diesem Browser behalten', 'Garder dans ce navigateur')}</button>
-        <Ease n={3} L={L} /><span className="jtb-why">{L('Your own computer only - lost on public or library computers', 'Nur eigener Computer - verloren an öffentlichen oder Bibliotheks-Computern', 'Votre ordinateur seulement - perdu sur un ordinateur public ou de bibliothèque')}</span>
+        <button className="btn-secondary" onClick={onExport}>{L('Cloud drive - save a file', 'Cloud-Speicher - Datei speichern', 'Cloud - enregistrer un fichier')}</button>
+        <Ease n={2} L={L} /><span className="jtb-why">{L('Only if your cloud account and passphrase are already set up - then upload the file. Not yet?', 'Nur wenn Cloud-Konto und Passphrase schon eingerichtet sind - dann die Datei hochladen. Noch nicht?', 'Seulement si votre compte cloud et votre phrase de passe sont déjà prêts - puis téléversez le fichier. Pas encore?')}{' '}
+          <a href="/security/personal#digital-life" target="_blank" rel="noopener">{L('Digital life in order', 'Digitaler Alltag im Griff', 'Vie numérique en ordre')}</a>{' + '}
+          <a href="/passphrase" target="_blank" rel="noopener">{L('Passphrase', 'Passphrase', 'Phrase de passe')}</a>
+        </span>
       </li>
       <li>
         <button className="btn-secondary" onClick={onExport}>{L('USB stick - save a file', 'USB-Stick - Datei speichern', 'Clé USB - enregistrer un fichier')}</button>
         <Ease n={1} L={L} /><span className="jtb-why">{L('Needs a USB stick with you', 'Braucht einen USB-Stick dabei', 'Il faut une clé USB sur vous')}</span>
+      </li>
+      <li>
+        <button className="btn-secondary" onClick={onKeep}>{L('Keep in this browser', 'In diesem Browser behalten', 'Garder dans ce navigateur')}</button>
+        <Ease n={3} L={L} /><span className="jtb-why">{L('Not with you on the go, lost on public or library computers', 'Unterwegs nicht dabei, verloren an öffentlichen oder Bibliotheks-Computern', 'Pas avec vous en déplacement, perdu sur un ordinateur public ou de bibliothèque')}</span>
       </li>
     </ul>
   )
