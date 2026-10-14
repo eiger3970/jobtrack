@@ -27,6 +27,7 @@ export interface OrpFields {
   phone?: string
   link?: string        // ad or online application form
   jobroomDone?: string // ISO date it was entered in Job-Room
+  adText?: string      // 2026-10-14: the ad as pasted - proof if the ad page disappears (404)
 }
 
 export interface Application extends OrpFields {

@@ -1159,6 +1159,11 @@
       "en": "link",
       "de": "Link",
       "fr": "lien"
+    },
+    "jr.other": {
+      "en": "Search this job on other sites",
+      "de": "Diese Stelle auf anderen Seiten suchen",
+      "fr": "Chercher ce poste sur d'autres sites"
     }
   }
 }

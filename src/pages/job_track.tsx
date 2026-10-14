@@ -962,7 +962,8 @@ export default function JobTrack() {
                   setForm(f => ({ ...f, role: ad.role || f.role, company: ad.company || f.company, address: ad.address || f.address,
                     contact: ad.contact || f.contact, rate: ad.rate ?? f.rate, notes: [f.notes, ad.notes].filter(Boolean).join(' · '),
                     street: ad.street || f.street, streetNo: ad.streetNo || f.streetNo, postal: ad.postal || f.postal, city: ad.city || f.city,
-                    contactPerson: ad.contactPerson || f.contactPerson, email: ad.email || f.email, phone: ad.phone || f.phone, link: ad.link || f.link }))
+                    contactPerson: ad.contactPerson || f.contactPerson, email: ad.email || f.email, phone: ad.phone || f.phone, link: ad.link || f.link,
+                    adText: adText.slice(0, 20000) }))
                   setOrpOpen(true); setAdFilled(true)
                 }}>{t('ad.fill')}</button>
                 {adFilled && <p className="ad-done">{t('ad.check')}</p>}

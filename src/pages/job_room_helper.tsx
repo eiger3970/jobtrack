@@ -49,6 +49,7 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
     const put = (k: keyof Application, v: string | undefined, have: string) => { if (v && !have) (patch as any)[k] = v }
     put('street', p.street, e.street); put('streetNo', p.streetNo, e.streetNo); put('postal', p.postal, e.postal); put('city', p.city, e.city)
     put('contactPerson', p.contactPerson, e.contactPerson); put('email', p.email, e.email); put('phone', p.phone, e.phone); put('link', p.link, e.link)
+    if (!a.adText) patch.adText = ad.slice(0, 20000) // kept as proof if the ad page goes 404
     if (Object.keys(patch).length) onUpdate(a.id, patch)
     setAd('')
   }
@@ -113,6 +114,8 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
               <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(a.company)}`} target="_blank" rel="noopener noreferrer">{t('jr.map')}</a>
               <button type="button" className="jr-copy" onClick={() => copy('sent', a.company)}>{copied === 'sent' ? ICON_CHECK : t('jr.sent')}</button>
               <a href="https://www.job-room.ch/job-search" target="_blank" rel="noopener noreferrer">{t('jr.search')}</a>
+              {/* 2026-10-14 owner: a Jobup link was 404 - the same job was still live on ostjob.ch */}
+              <a href={`https://duckduckgo.com/?q=${encodeURIComponent(`${a.company} ${a.role}`)}`} target="_blank" rel="noopener noreferrer">{t('jr.other')}</a>
             </div>
           </details>
         )}
