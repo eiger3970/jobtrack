@@ -475,3 +475,8 @@
 .jt-sc { color: #d0d0e0; } .jt-sc-rejected { color: #ff6b6b; } .jt-sc-applied { color: #4d9dff; } .jt-sc-interview, .jt-sc-offer, .jt-sc-accepted { color: #00ff41; }
 .orp-before-tip { border-left: 3px solid #ffb000; padding: 0.4rem 0.6rem; background: rgba(255,176,0,0.08); color: #ffcf70; font-size: 0.8rem; margin: 0.5rem 0; }
 .orp-warn ul { margin: 0.2rem 0 0; padding-left: 1.2rem; }
+/* 2026-10-14 owner: minimal panel - one question first */
+.orp-q { font-weight: 700; margin: 0.2rem 0 0.5rem; }
+.orp-weeks { font-size: 0.8rem; color: #8a86a8; margin: 0.3rem 0 0.6rem; }
+.orp-weeks summary { cursor: pointer; }
+.orp-weeks ul { margin: 0.3rem 0 0; padding-left: 1.2rem; }

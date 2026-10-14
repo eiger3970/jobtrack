@@ -86,41 +86,33 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
     <div className="modal" onClick={onClose}>
       <div className="modal-content orp-panel" onClick={e => e.stopPropagation()}>
         <h3>{t('orp.title')}</h3>
-        {/* 2026-10-13 owner: "help how to use the ORP registration date, One
-            month, Before unemployment - add an i for info" */}
-        <label className="modal-label orp-label-info">{t('orp.registered')}
-          <button type="button" className="info-btn" aria-label={t('orp.info.title')} onClick={() => setInfo(v => !v)}>i</button>
-        </label>
-        {info && (
-          <div className="orp-info">
-            <p className="orp-info-quick">{t('orp.info.quick')}</p>
-            <ul>
-              <li><b>{t('orp.registered')}</b>: {t('orp.info.registered')}</li>
-              <li><b>{t('orp.month')}</b>: {t('orp.info.month')}</li>
-              <li><b>{t('orp.before')}</b>: {t('orp.info.before')}</li>
-            </ul>
-          </div>
-        )}
-        <input type="date" value={profile.registered} onChange={e => update({ registered: e.target.value })} />
-
+        {/* 2026-10-14 owner: "way too much text for timid job searchers - minimal on welcome,
+            the rest appears when needed". One question first, then only what that answer needs. */}
+        <p className="orp-q">{t('orp.which')}</p>
         <div className="orp-tabs">
           <button className={mode === 'month' ? 'btn' : 'btn-secondary'} onClick={() => setMode('month')}>{t('orp.month')}</button>
-          <button className={mode === 'before' ? 'btn' : 'btn-secondary'} disabled={!profile.registered} onClick={() => setMode('before')}>{t('orp.before')}</button>
+          <button className={mode === 'before' ? 'btn' : 'btn-secondary'} onClick={() => setMode('before')}>{t('orp.before')}</button>
         </div>
-        {/* 2026-10-14 owner: important for people the office won't warn */}
-        <p className="orp-before-tip">{t('orp.beforeTip')}</p>
         {mode === 'month' && <input type="month" value={month} onChange={e => setMonth(e.target.value)} />}
+        {mode === 'before' && (<>
+          <label className="modal-label orp-label-info">{t('orp.registered')}
+            <button type="button" className="info-btn" aria-label={t('orp.info.title')} onClick={() => setInfo(v => !v)}>i</button>
+          </label>
+          {info && <p className="orp-before-tip">{t('orp.beforeTip')}</p>}
+          <input type="date" value={profile.registered} onChange={e => update({ registered: e.target.value })} />
+        </>)}
 
-        <p className="orp-count"><b>{rows.length}</b> {t('orp.searches')} · {swissDate(from)} - {swissDate(to)}</p>
-        {shortWeeks.length > 0 && (
-          <div className="orp-warn"><p>{t('orp.shortWeeks')}</p><ul>{shortWeeks.map(([wk, n]) => <li key={wk}>{t('orp.weekOf')} {swissDate(wk)}: {n} {n === 1 ? t('orp.search1') : t('orp.searchN')}</li>)}</ul></div>
+        {(mode === 'month' || profile.registered) && <p className="orp-count"><b>{rows.length}</b> {t('orp.searches')} · {swissDate(from)} - {swissDate(to)}</p>}
+        {shortWeeks.length > 0 && (mode === 'month' || profile.registered) && (
+          <details className="orp-weeks">
+            <summary>{t('orp.weeksShort').replace('{n}', String(shortWeeks.length))}</summary>
+            <p>{t('orp.shortWeeks')}</p>
+            <ul>{shortWeeks.map(([wk, n]) => <li key={wk}>{t('orp.weekOf')} {swissDate(wk)}: {n} {n === 1 ? t('orp.search1') : t('orp.searchN')}</li>)}</ul>
+          </details>
         )}
 
-        {/* 2026-10-13 owner: "digital online is best" - Job-Room cards come
-            first; the paper-form PDF is only for an office that asks for it */}
-        <p className="orp-hint">{t('orp.jobroomHint')}</p>
         {/* 2026-10-14 owner: one card at a time, exactly like Job-Room's ENTER form */}
-        <JobRoomHelper rows={rows} monthLabel={jobRoomMonth} onUpdate={onUpdate} t={t} />
+        {(mode === 'month' || profile.registered) && <JobRoomHelper rows={rows} monthLabel={jobRoomMonth} onUpdate={onUpdate} t={t} />}
         <details className="orp-paper">
           <summary>{t('orp.paper')}</summary>
           <p className="orp-hint">{t('orp.needProfile')}</p>

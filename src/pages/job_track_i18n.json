@@ -851,9 +851,9 @@
       "fr": "recherches"
     },
     "orp.shortWeeks": {
-      "en": "Weeks with fewer than 2 job searches - the office may ask why:",
-      "de": "Wochen mit weniger als 2 Bewerbungen - das Amt fragt eventuell nach:",
-      "fr": "Semaines avec moins de 2 recherches - l'office peut demander pourquoi:"
+      "en": "The office usually expects about 2 job searches a week - it may ask about these weeks:",
+      "de": "Das Amt erwartet meist etwa 2 Bewerbungen pro Woche - es fragt eventuell nach diesen Wochen:",
+      "fr": "L'office attend en général environ 2 recherches par semaine - il peut demander pour ces semaines:"
     },
     "orp.pdf": {
       "en": "Make the 716.007 PDF",
@@ -1239,6 +1239,16 @@
       "en": "Not here: drag this green button to your bookmarks bar. Then open Job-Room -> work-efforts -> ENTER, and click JobTrack fill in the bookmarks bar.",
       "de": "Nicht hier: diesen grünen Knopf in die Lesezeichenleiste ziehen. Dann Job-Room -> work-efforts -> ENTER öffnen und dort in der Lesezeichenleiste JobTrack fill klicken.",
       "fr": "Pas ici: glissez ce bouton vert dans la barre de favoris. Puis ouvrez Job-Room -> work-efforts -> ENTER et cliquez JobTrack fill dans la barre de favoris."
+    },
+    "orp.which": {
+      "en": "Which job searches do you want to enter?",
+      "de": "Welche Bewerbungen möchten Sie eintragen?",
+      "fr": "Quelles recherches voulez-vous saisir?"
+    },
+    "orp.weeksShort": {
+      "en": "{n} weeks with fewer than 2 searches",
+      "de": "{n} Wochen mit weniger als 2 Bewerbungen",
+      "fr": "{n} semaines avec moins de 2 recherches"
     }
   }
 }
