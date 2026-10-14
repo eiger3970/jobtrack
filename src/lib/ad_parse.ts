@@ -3,11 +3,16 @@
 // Job-Room's robots.txt says "Do not crawl Job Adverts", so nothing is
 // fetched: only text the person copied from the page they already opened.
 
+import { splitAddress } from './orp'
+
 export interface ParsedAd {
   role: string
   company: string
   address: string
   contact: string
+  // 2026-10-14: Job-Room's form fields, picked out of the ad
+  street: string; streetNo: string; postal: string; city: string
+  contactPerson: string; email: string; phone: string; link: string
   rate?: number
   housing: boolean
   notes: string
@@ -55,5 +60,10 @@ export function parseAd(text: string): ParsedAd {
   const duration = after(ls, /^(Employment duration|Anstellungsdauer|Durée de l'engagement)$/i)
   const notes = [housing ? 'Staff housing offered' : '', start && `Start: ${start}`, duration].filter(Boolean).join(' · ')
 
-  return { role, company, address, contact, rate: rateMatch ? Number(rateMatch[1]) : undefined, housing, notes }
+  // a full address anywhere in the ad beats the bare work location ("Bahnhofstr. 1, 3954 Leukerbad")
+  const fullAddr = text.match(/[A-ZÄÖÜ][\wäöüéèà.'-]+(?:\s[\wäöüéèà.'-]+)*\s\d+\s?[a-z]?,?\s+\d{4}\s+[A-ZÄÖÜ][\wäöüéèà' -]+/)?.[0] ?? ''
+  const parts = splitAddress(fullAddr || address)
+  const link = text.match(/https?:\/\/[^\s<>"]+/)?.[0] ?? ''
+  return { role, company, address, contact, ...parts, contactPerson: person, email, phone, link,
+    rate: rateMatch ? Number(rateMatch[1]) : undefined, housing, notes }
 }

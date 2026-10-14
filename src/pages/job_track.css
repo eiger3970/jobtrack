@@ -363,3 +363,41 @@
 /* 2026-10-14 owner: Minimal - a stale date turns amber instead of a second-line "check" */
 .jt-min .jt-stale { display: none; }
 .jt-min .jt-stale-date { color: #ffb000; white-space: nowrap; }
+/* 2026-10-14 Job-Room fields in the form */
+.orp-row2 { display: flex; gap: 0.5rem; }
+.orp-row2 input { flex: 1; min-width: 0; }
+.orp-row2 .orp-short { flex: 0 0 6.5rem; }
+/* 2026-10-14 Job-Room helper - one card at a time, Job-Room's order */
+.jr { margin-top: 0.6rem; }
+.jr-top { margin-bottom: 0.6rem; }
+.jr-progress { margin: 0 0 0.3rem; font-size: 0.9rem; }
+.jr-progress b { color: #00ff41; font-size: 1.1rem; }
+.jr-bar { height: 6px; background: #2a2a3a; border-radius: 3px; overflow: hidden; }
+.jr-bar div { height: 100%; background: #00ff41; transition: width 0.3s; }
+.jr-where { font-size: 0.8rem; color: #d0d0e0; margin: 0.4rem 0 0; }
+.jr-where b { color: #00ff41; text-transform: capitalize; }
+.jr-dots { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.4rem 0 0.8rem; }
+.jr-dot { min-width: 1.9rem; height: 1.9rem; border-radius: 6px; border: 1px solid #2a2a3a; background: #1a1a2a; color: #d0d0e0; font: inherit; font-size: 0.72rem; cursor: pointer; }
+.jr-dot.need { border-color: #ffb000; color: #ffb000; }
+.jr-dot.done { background: rgba(0,255,65,0.15); border-color: #00ff41; color: #00ff41; }
+.jr-dot.cur { outline: 2px solid #f0eeff; outline-offset: 1px; }
+.jr-card { border: 1px solid rgba(0,255,65,0.35); border-radius: 10px; padding: 0.8rem 0.9rem; background: #0f0d1c; }
+.jr-head { font-weight: 700; color: #f0eeff; margin: 0 0 0.4rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.jr-done-tag { display: inline-flex; align-items: center; gap: 0.2rem; font-size: 0.75rem; color: #00ff41; border: 1px solid #00ff41; border-radius: 6px; padding: 0 0.35rem; }
+.jr-warn { color: #ffb000; font-size: 0.8rem; margin: 0 0 0.4rem; }
+.jr-q { font-size: 0.75rem; color: #00ff41; margin: 0.7rem 0 0.25rem; font-weight: 700; }
+.jr-row { display: grid; grid-template-columns: 9rem 1fr auto; align-items: center; gap: 0.5rem; padding: 0.2rem 0; font-size: 0.85rem; }
+.jr-label { color: #8a86a8; font-size: 0.78rem; }
+.jr-value { color: #f0eeff; overflow-wrap: anywhere; }
+.jr-empty { color: #4a4a5a; }
+.jr-need .jr-label { color: #ffb000; }
+.modal-content .jr-input { margin: 0; padding: 0.35rem 0.5rem; font-size: 0.82rem; }
+.jr-need .jr-input { border-color: #ffb000; }
+.jr-copy { border: 1px solid #2a2a3a; background: #1a1a2a; color: #00ff41; border-radius: 6px; font: inherit; font-size: 0.72rem; padding: 0.25rem 0.5rem; cursor: pointer; min-width: 3.4rem; display: inline-flex; justify-content: center; }
+.jr-picks { display: flex; flex-wrap: wrap; gap: 0.35rem; grid-column: 2 / -1; }
+.jr-pick { font-size: 0.78rem; padding: 0.15rem 0.5rem; border-radius: 6px; border: 1px solid #2a2a3a; color: #4a4a5a; display: inline-flex; align-items: center; gap: 0.2rem; }
+.jr-pick.on { border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.1); font-weight: 700; }
+.jr-nav { display: flex; gap: 0.5rem; justify-content: space-between; margin-top: 0.8rem; }
+.jr-entered { display: inline-flex; align-items: center; gap: 0.3rem; flex: 1; justify-content: center; }
+.jr-all { display: flex; align-items: center; gap: 0.4rem; color: #00ff41; font-weight: 700; margin-top: 0.8rem; }
+@media (max-width: 520px) { .jr-row { grid-template-columns: 6.5rem 1fr auto; } }

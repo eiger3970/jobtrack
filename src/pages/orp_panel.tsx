@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
-import { type Application, METHOD_FR, inRange, monthRange, orpResult, swissDate } from '../lib/orp'
+import { type Application, inRange, monthRange, swissDate } from '../lib/orp'
 import { buildOrpPdf, type OrpProfile } from '../lib/orp_pdf'
+import JobRoomHelper from './job_room_helper'
 import { saveFile, stamp } from '../lib/save_file'
 
 // 2026-10-13 owner: ORP paperwork in one place - the filled 716.007 PDF for
@@ -25,13 +26,12 @@ function weekKey(isoDate: string): string {
   return iso(d)
 }
 
-export default function OrpPanel({ apps, t, onClose }: { apps: Application[]; t: (k: string) => string; onClose: () => void }) {
+export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Application[]; t: (k: string) => string; onClose: () => void; onUpdate: (id: number, patch: Partial<Application>) => void }) {
   const [profile, setProfile] = useState<Saved>(loadProfile)
   const now = new Date()
   const [month, setMonth] = useState(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
   const [mode, setMode] = useState<'month' | 'before'>('month')
   const [busy, setBusy] = useState(false)
-  const [copied, setCopied] = useState('')
   const [info, setInfo] = useState(false)
 
   function update(p: Partial<Saved>) {
@@ -54,6 +54,15 @@ export default function OrpPanel({ apps, t, onClose }: { apps: Application[]; t:
   }, [mode, month, profile.registered])
 
   const rows = useMemo(() => inRange(apps, from, to), [apps, from, to])
+  // ORP Lausanne sheet (2026-10-14): searches before unemployment go into the
+  // Job-Room folder of the last month before registration
+  const jobRoomMonth = useMemo(() => {
+    if (mode === 'before' && profile.registered) {
+      const d = new Date(profile.registered + 'T12:00:00'); d.setDate(1); d.setMonth(d.getMonth() - 1)
+      return `${MONTHS_FR[d.getMonth()]} ${d.getFullYear()}`
+    }
+    return label
+  }, [mode, profile.registered, label])
 
   // weeks in the period with fewer than 2 searches (ORP minimum)
   const shortWeeks = useMemo(() => {
@@ -72,18 +81,6 @@ export default function OrpPanel({ apps, t, onClose }: { apps: Application[]; t:
       await saveFile(`${stamp()}_preuves_recherches_${slug}.pdf`, pdf, 'application/pdf')
     } finally { setBusy(false) }
   }
-
-  async function copy(key: string, value: string) {
-    try { await navigator.clipboard.writeText(value); setCopied(key); setTimeout(() => setCopied(''), 1500) } catch { /* no clipboard */ }
-  }
-
-  const Field = ({ id, name, value }: { id: string; name: string; value: string }) => (
-    <div className="orp-row">
-      <span className="orp-row-name">{name}</span>
-      <span className="orp-row-value">{value || '-'}</span>
-      {value && <button className="orp-copy" onClick={() => copy(id, value)}>{copied === id ? t('orp.copied') : t('orp.copy')}</button>}
-    </div>
-  )
 
   return (
     <div className="modal" onClick={onClose}>
@@ -120,23 +117,8 @@ export default function OrpPanel({ apps, t, onClose }: { apps: Application[]; t:
         {/* 2026-10-13 owner: "digital online is best" - Job-Room cards come
             first; the paper-form PDF is only for an office that asks for it */}
         <p className="orp-hint">{t('orp.jobroomHint')}</p>
-        {rows.length > 0 && (
-          <div className="orp-cards">
-            {rows.map((a, i) => (
-              <div key={a.id} className="orp-card">
-                <p className="orp-card-head">{i + 1}. {swissDate(a.date)} - {a.company}</p>
-                <Field id={`${a.id}d`} name="Date" value={swissDate(a.date)} />
-                <Field id={`${a.id}c`} name="Entreprise" value={a.company} />
-                <Field id={`${a.id}a`} name="Adresse" value={a.address ?? ''} />
-                <Field id={`${a.id}p`} name="Contact" value={a.contact ?? ''} />
-                <Field id={`${a.id}r`} name="Poste" value={a.role} />
-                <Field id={`${a.id}m`} name="Offre" value={METHOD_FR[a.method ?? 'electronic']} />
-                <Field id={`${a.id}t`} name="Taux" value={(a.rate ?? 100) >= 100 ? 'plein temps' : `${a.rate}%`} />
-                <Field id={`${a.id}s`} name="Résultat" value={orpResult(a.status)} />
-              </div>
-            ))}
-          </div>
-        )}
+        {/* 2026-10-14 owner: one card at a time, exactly like Job-Room's ENTER form */}
+        <JobRoomHelper rows={rows} monthLabel={jobRoomMonth} onUpdate={onUpdate} t={t} />
         <details className="orp-paper">
           <summary>{t('orp.paper')}</summary>
           <p className="orp-hint">{t('orp.needProfile')}</p>

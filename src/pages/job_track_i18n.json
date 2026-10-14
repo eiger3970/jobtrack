@@ -954,6 +954,106 @@
       "en": "Save + write the cover letter",
       "de": "Speichern + Bewerbungsschreiben verfassen",
       "fr": "Enregistrer + rédiger la lettre"
+    },
+    "orp.street": {
+      "en": "Street",
+      "de": "Strasse",
+      "fr": "Rue"
+    },
+    "orp.no": {
+      "en": "No.",
+      "de": "Nr.",
+      "fr": "N°"
+    },
+    "orp.postal": {
+      "en": "Postal code",
+      "de": "PLZ",
+      "fr": "NPA"
+    },
+    "orp.city": {
+      "en": "City",
+      "de": "Ort",
+      "fr": "Localité"
+    },
+    "orp.contactPerson": {
+      "en": "Contact person",
+      "de": "Kontaktperson",
+      "fr": "Personne de contact"
+    },
+    "orp.email": {
+      "en": "Email you applied to",
+      "de": "E-Mail der Bewerbung",
+      "fr": "E-mail de la candidature"
+    },
+    "orp.phone": {
+      "en": "Phone",
+      "de": "Telefon",
+      "fr": "Téléphone"
+    },
+    "orp.link": {
+      "en": "Link to the ad or online form",
+      "de": "Link zum Inserat oder Online-Formular",
+      "fr": "Lien vers l'annonce ou le formulaire"
+    },
+    "orp.method.letter": {
+      "en": "By post (letter)",
+      "de": "Brieflich",
+      "fr": "Par courrier"
+    },
+    "jr.entered": {
+      "en": "entered in Job-Room",
+      "de": "in Job-Room erfasst",
+      "fr": "saisies dans Job-Room"
+    },
+    "jr.where": {
+      "en": "Job-Room -> job-room.ch/work-efforts -> ENTER, in the month:",
+      "de": "Job-Room -> job-room.ch/work-efforts -> ENTER, im Monat:",
+      "fr": "Job-Room -> job-room.ch/work-efforts -> ENTER, dans le mois:"
+    },
+    "jr.missing": {
+      "en": "Amber = Job-Room needs it - fill it in below first",
+      "de": "Orange = Job-Room braucht es - zuerst unten ausfüllen",
+      "fr": "Orange = Job-Room en a besoin - remplissez-le ci-dessous"
+    },
+    "jr.needed": {
+      "en": "needed - type it here",
+      "de": "nötig - hier eintippen",
+      "fr": "nécessaire - tapez ici"
+    },
+    "jr.optional": {
+      "en": "optional - add if you have it",
+      "de": "optional - falls vorhanden",
+      "fr": "facultatif - si vous l'avez"
+    },
+    "jr.doneTag": {
+      "en": "entered",
+      "de": "erfasst",
+      "fr": "saisie"
+    },
+    "jr.back": {
+      "en": "Back",
+      "de": "Zurück",
+      "fr": "Retour"
+    },
+    "jr.next": {
+      "en": "Next",
+      "de": "Weiter",
+      "fr": "Suivant"
+    },
+    "jr.undo": {
+      "en": "Not entered yet",
+      "de": "Noch nicht erfasst",
+      "fr": "Pas encore saisie"
+    },
+    "jr.enteredBtn": {
+      "en": "Entered in Job-Room",
+      "de": "In Job-Room erfasst",
+      "fr": "Saisie dans Job-Room"
+    },
+    "jr.all": {
+      "en": "All entered - now save the Job-Room page as a PDF (Ctrl+P) for your records",
+      "de": "Alle erfasst - jetzt die Job-Room-Seite als PDF sichern (Ctrl+P)",
+      "fr": "Tout est saisi - enregistrez la page Job-Room en PDF (Ctrl+P)"
     }
   }
 }

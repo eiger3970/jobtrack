@@ -1,5 +1,5 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
-import { type Application, METHOD_FR, orpResult, swissDate } from './orp'
+import { type Application, METHOD_FR, jobRoomEntry, orpResult, swissDate } from './orp'
 
 // 2026-10-13 owner: the ORP mails form 716.007 as Word files to print -
 // "homeless, papers get lost, stolen, damaged". Same columns, same order as
@@ -70,8 +70,9 @@ export async function buildOrpPdf(apps: Application[], profile: OrpProfile, peri
       x = 30
       const cells = a ? [
         swissDate(a.date),
-        [a.company, a.address].filter(Boolean).join(', '),
-        a.contact ?? '',
+        // 2026-10-14: the split Job-Room fields, joined back for the paper form
+        ((e) => [a.company, [e.street, e.streetNo].filter(Boolean).join(' '), [e.postal, e.city].filter(Boolean).join(' ')].filter(Boolean).join(', '))(jobRoomEntry(a)),
+        ((e) => [e.contactPerson, e.phone, e.email].filter(Boolean).join(', '))(jobRoomEntry(a)),
         a.role,
         a.assigned ? 'oui' : '',
         (a.rate ?? 100) >= 100 ? 'plein temps' : `partiel ${a.rate}%`,
