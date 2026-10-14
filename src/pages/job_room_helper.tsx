@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { type Application, type JobRoomEntry, JR_METHOD, jobRoomEntry, jobRoomMissing } from '../lib/orp'
 import { parseAd } from '../lib/ad_parse'
-import { bookmarklet, fillPayload, FILL_KEY } from '../lib/jobroom_fill'
+import { fillPayload, FILL_KEY } from '../lib/jobroom_fill'
 
 // 2026-10-14: the date Job-Room's ENTER form was last checked against these fields
 const FORM_CHECKED = '14.10.2026'
@@ -36,10 +36,6 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
   const [copied, setCopied] = useState('')
   const done = rows.filter(a => a.jobroomDone).length
   const [ad, setAd] = useState('')
-  const bm = useRef<HTMLAnchorElement>(null)
-  const fillUsed = (() => { try { return !!localStorage.getItem('kworld_jobtrack_fill_used') } catch { return false } })()
-  const [setupOpen, setSetupOpen] = useState(() => { try { return !localStorage.getItem('kworld_jobtrack_fill_used') && !localStorage.getItem('kworld_jobtrack_fill_seen') } catch { return false } })
-  useEffect(() => { bm.current?.setAttribute('href', bookmarklet(window.location.origin)) }, [rows.length, setupOpen])
   if (rows.length === 0) return null
   const idx = Math.min(i, rows.length - 1)
   const a = rows[idx]
@@ -95,22 +91,7 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
   return (
     <div className="jr">
       {/* 2026-10-14 owner: set-up first and small; then two lines, each saying WHERE you are */}
-      {/* 2026-10-14 owner: "is there a way to check it's set up?" - a site can't read bookmarks, but the
-          hand-over page records the first real use; until then a pop-up, after that a small link */}
-      {fillUsed
-        ? <button type="button" className="jr-bm-again" onClick={() => setSetupOpen(true)}>{t('jr.bm.again')}</button>
-        : <button type="button" className="jr-bm-start" onClick={() => setSetupOpen(true)}>{t('jr.bm.title')}</button>}
-      {setupOpen && (
-        <div className="jr-setup" role="dialog" aria-label={t('jr.bm.title')}>
-          <p className="jr-setup-title">{t('jr.bm.title')}</p>
-          <p>{t('jr.bm.once')}</p>
-          <a ref={bm} className="jr-bm-link" onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }} title={t('jr.bm.drag')}>JobTrack fill</a>
-          <div className="jr-setup-btns"><button type="button" className="btn" onClick={() => { setSetupOpen(false); try { localStorage.setItem('kworld_jobtrack_fill_seen', '1') } catch { /* private */ } }}>{t('jr.bm.done')}</button></div>
-        </div>
-      )}
       <div className="jr-top">
-        <p className="jr-progress"><b>{done}</b> / {rows.length} {t('jr.entered')}</p>
-        <div className="jr-bar"><div style={{ width: `${(done / rows.length) * 100}%` }} /></div>
         <ol className="jr-flow">
           {/* 2026-10-14 owner: 1 = here (this window), 2 = Job-Room next */}
           <li><b>{t('jr.here')}</b> {t('jr.flow2')}</li>

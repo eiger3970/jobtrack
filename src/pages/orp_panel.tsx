@@ -1,7 +1,8 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { type Application, inRange, monthRange, swissDate } from '../lib/orp'
 import { buildOrpPdf, type OrpProfile } from '../lib/orp_pdf'
 import JobRoomHelper from './job_room_helper'
+import { bookmarklet } from '../lib/jobroom_fill'
 import { saveFile, stamp } from '../lib/save_file'
 
 // 2026-10-13 owner: ORP paperwork in one place - the filled 716.007 PDF for
@@ -33,6 +34,10 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
   const [mode, setMode] = useState<'month' | 'before'>('month')
   const [busy, setBusy] = useState(false)
   const [info, setInfo] = useState(false)
+  const fillUsed = (() => { try { return !!localStorage.getItem('kworld_jobtrack_fill_used') } catch { return false } })()
+  const [step, setStep] = useState<'ask' | 'setup' | 'work'>('ask')
+  const bm = useRef<HTMLAnchorElement>(null)
+  useEffect(() => { bm.current?.setAttribute('href', bookmarklet(window.location.origin)) }, [step])
   const [regText, setRegText] = useState(() => (loadProfile().registered ? swissDate(loadProfile().registered) : ''))
   const pickRef = useRef<HTMLInputElement>(null)
 
@@ -89,13 +94,14 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
     <div className="modal" onClick={onClose}>
       <div className="modal-content orp-panel" onClick={e => e.stopPropagation()}>
         <h3>{t('orp.title')}</h3>
-        {/* 2026-10-14 owner: "way too much text for timid job searchers - minimal on welcome,
-            the rest appears when needed". One question first, then only what that answer needs. */}
-        <p className="orp-q">{t('orp.which')}</p>
-        <div className="orp-tabs">
-          <button className={mode === 'month' ? 'btn' : 'btn-secondary'} onClick={() => setMode('month')}>{t('orp.month')}</button>
-          <button className={mode === 'before' ? 'btn' : 'btn-secondary'} onClick={() => setMode('before')}>{t('orp.before')}</button>
-        </div>
+        {/* 2026-10-14 owner: "too confusing where to start" - three steps: the question, the
+            one-time set-up, then only the squares and the card. Numbers go into Details. */}
+        {step === 'ask' && (<>
+          <p className="orp-q">{t('orp.which')}</p>
+          <div className="orp-tabs">
+            <button className={mode === 'month' ? 'btn' : 'btn-secondary'} onClick={() => setMode('month')}>{t('orp.month')}</button>
+            <button className={mode === 'before' ? 'btn' : 'btn-secondary'} onClick={() => setMode('before')}>{t('orp.before')}</button>
+          </div>
         {mode === 'month' && <input type="month" value={month} onChange={e => setMonth(e.target.value)} />}
         {mode === 'before' && (<>
           <label className="modal-label orp-label-info">{t('orp.registered')}
@@ -114,7 +120,27 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
           </div>
         </>)}
 
-        {(mode === 'month' || profile.registered) && <p className="orp-count"><b>{rows.length}</b> {t('orp.searches')} · {swissDate(from)} - {swissDate(to)}</p>}
+          <button className="btn btn-glow orp-next" disabled={mode === 'before' && !profile.registered}
+            onClick={() => setStep(fillUsed ? 'work' : 'setup')}>{t('orp.next')}</button>
+        </>)}
+
+        {step === 'setup' && (
+          <div className="jr-setup">
+            <p className="jr-setup-title">{t('jr.bm.title')}</p>
+            <p>{t('jr.bm.once')}</p>
+            <a ref={bm} className="jr-bm-link" onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }} title={t('jr.bm.drag')}>JobTrack fill</a>
+            <div className="jr-setup-btns"><button type="button" className="btn" onClick={() => setStep('work')}>{t('jr.bm.done')}</button></div>
+          </div>
+        )}
+
+        {step === 'work' && (<>
+          <p className="orp-choice">{mode === 'before' ? `${t('orp.before')} - ${swissDate(profile.registered)}` : jobRoomMonth}
+            {' '}<button type="button" className="jr-bm-again" onClick={() => setStep('ask')}>{t('orp.change')}</button>
+            {' · '}<button type="button" className="jr-bm-again" onClick={() => setStep('setup')}>{t('jr.bm.title')}</button></p>
+          <JobRoomHelper rows={rows} monthLabel={jobRoomMonth} onUpdate={onUpdate} t={t} />
+          <details className="orp-details">
+            <summary>{t('orp.details2')}</summary>
+            <p className="orp-count"><b>{rows.filter(a => a.jobroomDone).length}</b> / {rows.length} {t('jr.entered')} · {swissDate(from)} - {swissDate(to)}</p>
         {shortWeeks.length > 0 && (mode === 'month' || profile.registered) && (
           <details className="orp-weeks">
             <summary>{t('orp.weeksShort').replace('{n}', String(shortWeeks.length))}</summary>
@@ -123,8 +149,6 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
           </details>
         )}
 
-        {/* 2026-10-14 owner: one card at a time, exactly like Job-Room's ENTER form */}
-        {(mode === 'month' || profile.registered) && <JobRoomHelper rows={rows} monthLabel={jobRoomMonth} onUpdate={onUpdate} t={t} />}
         <details className="orp-paper">
           <summary>{t('orp.paper')}</summary>
           <p className="orp-hint">{t('orp.needProfile')}</p>
@@ -132,6 +156,8 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
           <input type="text" placeholder={t('orp.avs')} value={profile.avs} onChange={e => update({ avs: e.target.value })} />
           <button className="btn-secondary" disabled={busy || !profile.name || !profile.avs || rows.length === 0} onClick={makePdf}>{busy ? '…' : t('orp.pdf')}</button>
         </details>
+          </details>
+        </>)}
         <div className="modal-buttons"><button className="btn-secondary" onClick={onClose}>{t('close')}</button></div>
       </div>
     </div>

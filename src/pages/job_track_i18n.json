@@ -1274,6 +1274,21 @@
       "en": "Here:",
       "de": "Hier:",
       "fr": "Ici:"
+    },
+    "orp.next": {
+      "en": "Next",
+      "de": "Weiter",
+      "fr": "Suivant"
+    },
+    "orp.change": {
+      "en": "change",
+      "de": "ändern",
+      "fr": "changer"
+    },
+    "orp.details2": {
+      "en": "Details (counts, weeks, paper form)",
+      "de": "Details (Zahlen, Wochen, Papierformular)",
+      "fr": "Détails (chiffres, semaines, formulaire papier)"
     }
   }
 }

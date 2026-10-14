@@ -500,3 +500,7 @@
 .jr-setup-title { color: #00ff41; font-weight: 700; margin: 0 0 0.4rem; }
 .jr-setup p { color: #d0d0e0; font-size: 0.85rem; }
 .jr-setup-btns { margin-top: 0.7rem; text-align: right; }
+.orp-next { display: block; width: 100%; margin-top: 0.8rem; }
+.orp-choice { font-size: 0.82rem; color: #d0d0e0; margin: 0 0 0.5rem; }
+.orp-details { margin-top: 0.8rem; font-size: 0.82rem; }
+.orp-details summary { cursor: pointer; color: #8a86a8; }
