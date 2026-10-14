@@ -59,6 +59,10 @@ const QUOTA_STORAGE = 'kworld_jobtrack_quota'
 const BACKUP_SNAPSHOT_STORAGE = 'kworld_jobtrack_backup_snapshot'
 const BACKUP_AT_STORAGE = 'kworld_jobtrack_backup_at'
 
+// 2026-10-14: icons-only view, remembered per device
+const MIN_STORAGE = 'kworld_jobtrack_minimal'
+const MIN_LABEL = { en: { min: 'Minimal', full: 'Full view' }, de: { min: 'Minimal', full: 'Volle Ansicht' }, fr: { min: 'Minimal', full: 'Vue complète' } }
+
 function readStored(key: string): string | null {
   try { return localStorage.getItem(key) } catch { return null }
 }
@@ -187,6 +191,8 @@ export default function JobTrack() {
   const [adText, setAdText] = useState('')
   const [adFilled, setAdFilled] = useState(false)
   const [orpPanel, setOrpPanel] = useState(false)
+  const [minimal, setMinimal] = useState(() => readStored(MIN_STORAGE) === '1' || (import.meta.env.DEV && typeof window !== 'undefined' && window.location.search.includes('min')))
+  useEffect(() => { try { localStorage.setItem(MIN_STORAGE, minimal ? '1' : '0') } catch { /* private mode */ } }, [minimal])
   // 2026-10-14: phone + computer sync - the phone arrives from the QR with #sync=
   // prerender has no navigator - counts as a computer there
   const phoneDevice = isApp() || (typeof navigator !== 'undefined' && /iPhone|iPod|Android/i.test(navigator.userAgent))
@@ -573,7 +579,7 @@ export default function JobTrack() {
   }
 
   return (
-    <div className="jobtrack-page">
+    <div className={'jobtrack-page' + (minimal ? ' jt-min' : '')}>
       <div className="container">
         {/* 2026-09-15: real feedback, live - "update emoji to svg
             image. JobTrack header is darkened for some strange
@@ -587,6 +593,12 @@ export default function JobTrack() {
           {/* 2026-10-14 owner: the app icon (clipboard + check + confetti) everywhere */}
           <img src={jobTrackIcon} alt="" style={{ width: '2.4rem', height: '2.4rem', borderRadius: '22%', flexShrink: 0 }} />
           <span>{t('title')}</span>
+          {/* 2026-10-14 owner: "lots of controls... a minimal version with only images" -
+              icons only; mouse over a row (or tap this again on a phone) for the full view */}
+          <button type="button" className="jt-min-toggle" aria-pressed={minimal} onClick={() => setMinimal(m => !m)} title={minimal ? MIN_LABEL[lang].full : MIN_LABEL[lang].min}>
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d={minimal ? 'M3 5v14h18V5H3zm16 6H5V7h14v4zM5 17v-4h14v4H5z' : 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z'} /></svg>
+            <span>{minimal ? MIN_LABEL[lang].full : MIN_LABEL[lang].min}</span>
+          </button>
         </h1>
 
         {/* 2026-10-13 owner: "top header has 1. - 4., they could be the actual link
@@ -745,18 +757,18 @@ export default function JobTrack() {
           <div className="stat-card"><div className="stat-number">{apps.length}</div><div className="stat-label">{t('stat.total')}</div></div>
           {Object.entries(counts).map(([s, n]) => <div key={s} className="stat-card"><div className="stat-number">{n}</div><div className="stat-label">{STATUS_PLAIN[s] || s}</div></div>)}
         </div>
-        {apps.length > 0 && <JobTrackPro apps={apps} lang={lang} />}
+        {apps.length > 0 && <div className="jt-verbose"><JobTrackPro apps={apps} lang={lang} /></div>}
 
         <div className="toolbar">
           <div className="toolbar-primary">
             {/* 2026-10-13 owner: ORP proofs (716.007 PDF + Job-Room) in one tap */}
             <button className="btn-secondary export-btn orp-btn" onClick={() => setOrpPanel(true)}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><path d="M9 15l2 2 4-4" /></svg>
-              {t('orp.button')}
+              <span className="export-btn-label">{t('orp.button')}</span>
             </button>
             <button className="btn-secondary export-btn" onClick={() => setBulkModal(true)}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>
-              {t('bulkAdd')}
+              <span className="export-btn-label">{t('bulkAdd')}</span>
             </button>
           </div>
           <div className="toolbar-tools">
@@ -804,7 +816,7 @@ export default function JobTrack() {
           {STATUSES.map(s => (
             <span key={s} className="filter-btn-wrap">
               <button className={`filter-btn${filter === s ? ' active' : ''}`} onClick={() => setFilter(s)}>
-                <StatusIcon status={s} />{STATUS_PLAIN[s]}
+                <StatusIcon status={s} /><span className="jt-lbl">{STATUS_PLAIN[s]}</span>
               </button>
               {s === 'technical' && (
                 <InfoTip
@@ -864,8 +876,8 @@ export default function JobTrack() {
                   <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.cover || '-'}</td>
                   <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.nextDate || '-'}</td>
                   <td>
-                    <button className="action-btn" title={t('action.edit')} onClick={() => openEdit(a)}>✏️</button>
-                    <button className="action-btn" title={t('action.delete')} onClick={() => del(a.id)}>🗑️</button>
+                    <button className="action-btn" title={t('action.edit')} aria-label={t('action.edit')} onClick={() => openEdit(a)}><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" /></svg></button>
+                    <button className="action-btn" title={t('action.delete')} aria-label={t('action.delete')} onClick={() => del(a.id)}><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" /></svg></button>
                   </td>
                 </tr>
               ))}
@@ -873,7 +885,7 @@ export default function JobTrack() {
           </table>
         </div>
 
-        <div className="backup-panel">
+        <div className="backup-panel jt-verbose">
           <div className="backup-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="9" rx="1.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
             <span><strong>{t('backup.privacy')}</strong> · {t('backup.privacyNote')}</span>
@@ -884,7 +896,7 @@ export default function JobTrack() {
           </div>
         </div>
 
-        <div className="ad-strip">
+        <div className="ad-strip jt-verbose">
           <a href="/cv-gen/" className="ad-card">
             <span className="ad-label">{t('ad.label')}</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
