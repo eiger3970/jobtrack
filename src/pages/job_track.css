@@ -401,3 +401,7 @@
 .jr-entered { display: inline-flex; align-items: center; gap: 0.3rem; flex: 1; justify-content: center; }
 .jr-all { display: flex; align-items: center; gap: 0.4rem; color: #00ff41; font-weight: 700; margin-top: 0.8rem; }
 @media (max-width: 520px) { .jr-row { grid-template-columns: 6.5rem 1fr auto; } }
+/* 2026-10-14 owner: in the "Still here?" pop-up the text was squished into a thin right
+   column - there it goes under the button instead */
+.jts-panel .jtb-choices li { grid-template-columns: 1fr auto; }
+.jts-panel .jtb-why { grid-column: 1 / -1; margin-bottom: 0.3rem; }

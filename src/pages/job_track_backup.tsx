@@ -70,7 +70,7 @@ export default function BackupBar({ lang, apps, snapshot, onSync, onExport }: { 
   const L: Tx = (en, de, fr) => (lang === 'de' ? de : lang === 'fr' ? fr : en)
   const [, bump] = useState(0)
   const n = notBackedUp(apps, snapshot)
-  const [idle, setIdle] = useState(false)
+  const [idle, setIdle] = useState(() => import.meta.env.DEV && typeof window !== 'undefined' && window.location.search.includes('idle'))
 
   // idle reminder: no tap, key or scroll for 3 minutes while something is not backed up
   useEffect(() => {
