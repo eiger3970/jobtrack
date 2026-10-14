@@ -465,3 +465,13 @@
 .jr-bm ol { margin: 0.5rem 0 0; padding-left: 1.2rem; color: #d0d0e0; }
 .jr-bm-link { display: inline-block; padding: 0.4rem 0.9rem; border-radius: 8px; background: #00ff41; color: #03020a !important; font-weight: 700; text-decoration: none; cursor: grab; }
 .jr-copyfill { white-space: nowrap; }
+/* 2026-10-14 owner: white = this period's quota, amber = older, thick line between */
+.applications-table td.jt-old-date { color: #ffb000; }
+.applications-table tr.jt-first-old td { border-top: 3px solid #ffb000; }
+.jt-datekey { display: flex; flex-direction: column; gap: 0.35rem; }
+.jt-dk-white { color: #f0eeff; } .jt-dk-amber { color: #ffb000; }
+.jt-dk-line { display: inline-block; width: 1.6rem; height: 3px; background: #ffb000; vertical-align: middle; }
+.jt-status-counts { display: flex; flex-wrap: wrap; gap: 0.15rem 0.4rem; font-weight: 400; font-size: 0.65rem; margin-top: 0.2rem; }
+.jt-sc { color: #d0d0e0; } .jt-sc-rejected { color: #ff6b6b; } .jt-sc-applied { color: #4d9dff; } .jt-sc-interview, .jt-sc-offer, .jt-sc-accepted { color: #00ff41; }
+.orp-before-tip { border-left: 3px solid #ffb000; padding: 0.4rem 0.6rem; background: rgba(255,176,0,0.08); color: #ffcf70; font-size: 0.8rem; margin: 0.5rem 0; }
+.orp-warn ul { margin: 0.2rem 0 0; padding-left: 1.2rem; }

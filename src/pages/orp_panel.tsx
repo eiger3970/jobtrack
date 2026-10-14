@@ -107,11 +107,13 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
           <button className={mode === 'month' ? 'btn' : 'btn-secondary'} onClick={() => setMode('month')}>{t('orp.month')}</button>
           <button className={mode === 'before' ? 'btn' : 'btn-secondary'} disabled={!profile.registered} onClick={() => setMode('before')}>{t('orp.before')}</button>
         </div>
+        {/* 2026-10-14 owner: important for people the office won't warn */}
+        <p className="orp-before-tip">{t('orp.beforeTip')}</p>
         {mode === 'month' && <input type="month" value={month} onChange={e => setMonth(e.target.value)} />}
 
         <p className="orp-count"><b>{rows.length}</b> {t('orp.searches')} · {swissDate(from)} - {swissDate(to)}</p>
         {shortWeeks.length > 0 && (
-          <p className="orp-warn">{t('orp.shortWeeks')} {shortWeeks.map(([wk, n]) => `${swissDate(wk)} (${n})`).join(', ')}</p>
+          <div className="orp-warn"><p>{t('orp.shortWeeks')}</p><ul>{shortWeeks.map(([wk, n]) => <li key={wk}>{t('orp.weekOf')} {swissDate(wk)}: {n} {n === 1 ? t('orp.search1') : t('orp.searchN')}</li>)}</ul></div>
         )}
 
         {/* 2026-10-13 owner: "digital online is best" - Job-Room cards come

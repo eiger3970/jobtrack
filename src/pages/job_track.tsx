@@ -130,7 +130,7 @@ function HeaderIcon({ col }: { col: 'company' | 'role' | 'date' | 'status' | 'cv
 
 // Tap-to-reveal, not hover/title - a native title attribute never shows on
 // phone at all, so anything that needs explaining on mobile has to use this.
-function InfoTip({ text, label, icon }: { text: string; label: string; icon: ReactNode }) {
+function InfoTip({ text, label, icon }: { text: ReactNode; label: string; icon: ReactNode }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLSpanElement>(null)
   useEffect(() => {
@@ -320,6 +320,11 @@ export default function JobTrack() {
     </svg>
   )
   const sortCls = (col: 'date' | 'company') => 'jt-sortable' + (sortBy.col === col ? ' jt-sorted' : '')
+  // 2026-10-14 owner: white = counts for this period's quota, amber = older; a thick line where the old ones start
+  const cutoff = (() => { const d = quota ? periodStart(quota.period) : new Date(new Date().getFullYear(), new Date().getMonth(), 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` })()
+  const isOld = (a: App) => a.date < cutoff
+  const firstOldId = sortBy.col === 'date' && !sortBy.asc ? filtered.find(isOld)?.id : undefined
+  const statusCounts = STATUSES.map(st => [st, apps.filter(a => a.status === st).length] as const).filter(([, n]) => n > 0)
 
   function openAdd() { setEditing(null); setOrpOpen(false); setAdText(''); setAdFilled(false); setForm({ company:'',role:'',date:new Date().toISOString().slice(0,10),status:'applied',cv:'',cover:'',nextDate:'',notes:'', ...ORP_DEFAULTS }); setModal(true) }
   function openEdit(a: App) {
@@ -817,7 +822,8 @@ export default function JobTrack() {
           <div className="toolbar-primary">
             {/* 2026-10-13 owner: ORP proofs (716.007 PDF + Job-Room) in one tap */}
             <button className="btn-secondary export-btn orp-btn" onClick={() => setOrpPanel(true)}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><path d="M9 15l2 2 4-4" /></svg>
+              {/* 2026-10-14 owner: an office building - the ORP is on the 3rd floor, those windows lit */}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="1" /><path d="M10 21.5v-3h4v3" />{[5.5, 9, 12.5, 16].map(y => [7.5, 11, 14.5].map(x => <rect key={`${x}${y}`} x={x} y={y - (y === 16 ? 0 : 0)} width="2" height="1.8" rx="0.3" fill={y === 9 ? '#ffb000' : 'currentColor'} stroke="none" opacity={y === 9 ? 1 : 0.55} />))}</svg>
               <span className="export-btn-label">{t('orp.button')}</span>
             </button>
             <button className="btn-secondary export-btn" onClick={() => setBulkModal(true)}>
@@ -877,9 +883,14 @@ export default function JobTrack() {
           <table className="applications-table">
             {/* 2026-10-14 owner: Date, Next, Status, Cover, CV, Company, Role, Actions - fits the screen, no sideways scroll */}
             <thead><tr>
-              <th className={sortCls('date')} aria-sort={sortBy.col === 'date' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}<InfoTip text={t('stale.legend')} label={t('stale.legend')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} /></th>
+              <th className={sortCls('date')} aria-sort={sortBy.col === 'date' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}<InfoTip label={t('stale.legend')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} text={
+                <span className="jt-datekey">
+                  <span><b className="jt-dk-white">2026-10-14</b> = {t('dk.white')}</span>
+                  <span><b className="jt-dk-amber">2026-09-19</b> <span className="jt-dk-amber">= {t('dk.amber')}</span></span>
+                  <span><i className="jt-dk-line" /> = {t('dk.line')}</span>
+                </span>} /></th>
               <th><HeaderIcon col="next" />{t('table.next')}<InfoTip text={t('table.next.hint')} label={t('table.next.hint')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} /></th>
-              <th><HeaderIcon col="status" />{t('table.status')}</th>
+              <th><HeaderIcon col="status" />{t('table.status')}{statusCounts.length > 0 && <span className="jt-status-counts">{statusCounts.map(([st, n]) => <span key={st} className={`jt-sc jt-sc-${st}`}>{n} {STATUS_PLAIN[st]}</span>)}</span>}</th>
               <th><HeaderIcon col="cover" />{t('table.cover')}</th>
               <th><HeaderIcon col="cv" />{t('table.cv')}</th>
               <th className={sortCls('company')} aria-sort={sortBy.col === 'company' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('company')} title="Sort A-Z"><HeaderIcon col="company" />{t('table.company')}{sortMark('company')}</th>
@@ -889,8 +900,8 @@ export default function JobTrack() {
             <tbody>
               {filtered.length === 0 && <tr><td colSpan={8} style={{ textAlign: 'center', color: '#a0a0b0', padding: '2rem' }}>{t('table.empty')}</td></tr>}
               {filtered.map(a => (
-                <tr key={a.id}>
-                  <td data-label={t('table.date')} className={[isStale(a) ? 'jt-stale-date' : '', sortBy.col === 'date' ? 'jt-sorted-cell' : ''].filter(Boolean).join(' ') || undefined} title={isStale(a) ? t('stale.hint') : undefined}>{a.date}{isStale(a) && <span className="jt-stale" title={t('stale.hint')}>{t('stale')}</span>}</td>
+                <tr key={a.id} className={a.id === firstOldId ? 'jt-first-old' : undefined}>
+                  <td data-label={t('table.date')} className={[isOld(a) ? 'jt-old-date' : '', sortBy.col === 'date' ? 'jt-sorted-cell' : ''].filter(Boolean).join(' ') || undefined} title={isStale(a) ? t('stale.hint') : undefined}>{a.date}</td>
                   <td data-label={t('table.next')} className="jt-small">{a.nextDate || '-'}</td>
                   <td data-label={t('table.status')}>
                     <label className={`status-badge status-select-wrap status-${a.status}`}>

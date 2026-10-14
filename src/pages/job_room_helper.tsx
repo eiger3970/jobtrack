@@ -99,7 +99,7 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
       <details className="jr-bm">
         <summary>{t('jr.bm.title')}</summary>
         <p>{t('jr.bm.once')}</p>
-        <a ref={bm} className="jr-bm-link" onClick={ev => ev.preventDefault()} title={t('jr.bm.drag')}>JobTrack fill</a>
+        <a ref={bm} className="jr-bm-link" onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }} title={t('jr.bm.drag')}>JobTrack fill</a>
         <ol>
           <li>{t('jr.bm.s1')}</li>
           <li>{t('jr.bm.s2')}</li>

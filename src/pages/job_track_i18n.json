@@ -841,9 +841,9 @@
       "fr": "Un mois"
     },
     "orp.before": {
-      "en": "Before unemployment (3 months)",
-      "de": "Vor Arbeitslosigkeit (3 Monate)",
-      "fr": "Avant chômage (3 mois)"
+      "en": "Before registration date (3 months)",
+      "de": "Vor dem Anmeldedatum (3 Monate)",
+      "fr": "Avant la date d'inscription (3 mois)"
     },
     "orp.searches": {
       "en": "searches",
@@ -851,9 +851,9 @@
       "fr": "recherches"
     },
     "orp.shortWeeks": {
-      "en": "Weeks under 2 searches:",
-      "de": "Wochen unter 2 Bewerbungen:",
-      "fr": "Semaines avec moins de 2 recherches:"
+      "en": "Weeks with fewer than 2 job searches - the office may ask why:",
+      "de": "Wochen mit weniger als 2 Bewerbungen - das Amt fragt eventuell nach:",
+      "fr": "Semaines avec moins de 2 recherches - l'office peut demander pourquoi:"
     },
     "orp.pdf": {
       "en": "Make the 716.007 PDF",
@@ -1199,6 +1199,46 @@
       "en": "Copy for Job-Room",
       "de": "Für Job-Room kopieren",
       "fr": "Copier pour Job-Room"
+    },
+    "orp.weekOf": {
+      "en": "Week of",
+      "de": "Woche ab",
+      "fr": "Semaine du"
+    },
+    "orp.search1": {
+      "en": "search",
+      "de": "Bewerbung",
+      "fr": "recherche"
+    },
+    "orp.searchN": {
+      "en": "searches",
+      "de": "Bewerbungen",
+      "fr": "recherches"
+    },
+    "orp.beforeTip": {
+      "en": "Important: the office also counts your job searches from the 3 months BEFORE you registered. Enter them too - missing ones can cost days of benefits, and nobody may warn you.",
+      "de": "Wichtig: Das Amt zählt auch Ihre Bewerbungen der 3 Monate VOR der Anmeldung. Tragen Sie sie ein - fehlende können Taggelder kosten, und niemand warnt Sie vielleicht.",
+      "fr": "Important: l'office compte aussi vos recherches des 3 mois AVANT votre inscription. Saisissez-les - celles qui manquent peuvent coûter des jours d'indemnités, et personne ne vous préviendra peut-être."
+    },
+    "dk.white": {
+      "en": "this period - counts for your quota",
+      "de": "diese Periode - zählt für Ihre Quote",
+      "fr": "cette période - compte pour votre quota"
+    },
+    "dk.amber": {
+      "en": "older - not in this quota",
+      "de": "älter - nicht in dieser Quote",
+      "fr": "plus ancien - hors de ce quota"
+    },
+    "dk.line": {
+      "en": "where the older ones start",
+      "de": "hier beginnen die älteren",
+      "fr": "là où commencent les plus anciens"
+    },
+    "jr.bm.notHere": {
+      "en": "Not here: drag this green button to your bookmarks bar. Then open Job-Room -> work-efforts -> ENTER, and click JobTrack fill in the bookmarks bar.",
+      "de": "Nicht hier: diesen grünen Knopf in die Lesezeichenleiste ziehen. Dann Job-Room -> work-efforts -> ENTER öffnen und dort in der Lesezeichenleiste JobTrack fill klicken.",
+      "fr": "Pas ici: glissez ce bouton vert dans la barre de favoris. Puis ouvrez Job-Room -> work-efforts -> ENTER et cliquez JobTrack fill dans la barre de favoris."
     }
   }
 }
