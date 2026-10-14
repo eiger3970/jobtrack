@@ -329,3 +329,13 @@
 .jts-shared { border-top: 1px solid #2a2a3a; padding-top: 0.8rem; margin-bottom: 0.6rem; }
 .jts-check { display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.85rem; margin: 0 0 0.6rem; }
 .modal-content .jts-check input { width: auto; margin: 0.15rem 0 0; }
+/* 2026-10-14 not backed up bar (computers) */
+.jtb-bar { display: block; }
+.jtb-head { font-weight: 700; margin: 0 0 0.6rem; }
+.jtb-choices { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+.jtb-choices li { display: grid; grid-template-columns: 15rem 4.5rem 1fr; align-items: center; gap: 0.3rem 0.8rem; }
+.jtb-choices button { text-align: left; }
+@media (max-width: 640px) { .jtb-choices li { grid-template-columns: 1fr auto; } .jtb-why { grid-column: 1 / -1; } }
+.jtb-ease { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: #d0d0e0; }
+.jtb-why { font-size: 0.8rem; color: #d0d0e0; }
+.jtb-best .jtb-why { color: #00ff41; }

@@ -23,7 +23,7 @@ export const SIGNAL = import.meta.env.DEV && new URLSearchParams(window.location
 export type Base = Record<number, string>
 export const baseOf = (apps: Application[]): Base => Object.fromEntries(apps.map(a => [a.id, key(a)]))
 // field order doesn't matter - sorted keys
-function key(a: Application): string {
+export function key(a: Application): string {
   return JSON.stringify(Object.keys(a).sort().map(k => [k, (a as any)[k] ?? '']).filter(([, v]) => v !== ''))
 }
 

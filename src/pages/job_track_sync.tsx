@@ -19,7 +19,7 @@ interface Props {
 
 // the list as it was right after this device's last sync (see merge rules)
 const BASE = 'kworld_jobtrack_sync_base'
-function loadBase(): Base { try { return JSON.parse(localStorage.getItem(BASE) || '{}') } catch { return {} } }
+export function loadBase(): Base { try { return JSON.parse(localStorage.getItem(BASE) || '{}') } catch { return {} } }
 function keepBase(apps: Application[]) { try { localStorage.setItem(BASE, JSON.stringify(baseOf(apps))) } catch { /* private mode */ } }
 // the ORP form details (name, AVS...) travel too, so clearing a library computer loses nothing;
 // a device that already has its own keeps them

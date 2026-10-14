@@ -6,6 +6,7 @@ import JobTrackPro from './job_track_pro'
 import { type Application, type OrpMethod, ORP_DEFAULTS } from '../lib/orp'
 import OrpPanel from './orp_panel'
 import JobTrackSync from './job_track_sync'
+import BackupBar from './job_track_backup'
 import { linkFromHash } from '../lib/jobtrack_sync'
 import { parseAd } from '../lib/ad_parse'
 import { planReminders } from '../lib/reminders'
@@ -43,6 +44,8 @@ const STATUSES = ['applied','screening','interview','technical','offer','accepte
 const STORAGE = 'kworld_jobtrack'
 
 function loadApps(): App[] {
+  // DEV preview of the not-backed-up bar
+  if (import.meta.env.DEV && typeof window !== 'undefined' && window.location.hash === '#preview=backup') return [1, 2].map(i => ({ id: i, company: 'Example ' + i, role: 'Cook', date: '2026-10-14', status: 'applied', cv: '', cover: '', nextDate: '', notes: '' }))
   try { return JSON.parse(localStorage.getItem(STORAGE) || '[]') } catch { return [] }
 }
 
@@ -184,6 +187,8 @@ export default function JobTrack() {
   const [adFilled, setAdFilled] = useState(false)
   const [orpPanel, setOrpPanel] = useState(false)
   // 2026-10-14: phone + computer sync - the phone arrives from the QR with #sync=
+  // prerender has no navigator - counts as a computer there
+  const phoneDevice = isApp() || (typeof navigator !== 'undefined' && /iPhone|iPod|Android/i.test(navigator.userAgent))
   const [syncOpen, setSyncOpen] = useState(() => linkFromHash() !== null || (import.meta.env.DEV && window.location.hash === '#preview=sync'))
   const [showStorageInfo, setShowStorageInfo] = useState(false)
   const infoRef = useRef<HTMLDivElement>(null)
@@ -674,6 +679,8 @@ export default function JobTrack() {
           </div>
         </div>
 
+        {/* 2026-10-14 owner: computers get the choices bar (phone recommended), visible without scrolling */}
+        {!phoneDevice && <BackupBar lang={lang} apps={apps} snapshot={backupSnapshot} onSync={() => setSyncOpen(true)} onExport={exportBackup} />}
         <div className="stats">
           {quota && !editingQuota && (() => {
             const count = countInPeriod(apps, quota.period)
@@ -813,7 +820,7 @@ export default function JobTrack() {
 
         {/* Sits between the filters and the table - right where the
             records it is warning about are. */}
-        {unbackedUp && (
+        {unbackedUp && phoneDevice && (
           <div className="backup-reminder" role="status">
             <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" /></svg>
             <span>
