@@ -52,21 +52,23 @@ function Lock({ x, y, L }: { x: number; y: number; L: Tx }) {
 // through our server, which sees only a locked box and two linked devices.
 function SyncPicture({ L }: { L: Tx }) {
   return (
-    <svg className="jts-flow" viewBox="0 0 300 140" role="img" aria-label={L('Your list is locked on one device and unlocked only on the other. Our server passes the locked box and sees only that two devices linked.', 'Ihre Liste wird auf einem Gerät verschlossen und nur auf dem anderen geöffnet. Unser Server reicht die verschlossene Box weiter und sieht nur, dass zwei Geräte verbunden sind.', "Votre liste est verrouillée sur un appareil et ouverte seulement sur l'autre. Notre serveur transmet la boîte verrouillée et voit seulement que deux appareils sont liés.")}>
-      <rect x="96" y="4" width="108" height="46" rx="6" fill="#0f0d1c" stroke="#8a86a8" strokeWidth="1.6" />
-      <text x="150" y="20" textAnchor="middle" fontSize="9" fill="#8a86a8">{L('Our server sees', 'Unser Server sieht', 'Notre serveur voit')}</text>
-      <rect x="128" y="27" width="14" height="12" rx="2" fill="#00ff41" /><path d="M131 28v-3a4 4 0 0 1 8 0v3" fill="none" stroke="#00ff41" strokeWidth="1.8" />
-      <text x="148" y="37" fontSize="9" fill="#f0eeff">+ 2</text>
-      <svg x="161" y="27" width="10" height="12" viewBox="0 0 24 24"><path fill="#8a86a8" d={PHONE_D} /></svg>
-      <svg x="172" y="28" width="12" height="11" viewBox="0 0 24 24"><path fill="#8a86a8" d={PC_D} /></svg>
-      <path d="M44 84L100 46M256 84L200 46" stroke="#00ff41" strokeWidth="2.4" strokeDasharray="5 4" />
-      <svg x="16" y="84" width="40" height="40" viewBox="0 0 24 24"><path fill="#f0eeff" d={PHONE_D} /></svg>
-      <svg x="244" y="84" width="40" height="40" viewBox="0 0 24 24"><path fill="#f0eeff" d={PC_D} /></svg>
-      <text x="36" y="136" textAnchor="middle" fontSize="9" fill="#8a86a8">{L('unlocked', 'offen', 'ouvert')}</text>
-      <text x="264" y="136" textAnchor="middle" fontSize="9" fill="#8a86a8">{L('unlocked', 'offen', 'ouvert')}</text>
+    <svg className="jts-flow" viewBox="0 -14 300 154" role="img" aria-label={L('Your list is locked on one device and unlocked only on the other. Our server passes the locked box and sees only that two devices linked.', 'Ihre Liste wird auf einem Gerät verschlossen und nur auf dem anderen geöffnet. Unser Server reicht die verschlossene Box weiter und sieht nur, dass zwei Geräte verbunden sind.', "Votre liste est verrouillée sur un appareil et ouverte seulement sur l'autre. Notre serveur transmet la boîte verrouillée et voit seulement que deux appareils sont liés.")}>
+      {/* 2026-10-14 owner: the server as the internet (globe), no stray "2"; phone green, computer blue */}
+      <g fill="none" stroke="#8a86a8" strokeWidth="1.6">
+        <circle cx="150" cy="26" r="20" fill="#0f0d1c" />
+        <ellipse cx="150" cy="26" rx="9" ry="20" />
+        <path d="M130 26h40M133 16h34M133 36h34" />
+      </g>
+      <rect x="143" y="20" width="14" height="12" rx="2" fill="#00ff41" /><path d="M146 21v-3a4 4 0 0 1 8 0v3" fill="none" stroke="#00ff41" strokeWidth="1.8" />
+      <text x="150" y="-4" textAnchor="middle" fontSize="8.5" fill="#8a86a8">{L('Internet: locked data only', 'Internet: nur Verschlossenes', 'Internet: que du verrouillé')}</text>
+      <path d="M44 84L128 40M256 84L172 40" stroke="#00ff41" strokeWidth="2.4" strokeDasharray="5 4" />
+      <svg x="16" y="84" width="40" height="40" viewBox="0 0 24 24"><path fill="#00ff41" d={PHONE_D} /></svg>
+      <svg x="244" y="84" width="40" height="40" viewBox="0 0 24 24"><path fill="#4d9dff" d={PC_D} /></svg>
+      <text x="36" y="136" textAnchor="middle" fontSize="9" fill="#00ff41">{L('unlocked', 'offen', 'ouvert')}</text>
+      <text x="264" y="136" textAnchor="middle" fontSize="9" fill="#4d9dff">{L('unlocked', 'offen', 'ouvert')}</text>
       {/* 2026-10-14 owner: the passphrase symbol in each lock, tap -> what a passphrase is */}
-      <Lock x={64} y={56} L={L} />
-      <Lock x={210} y={56} L={L} />
+      <Lock x={70} y={54} L={L} />
+      <Lock x={204} y={54} L={L} />
     </svg>
   )
 }
@@ -74,10 +76,10 @@ function SyncPicture({ L }: { L: Tx }) {
 function Points({ L }: { L: Tx }) {
   return (
     <ul className="jts-points">
-      <li><b>{L('Keep both', 'Beide behalten', 'Garder les deux')}</b> {L('- the same entry changed on both devices stays twice, nothing is lost.', '- derselbe Eintrag auf beiden Geräten geändert bleibt doppelt, nichts geht verloren.', "- la même entrée modifiée sur les deux appareils reste en double, rien n'est perdu.")}</li>
-      <li><b>{L('Key', 'Schlüssel', 'Clé')}</b> {L('- only inside the QR code, never sent over the internet.', '- nur im QR-Code, nie übers Internet geschickt.', "- seulement dans le code QR, jamais envoyée par internet.")}</li>
-      <li><b>{L('Our server', 'Unser Server', 'Notre serveur')}</b> {L('- passes the locked list, sees only that 2 devices linked, keeps nothing.', '- reicht die verschlossene Liste weiter, sieht nur 2 verbundene Geräte, speichert nichts.', '- transmet la liste verrouillée, voit seulement 2 appareils liés, ne garde rien.')}</li>
-      <li><b>{L('Shared computer', 'Fremder Computer', 'Ordinateur partagé')}</b> {L('(library) - after the sync, one tap clears JobTrack from it.', '(Bibliothek) - nach dem Sync löscht ein Tipp JobTrack davon.', "(bibliothèque) - après la synchro, un geste efface JobTrack.")}</li>
+      {/* 2026-10-14 owner: "Keep both, what does this mean ... Key, I don't understand" - plain words */}
+      <li><b>{L('Changed on both devices?', 'Auf beiden Geräten geändert?', 'Modifié sur les deux appareils?')}</b> {L("Both versions are kept - delete the one you don't want. Nothing is lost.", 'Beide Versionen bleiben - löschen Sie die, die Sie nicht wollen. Nichts geht verloren.', "Les deux versions sont gardées - supprimez celle que vous ne voulez pas. Rien n'est perdu.")}</li>
+      <li><b>{L('The lock key', 'Der Schlüssel', 'La clé')}</b> {L('travels only from this screen to your phone camera, inside the QR code - never over the internet. Nobody else can open your list.', 'reist nur von diesem Bildschirm zur Handykamera, im QR-Code - nie übers Internet. Niemand sonst kann Ihre Liste öffnen.', "passe seulement de cet écran à la caméra du téléphone, dans le code QR - jamais par internet. Personne d'autre ne peut ouvrir votre liste.")}</li>
+      <li><b>{L('Our server', 'Unser Server', 'Notre serveur')}</b> {L('passes on the locked list, sees only that 2 devices linked, keeps nothing.', 'reicht die verschlossene Liste weiter, sieht nur 2 verbundene Geräte, speichert nichts.', 'transmet la liste verrouillée, voit seulement 2 appareils liés, ne garde rien.')}</li>
     </ul>
   )
 }
@@ -266,10 +268,12 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
     {/* 2026-10-14 owner: a clear hint - sync first, then clear the shared computer */}
     <ol className="jts-steps">
       <li>{L('Phone -> Camera -> point at this QR -> tap the link', 'Telefon -> Kamera -> auf diesen QR richten -> Link tippen', 'Téléphone -> Appareil photo -> visez ce QR -> touchez le lien')}<br /><span className="jts-or">{L('or JobTrack app -> Sync phone + computer -> Scan the QR code', 'oder JobTrack-App -> Sync Telefon + Computer -> QR-Code scannen', 'ou app JobTrack -> Sync téléphone + ordinateur -> Scanner le code QR')}</span></li>
-      <li>{L('Shared or library computer: after the sync, tap Clear JobTrack from this computer', 'Fremder oder Bibliotheks-Computer: nach dem Sync auf JobTrack von diesem Computer löschen tippen', 'Ordinateur partagé ou de bibliothèque: après la synchro, touchez Effacer JobTrack de cet ordinateur')}</li>
+      <li>{L('Shared or library computer: after the sync, tap the green button below the QR code', 'Fremder oder Bibliotheks-Computer: nach dem Sync den grünen Knopf unter dem QR-Code tippen', 'Ordinateur partagé ou de bibliothèque: après la synchro, touchez le bouton vert sous le code QR')}</li>
     </ol>
     {qr ? <img className="jts-qr" src={qr} alt={L('QR code to sync', 'QR-Code zum Synchronisieren', 'Code QR pour synchroniser')} /> : <div className="jts-qr" />}
     {state === 'syncing' && <p className="jts-wait"><span className="jts-spin" />{L('Syncing...', 'Synchronisiere...', 'Synchronisation...')}</p>}
+    {/* 2026-10-14 owner: "where is this infernal one tap" - always in sight, unlocks after the sync */}
+    <button className="btn-secondary jts-clear-wait" disabled>{L('Clear JobTrack from this computer - after the sync', 'JobTrack von diesem Computer löschen - nach dem Sync', 'Effacer JobTrack de cet ordinateur - après la synchro')}</button>
   </>)
 
   return (
@@ -277,7 +281,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
       <div className="modal-content jts-panel" onClick={e => e.stopPropagation()}>
         <h2 className="jts-title">{title}</h2>
         {body}
-        {link && state !== 'done' && state !== 'lost' && state !== 'cleared' && <p className="jts-match">{L('Same words on both screens = your devices are linked, secure and encrypted', 'Gleiche Wörter auf beiden Bildschirmen = Ihre Geräte sind verbunden, sicher und verschlüsselt', 'Mêmes mots sur les deux écrans = vos appareils sont liés, sécurisés et chiffrés')}: <code>{words(link.room)}</code></p>}
+        {link && state !== 'done' && state !== 'lost' && state !== 'cleared' && <p className="jts-match">{L('Same words on both screens = your devices are linked, secure and encrypted', 'Gleiche Wörter auf beiden Bildschirmen = Ihre Geräte sind verbunden, sicher und verschlüsselt', 'Mêmes mots sur les deux écrans = vos appareils sont liés, sécurisés et chiffrés')}:<code className="jts-words">{words(link.room)}</code></p>}
         {state !== 'cleared' && <><SyncPicture L={L} /><Points L={L} /></>}
         <div className="modal-buttons"><button className="btn-secondary" onClick={close}>{L('Close', 'Schliessen', 'Fermer')}</button></div>
       </div>

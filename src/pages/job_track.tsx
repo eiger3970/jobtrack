@@ -299,6 +299,7 @@ export default function JobTrack() {
     return () => document.removeEventListener('mousedown', onClickOutside)
   }, [])
 
+  // 2026-10-14 owner: columns left to right Date, Company, Role, Status, Cover, CV.
   // 2026-09-25: user - "can the Company column be sorted by a-z to find?"
   // Company and Date headers sort the list; tap again to reverse.
   const [sortBy, setSortBy] = useState<{ col: 'date' | 'company'; asc: boolean }>({ col: 'date', asc: false })
@@ -870,12 +871,12 @@ export default function JobTrack() {
         <div style={{ overflowX: 'auto' }}>
           <table className="applications-table">
             <thead><tr>
+              <th className={sortCls('date')} aria-sort={sortBy.col === 'date' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}</th>
               <th className={sortCls('company')} aria-sort={sortBy.col === 'company' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('company')} title="Sort A-Z"><HeaderIcon col="company" />{t('table.company')}{sortMark('company')}</th>
               <th><HeaderIcon col="role" />{t('table.role')}</th>
-              <th className={sortCls('date')} aria-sort={sortBy.col === 'date' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}</th>
               <th><HeaderIcon col="status" />{t('table.status')}</th>
-              <th><HeaderIcon col="cv" />{t('table.cv')}</th>
               <th><HeaderIcon col="cover" />{t('table.cover')}</th>
+              <th><HeaderIcon col="cv" />{t('table.cv')}</th>
               <th><HeaderIcon col="next" />{t('table.next')}<InfoTip text={t('table.next.hint')} label={t('table.next.hint')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} /></th>
               <th><HeaderIcon col="actions" />{t('table.actions')}<InfoTip text={t('table.actions.hint')} label={t('table.actions.hint')} icon={<><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z" /></>} /></th>
             </tr></thead>
@@ -883,10 +884,10 @@ export default function JobTrack() {
               {filtered.length === 0 && <tr><td colSpan={8} style={{ textAlign: 'center', color: '#a0a0b0', padding: '2rem' }}>{t('table.empty')}</td></tr>}
               {filtered.map(a => (
                 <tr key={a.id}>
+                  <td className={[isStale(a) ? 'jt-stale-date' : '', sortBy.col === 'date' ? 'jt-sorted-cell' : ''].filter(Boolean).join(' ') || undefined} title={isStale(a) ? t('stale.hint') : undefined}>{a.date}{isStale(a) && <span className="jt-stale" title={t('stale.hint')}>{t('stale')}</span>}</td>
                   {/* 2026-10-14 owner: Minimal = one line per cell (full text on hover), notes hidden */}
                   <td className={'jt-cell-company' + (sortBy.col === 'company' ? ' jt-sorted-cell' : '')} title={a.company}><span className="jt-one">{a.company}</span>{a.notes && <span className="jt-note">{a.notes.split('\n').filter(Boolean).pop()}</span>}</td>
                   <td className="jt-cell-role" title={a.role}><span className="jt-one">{a.role}</span></td>
-                  <td className={[isStale(a) ? 'jt-stale-date' : '', sortBy.col === 'date' ? 'jt-sorted-cell' : ''].filter(Boolean).join(' ') || undefined} title={isStale(a) ? t('stale.hint') : undefined}>{a.date}{isStale(a) && <span className="jt-stale" title={t('stale.hint')}>{t('stale')}</span>}</td>
                   <td>
                     <label className={`status-badge status-select-wrap status-${a.status}`}>
                       <StatusIcon status={a.status} />
@@ -896,8 +897,8 @@ export default function JobTrack() {
                       </select>
                     </label>
                   </td>
-                  <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.cv || '-'}</td>
                   <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.cover || '-'}</td>
+                  <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.cv || '-'}</td>
                   <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.nextDate || '-'}</td>
                   <td>
                     <button className="action-btn" title={t('action.edit')} aria-label={t('action.edit')} onClick={() => openEdit(a)}><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" /></svg></button>

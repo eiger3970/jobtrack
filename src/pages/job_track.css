@@ -410,3 +410,7 @@
 .jt-sort-ic.on { opacity: 1; color: #00ff41; }
 .applications-table th.jt-sorted { background: rgba(0,255,65,0.12); box-shadow: inset 0 -2px 0 #00ff41; }
 .applications-table td.jt-sorted-cell { background: rgba(0,255,65,0.04); }
+/* 2026-10-14 owner: sync panel tidy-up */
+.jts-or { font-size: 0.7em; }
+.jts-words { display: block; text-align: center; font-size: 1.05rem; margin-top: 0.3rem; }
+.jts-clear-wait { display: block; width: 100%; margin: 0.2rem 0 0.6rem; opacity: 0.55; font-size: 0.8rem; }
