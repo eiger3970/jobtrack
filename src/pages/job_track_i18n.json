@@ -1344,6 +1344,11 @@
       "en": "Add optional details",
       "de": "Optionale Angaben ergänzen",
       "fr": "Ajouter des détails facultatifs"
+    },
+    "jr.odd": {
+      "en": "looks wrong - check?",
+      "de": "sieht falsch aus - prüfen?",
+      "fr": "semble faux - vérifier?"
     }
   }
 }

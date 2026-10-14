@@ -119,3 +119,24 @@ export const JR_METHOD: Record<OrpMethod, string> = { electronic: 'Elektronisch'
 export function jobRoomMissing(e: JobRoomEntry): string[] {
   return (['date', 'business', 'postal', 'city', 'jobTitle'] as const).filter(k => !e[k])
 }
+
+// 2026-10-14 owner: "can code pick up these obvious errors?" ("asdf" saved as a street).
+// Soft checks - a hint, never a block. Returns why a value looks wrong, or ''.
+const MASH = /^(asdf|asd|qwer|qwert|qwertz|yxcv|zxcv|test|tset|xxx+|aaa+|abc|abcd|123+|1234|foo|bar|blah|lol|dfgh|jkl)$/i
+export function looksWrong(field: string, v: string): string {
+  const x = (v || '').trim()
+  if (!x) return ''
+  if (MASH.test(x.replace(/\s+/g, ''))) return 'mash'
+  switch (field) {
+    case 'postal': return /^\d{4}$/.test(x) && +x >= 1000 ? '' : 'postal'
+    case 'email': return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(x) ? '' : 'email'
+    case 'phone': return /^(\+|00)?[\d\s/().-]{9,20}$/.test(x) ? '' : 'phone'
+    case 'link': return /^(https?:\/\/|www\.)\S+\.\S+/i.test(x) ? '' : 'link'
+    case 'streetNo': return /^\d{1,4}\s?[a-z]?$/i.test(x) ? '' : 'number'
+    case 'street': case 'city': case 'contactPerson': case 'company':
+      if (/^\d+$/.test(x)) return 'digits'
+      if (x.length >= 3 && !/[aeiouyäöüéèàâêîôû]/i.test(x)) return 'vowels'
+      return ''
+    default: return ''
+  }
+}

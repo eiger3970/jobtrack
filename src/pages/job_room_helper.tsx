@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { type Application, type JobRoomEntry, JR_METHOD, jobRoomEntry, jobRoomMissing } from '../lib/orp'
+import { type Application, type JobRoomEntry, JR_METHOD, jobRoomEntry, jobRoomMissing, looksWrong } from '../lib/orp'
 import { parseAd } from '../lib/ad_parse'
 import { fillPayload, FILL_KEY } from '../lib/jobroom_fill'
 
@@ -63,8 +63,8 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
 
   // a text value: shown with Copy; empty -> an input right here (amber if Job-Room needs it)
   const Val = ({ k, label, field, value, required = false }: { k: string; label: string; field?: keyof Application; value: string; required?: boolean }) => (
-    <div className={'jr-row' + (!value && required ? ' jr-need' : '')}>
-      <span className="jr-label">{label}</span>
+    <div className={'jr-row' + (!value && required ? ' jr-need' : '') + (field && looksWrong(field, value) ? ' jr-odd' : '')}>
+      <span className="jr-label">{label}{field && looksWrong(field, value) && <span className="jr-odd-tag">{t('jr.odd')}</span>}</span>
       {value
         ? <span className="jr-value">{value}</span>
         : field
