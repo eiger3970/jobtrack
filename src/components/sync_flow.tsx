@@ -18,6 +18,19 @@ const MiniLock = ({ x, y }: { x: number; y: number }) => (
   </g>
 )
 
+// a page whose "text" is rows of passphrase blocks (short first line, longer ones below)
+function LockedList({ x, y }: { x: number; y: number }) {
+  const rows = [4, 7, 5, 6]
+  return (
+    <g>
+      <path d={`M${x} ${y}h16l5 5v22h-21z`} fill="#03020a" stroke="#f0eeff" strokeWidth="1.4" strokeLinejoin="round" />
+      {rows.map((n, r) => Array.from({ length: n }, (_, i) => (
+        <rect key={`${r}-${i}`} x={x + 2.6 + i * 2.25} y={y + 6.5 + r * 5} width="1.5" height="2.6" rx="0.5" fill="#00ff41" />
+      )))}
+    </g>
+  )
+}
+
 export default function SyncFlow({ variant, label, lockTip, onLock, lockExpanded, className = 'trx-flow' }: {
   variant: 'direct' | 'relay'; label: string; lockTip: string; onLock?: () => void; lockExpanded?: boolean; className?: string
 }) {
@@ -53,7 +66,9 @@ export default function SyncFlow({ variant, label, lockTip, onLock, lockExpanded
         {/* the passphrase symbol inside the lock (4 blocks, 3 hyphens - components/passphrase_icon.tsx) */}
         <svg x="141.5" y="99.5" width="17" height="8.5" viewBox="0 0 32 16" fill="none" stroke="#03020a" strokeWidth="2.6" strokeLinecap="round"><rect x="0.8" y="4" width="4.9" height="8" rx="1.8" /><rect x="9.3" y="4" width="4.9" height="8" rx="1.8" /><rect x="17.8" y="4" width="4.9" height="8" rx="1.8" /><rect x="26.3" y="4" width="4.9" height="8" rx="1.8" /><path d="M6.8 8h1.4M15.3 8h1.4M23.8 8h1.4" /></svg>
       </g>
-      <path d="M96 97h12l4 4v12h-16z" fill="#03020a" stroke="#f0eeff" strokeWidth="1.4" /><path d="M192 97h12l4 4v12h-16z" fill="#03020a" stroke="#f0eeff" strokeWidth="1.4" />
+      {/* 2026-10-14 owner: the list itself, locked - lines of mini passphrase blocks instead of text */}
+      <LockedList x={90} y={90} />
+      <LockedList x={186} y={90} />
     </svg>
   )
 }
