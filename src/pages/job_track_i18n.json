@@ -1326,9 +1326,9 @@
       "fr": "Barre de favoris"
     },
     "jr.bm.how": {
-      "en": "Press and hold the green button below, drag it up into the bookmarks bar, let go. No bar? Press Ctrl+Shift+B.",
-      "de": "Den grünen Knopf unten gedrückt halten, nach oben in die Lesezeichenleiste ziehen, loslassen. Keine Leiste? Ctrl+Shift+B drücken.",
-      "fr": "Maintenez le bouton vert ci-dessous, glissez-le dans la barre de favoris, relâchez. Pas de barre? Ctrl+Maj+B."
+      "en": "Press and hold the green button below, drag it up into the bookmarks bar, let go -> tap Save\nNo bar? Press Ctrl+Shift+B.",
+      "de": "Den grünen Knopf unten gedrückt halten, nach oben in die Lesezeichenleiste ziehen, loslassen -> Speichern tippen\nKeine Leiste? Ctrl+Shift+B drücken.",
+      "fr": "Maintenez le bouton vert ci-dessous, glissez-le dans la barre de favoris, relâchez -> touchez Enregistrer\nPas de barre? Ctrl+Maj+B."
     },
     "jr.bm.done2": {
       "en": "Done - it's in my bookmarks bar",
