@@ -196,6 +196,8 @@ export default function JobTrack() {
   const [orpOpen, setOrpOpen] = useState(false)
   const [adText, setAdText] = useState('')
   const [adFilled, setAdFilled] = useState(false)
+  // how many duplicates the last Open backup file joined (shown on the button)
+  const [importJoined, setImportJoined] = useState(0)
   const [orpPanel, setOrpPanel] = useState(() => import.meta.env.DEV && typeof window !== 'undefined' && window.location.hash === '#preview=jobroom')
   const [minimal, setMinimal] = useState(() => readStored(MIN_STORAGE) === '1' || (import.meta.env.DEV && typeof window !== 'undefined' && window.location.search.includes('min')))
   useEffect(() => { try { localStorage.setItem(MIN_STORAGE, minimal ? '1' : '0') } catch { /* private mode */ } }, [minimal])
@@ -589,7 +591,7 @@ export default function JobTrack() {
         // collide with ids already used here.
         // 2026-10-14 owner: same merge as Sync - opening the same backup twice no
         // longer doubles the list; an entry that differs is kept twice (never lose data)
-        setApps(prev => merge(prev, {}, importedApps, {}).apps)
+        setApps(prev => { const r = merge(prev, {}, importedApps, {}); setImportJoined(r.joined); return r.apps })
         if (!quota && parsed.quota) setQuota(parsed.quota)
         setBackupImported(true)
         setTimeout(() => setBackupImported(false), 2500)
@@ -716,7 +718,7 @@ export default function JobTrack() {
           <div className="howto-step howto-step-info import-btn-wrap" ref={importInfoRef}>
             <button type="button" className="howto-go" onClick={() => backupInputRef.current?.click()} title={t('backup.hint')}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-              <span className="export-btn-label">{backupImported ? t('backup.imported') : t('backup.import')}</span>
+              <span className="export-btn-label">{backupImported ? (importJoined ? `${t('backup.imported')} - ${importJoined} ${t('backup.joined')}` : t('backup.imported')) : t('backup.import')}</span>
             </button>
             <button type="button" className="info-btn" aria-label={t('backup.importInfo.title')} onClick={() => setShowImportInfo(v => !v)}>i</button>
             {showImportInfo && (

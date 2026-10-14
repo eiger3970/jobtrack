@@ -28,7 +28,7 @@ export function key(a: Application): string {
   return JSON.stringify(Object.keys(a).sort().map(k => [k, (a as any)[k] ?? '']).filter(([, v]) => v !== ''))
 }
 
-export interface MergeResult { apps: Application[]; fromPhone: number; fromComputer: number; both: number; removed: number; merged: number }
+export interface MergeResult { apps: Application[]; fromPhone: number; fromComputer: number; both: number; removed: number; merged: number; joined: number }
 
 // the entry as it was at the last sync (key() is sorted [field, value] pairs)
 function unkey(k: string | undefined): Record<string, unknown> | null {
@@ -84,7 +84,44 @@ export function merge(pc: Application[], pcBase: Base, phone: Application[], pho
       else { out.push(q); if (!(id in pcBase)) fromPhone++ }
     }
   }
-  return { apps: out, fromPhone, fromComputer, both, removed, merged }
+  const d = dedupe(out)
+  return { apps: d.apps, fromPhone, fromComputer, both, removed, merged, joined: d.joined }
+}
+
+// 2026-10-14 owner: "merging could cause a big mess of 35 hard to find job duplicates
+// ... can this not be auto checked?" Same job = same date + company + role (case,
+// accents, spaces, "100%" ignored). Copies are joined: empty fields filled from the
+// other copy; a different value for the same detail goes into the notes - never lost.
+const norm = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\d+\s*(-\s*\d+\s*)?%/g, '').replace(/[^a-z0-9]+/g, '')
+const SKIP = new Set(['id', 'notes'])
+function filled(a: Application) { return Object.entries(a).filter(([k, v]) => !SKIP.has(k) && v !== '' && v !== undefined && v !== null).length }
+
+export function dedupe(apps: Application[]): { apps: Application[]; joined: number } {
+  const byKey = new Map<string, Application>()
+  const out: Application[] = []
+  let joined = 0
+  for (const a of apps) {
+    const k = `${a.date}|${norm(a.company)}|${norm(a.role)}`
+    const first = byKey.get(k)
+    if (!first || !norm(a.company)) { byKey.set(k, a); out.push(a); continue }
+    // keep the fuller copy, fill its gaps from the other
+    const [keep, other] = filled(a) > filled(first) ? [a, first] : [first, a]
+    const m: Record<string, unknown> = { ...keep }
+    const extra: string[] = []
+    for (const [f, v] of Object.entries(other)) {
+      if (SKIP.has(f) || v === '' || v === undefined || v === null) continue
+      const cur = m[f]
+      if (cur === '' || cur === undefined || cur === null) m[f] = v
+      else if ((f === 'company' || f === 'role') && norm(String(cur)) === norm(String(v))) continue // only spelling differs
+      else if (JSON.stringify(cur) !== JSON.stringify(v)) extra.push(`${f} = ${v}`)
+    }
+    const notes = [keep.notes, other.notes && other.notes !== keep.notes ? other.notes : '', extra.length ? `Other copy: ${extra.join(', ')}` : ''].filter(Boolean).join('\n')
+    const joinedApp = { ...(m as unknown as Application), notes }
+    out[out.indexOf(first)] = joinedApp
+    byKey.set(k, joinedApp)
+    joined++
+  }
+  return { apps: out, joined }
 }
 
 // ── Link ──

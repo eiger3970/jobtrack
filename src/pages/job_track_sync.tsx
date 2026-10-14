@@ -39,7 +39,7 @@ function Points({ L }: { L: Tx }) {
   return (
     <ul className="jts-points">
       {/* 2026-10-14 owner: "Keep both, what does this mean ... Key, I don't understand" - plain words */}
-      <li><b>{L('Changed on both devices?', 'Auf beiden Geräten geändert?', 'Modifié sur les deux appareils?')}</b> {L("Merged automatically. Only if the same detail was changed differently on both, both versions are kept - delete the one you don't want. Nothing is lost.", 'Automatisch zusammengeführt. Nur wenn dieselbe Angabe auf beiden verschieden geändert wurde, bleiben beide Versionen - löschen Sie die, die Sie nicht wollen. Nichts geht verloren.', "Fusionné automatiquement. Seulement si le même détail a été modifié différemment des deux côtés, les deux versions sont gardées - supprimez celle que vous ne voulez pas. Rien n'est perdu.")}</li>
+      <li><b>{L('Changed on both devices?', 'Auf beiden Geräten geändert?', 'Modifié sur les deux appareils?')}</b> {L('Merged automatically into one entry. If the same detail differs, the other value is written into the notes - nothing is lost, no duplicates to hunt for.', 'Automatisch zu einem Eintrag zusammengeführt. Weicht dieselbe Angabe ab, steht der andere Wert in den Notizen - nichts geht verloren, keine Doppelten zu suchen.', "Fusionné automatiquement en une entrée. Si le même détail diffère, l'autre valeur est notée - rien n'est perdu, aucun doublon à chercher.")}</li>
       <li><b>{L('The lock key', 'Der Schlüssel', 'La clé')}</b> {L('travels only from this screen to your phone camera, inside the QR code - never over the internet. Nobody else can open your list.', 'reist nur von diesem Bildschirm zur Handykamera, im QR-Code - nie übers Internet. Niemand sonst kann Ihre Liste öffnen.', "passe seulement de cet écran à la caméra du téléphone, dans le code QR - jamais par internet. Personne d'autre ne peut ouvrir votre liste.")}</li>
       <li><b>{L('Our server', 'Unser Server', 'Notre serveur')}</b> {L('passes on the locked list, sees only that 2 devices linked, keeps nothing.', 'reicht die verschlossene Liste weiter, sieht nur 2 verbundene Geräte, speichert nichts.', 'transmet la liste verrouillée, voit seulement 2 appareils liés, ne garde rien.')}</li>
     </ul>
@@ -53,6 +53,7 @@ function Done({ r, L }: { r: MergeResult; L: Tx }) {
       <ul>
         <li>{L('From the phone', 'Vom Telefon', 'Du téléphone')}: {r.fromPhone}</li>
         <li>{L('From the computer', 'Vom Computer', "De l'ordinateur")}: {r.fromComputer}</li>
+        {(r.joined ?? 0) > 0 && <li>{L('Duplicates joined (same job, date and company)', 'Doppelte zusammengelegt (gleiche Stelle, Datum, Firma)', 'Doublons réunis (même poste, date, entreprise)')}: {r.joined}</li>}
         {(r.merged ?? 0) > 0 && <li>{L('Merged automatically (different details changed)', 'Automatisch zusammengeführt (verschiedene Angaben geändert)', 'Fusionné automatiquement (détails différents modifiés)')}: {r.merged}</li>}
         {r.both > 0 && <li>{L('Kept both (changed on both)', 'Beide behalten (auf beiden geändert)', 'Gardé les deux (modifié des deux côtés)')}: {r.both}</li>}
         {r.removed > 0 && <li>{L('Deleted (deleted on one device)', 'Gelöscht (auf einem Gerät gelöscht)', 'Supprimé (supprimé sur un appareil)')}: {r.removed}</li>}

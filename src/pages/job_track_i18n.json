@@ -1054,6 +1054,11 @@
       "en": "All entered - now save the Job-Room page as a PDF (Ctrl+P) for your records",
       "de": "Alle erfasst - jetzt die Job-Room-Seite als PDF sichern (Ctrl+P)",
       "fr": "Tout est saisi - enregistrez la page Job-Room en PDF (Ctrl+P)"
+    },
+    "backup.joined": {
+      "en": "duplicates joined",
+      "de": "Doppelte zusammengelegt",
+      "fr": "doublons réunis"
     }
   }
 }
