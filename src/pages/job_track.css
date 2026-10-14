@@ -423,11 +423,30 @@
 .jts-confirm-btns { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
 .jts-confirm-btns .jts-clear-amber { flex: 1; }
 .jtb-synced .jts-clear-amber, .jtb-synced .jts-confirm { max-width: 32rem; }
-/* 2026-10-14 colour key above the table */
-.jt-key { display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; font-size: 0.75rem; color: #d0d0e0; margin: 0 0 0.5rem; }
-.jt-key span { display: inline-flex; align-items: center; gap: 0.35rem; }
-.jt-key i { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 3px; }
-.jt-key-amber { background: #ffb000; }
-.jt-key-sort { background: rgba(0,255,65,0.25); box-shadow: inset 0 -2px 0 #00ff41; }
-.jt-key-scroll { color: #8a86a8; }
-@media (min-width: 1100px) { .jt-key-scroll { display: none !important; } }
+/* 2026-10-14 owner: all 8 columns fit the screen - no sideways scroll, nothing hidden */
+.applications-table { table-layout: fixed; }
+.applications-table th:nth-child(1) { width: 7.4rem; }
+.applications-table th:nth-child(2) { width: 6.6rem; }
+.applications-table th:nth-child(3) { width: 8.6rem; }
+.applications-table th:nth-child(4), .applications-table th:nth-child(5) { width: 5.2rem; }
+.applications-table th:nth-child(8) { width: 5.4rem; }
+.applications-table td { overflow-wrap: anywhere; }
+.jt-small { font-size: 0.75rem; color: #a0a0b0; }
+.jt-clip { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.action-btn { color: #00ff41; }
+.action-btn:last-child { color: #ff6b6b; }
+.action-btn svg { display: block; }
+.jt-actions { white-space: nowrap; }
+/* phones: each application becomes a card, every column labelled */
+@media (max-width: 760px) {
+  .applications-table, .applications-table tbody, .applications-table tr, .applications-table td { display: block; width: 100%; }
+  .applications-table thead { display: none; }
+  .applications-table { background: none; }
+  .applications-table tr { background: #0f0d1a; border: 1px solid #2a2a3a; border-radius: 10px; margin-bottom: 0.6rem; padding: 0.4rem 0.6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0 0.6rem; }
+  .applications-table td { border: 0; padding: 0.3rem 0; font-size: 0.82rem; }
+  .applications-table td::before { content: attr(data-label); display: block; font-size: 0.65rem; color: #00ff41; letter-spacing: 0.04em; }
+  .applications-table td.jt-cell-company, .applications-table td.jt-cell-role { grid-column: 1 / -1; }
+  .applications-table td.jt-cell-company { font-weight: 700; }
+  .applications-table td[colspan] { grid-column: 1 / -1; }
+  .applications-table tbody tr:last-child td { border-radius: 0; }
+}

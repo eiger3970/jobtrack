@@ -873,34 +873,26 @@ export default function JobTrack() {
           </div>
         )}
 
-        {/* 2026-10-14 owner: "colours need a key, humans aren't mind readers" */}
-        {apps.length > 0 && <p className="jt-key">
-          <span><i className="jt-key-amber" />{t('key.amber')}</span>
-          <span><i className="jt-key-sort" />{t('key.sort')}</span>
-          <span className="jt-key-scroll">{t('key.scroll')}</span>
-        </p>}
-        <div style={{ overflowX: 'auto' }}>
+        <div className="jt-table-wrap">
           <table className="applications-table">
+            {/* 2026-10-14 owner: Date, Next, Status, Cover, CV, Company, Role, Actions - fits the screen, no sideways scroll */}
             <thead><tr>
               <th className={sortCls('date')} aria-sort={sortBy.col === 'date' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}<InfoTip text={t('stale.legend')} label={t('stale.legend')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} /></th>
+              <th><HeaderIcon col="next" />{t('table.next')}<InfoTip text={t('table.next.hint')} label={t('table.next.hint')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} /></th>
+              <th><HeaderIcon col="status" />{t('table.status')}</th>
+              <th><HeaderIcon col="cover" />{t('table.cover')}</th>
+              <th><HeaderIcon col="cv" />{t('table.cv')}</th>
               <th className={sortCls('company')} aria-sort={sortBy.col === 'company' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('company')} title="Sort A-Z"><HeaderIcon col="company" />{t('table.company')}{sortMark('company')}</th>
               <th><HeaderIcon col="role" />{t('table.role')}</th>
-              <th><HeaderIcon col="cover" />{t('table.cover')}</th>
-              <th><HeaderIcon col="status" />{t('table.status')}</th>
-              <th><HeaderIcon col="cv" />{t('table.cv')}</th>
-              <th><HeaderIcon col="next" />{t('table.next')}<InfoTip text={t('table.next.hint')} label={t('table.next.hint')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} /></th>
               <th><HeaderIcon col="actions" />{t('table.actions')}<InfoTip text={t('table.actions.hint')} label={t('table.actions.hint')} icon={<><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z" /></>} /></th>
             </tr></thead>
             <tbody>
               {filtered.length === 0 && <tr><td colSpan={8} style={{ textAlign: 'center', color: '#a0a0b0', padding: '2rem' }}>{t('table.empty')}</td></tr>}
               {filtered.map(a => (
                 <tr key={a.id}>
-                  <td className={[isStale(a) ? 'jt-stale-date' : '', sortBy.col === 'date' ? 'jt-sorted-cell' : ''].filter(Boolean).join(' ') || undefined} title={isStale(a) ? t('stale.hint') : undefined}>{a.date}{isStale(a) && <span className="jt-stale" title={t('stale.hint')}>{t('stale')}</span>}</td>
-                  {/* 2026-10-14 owner: Minimal = one line per cell (full text on hover), notes hidden */}
-                  <td className={'jt-cell-company' + (sortBy.col === 'company' ? ' jt-sorted-cell' : '')} title={a.company}><span className="jt-one">{a.company}</span>{a.notes && <span className="jt-note">{a.notes.split('\n').filter(Boolean).pop()}</span>}</td>
-                  <td className="jt-cell-role" title={a.role}><span className="jt-one">{a.role}</span></td>
-                  <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.cover || '-'}</td>
-                  <td>
+                  <td data-label={t('table.date')} className={[isStale(a) ? 'jt-stale-date' : '', sortBy.col === 'date' ? 'jt-sorted-cell' : ''].filter(Boolean).join(' ') || undefined} title={isStale(a) ? t('stale.hint') : undefined}>{a.date}{isStale(a) && <span className="jt-stale" title={t('stale.hint')}>{t('stale')}</span>}</td>
+                  <td data-label={t('table.next')} className="jt-small">{a.nextDate || '-'}</td>
+                  <td data-label={t('table.status')}>
                     <label className={`status-badge status-select-wrap status-${a.status}`}>
                       <StatusIcon status={a.status} />
                       {STATUS_PLAIN[a.status] || a.status}
@@ -909,9 +901,11 @@ export default function JobTrack() {
                       </select>
                     </label>
                   </td>
-                  <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.cv || '-'}</td>
-                  <td style={{ fontSize: '0.75rem', color: '#a0a0b0' }}>{a.nextDate || '-'}</td>
-                  <td>
+                  <td data-label={t('table.cover')} className="jt-small jt-clip" title={a.cover || undefined}>{a.cover || '-'}</td>
+                  <td data-label={t('table.cv')} className="jt-small jt-clip" title={a.cv || undefined}>{a.cv || '-'}</td>
+                  <td data-label={t('table.company')} className={'jt-cell-company' + (sortBy.col === 'company' ? ' jt-sorted-cell' : '')} title={a.company}><span className="jt-one">{a.company}</span>{a.notes && <span className="jt-note">{a.notes.split('\n').filter(Boolean).pop()}</span>}</td>
+                  <td data-label={t('table.role')} className="jt-cell-role" title={a.role}><span className="jt-one">{a.role}</span></td>
+                  <td data-label={t('table.actions')} className="jt-actions">
                     <button className="action-btn" title={t('action.edit')} aria-label={t('action.edit')} onClick={() => openEdit(a)}><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" /></svg></button>
                     <button className="action-btn" title={t('action.delete')} aria-label={t('action.delete')} onClick={() => del(a.id)}><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" /></svg></button>
                   </td>
