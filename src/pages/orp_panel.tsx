@@ -36,6 +36,7 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
   const [info, setInfo] = useState(false)
   const [step, setStep] = useState<'ask' | 'setup' | 'work'>(() => (import.meta.env.DEV && window.location.search.includes('setup') ? 'setup' : 'ask'))
   const bm = useRef<HTMLAnchorElement>(null)
+  const [dragged, setDragged] = useState(false)
   useEffect(() => { bm.current?.setAttribute('href', bookmarklet(window.location.origin)) }, [step])
   const [regText, setRegText] = useState(() => (loadProfile().registered ? swissDate(loadProfile().registered) : ''))
   const pickRef = useRef<HTMLInputElement>(null)
@@ -142,8 +143,9 @@ export default function OrpPanel({ apps, t, onClose, onUpdate }: { apps: Applica
               <path d="M120 88 l0 14 l4 -4 l3 6 l3 -1 l-3 -6 l5 0 z" fill="#f0eeff" stroke="#03020a" strokeWidth="0.8" />
             </svg>
             <p className="orp-setup-how">{t('jr.bm.how').split('\n').map((l, i) => <span key={i}>{i > 0 && <br />}{l}</span>)}</p>
-            <a ref={bm} className="jr-bm-link orp-setup-btn" onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }}>JobTrack fill</a>
-            <button type="button" className="btn btn-glow orp-next" onClick={() => setStep('work')}>{t('jr.bm.done2')}</button>
+            {/* 2026-10-14 owner: the button to drag glows first; after the drag, Done glows */}
+            <a ref={bm} className={'jr-bm-link orp-setup-btn' + (dragged ? '' : ' orp-glow')} onDragEnd={() => setDragged(true)} onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }}>JobTrack fill</a>
+            <button type="button" className={(dragged ? 'btn btn-glow' : 'btn-secondary') + ' orp-next'} onClick={() => setStep('work')}>{t('jr.bm.done2')}</button>
           </div>
         )}
 

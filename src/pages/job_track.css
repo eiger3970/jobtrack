@@ -525,3 +525,5 @@
 .orp-stepno { font-size: 0.85rem; color: #00ff41; font-weight: 700; letter-spacing: 0.1em; }
 /* 2026-10-14 owner: the drag button looked too big to fit the bookmarks bar - bookmark-sized */
 .jr-bm-link.orp-setup-btn { font-size: 0.85rem; padding: 0.25rem 0.7rem !important; border-radius: 5px; }
+.orp-glow { animation: orp-glow 1.4s ease-in-out infinite; }
+@keyframes orp-glow { 50% { box-shadow: 0 0 0 4px rgba(0,255,65,0.35), 0 0 18px rgba(0,255,65,0.7); } }
