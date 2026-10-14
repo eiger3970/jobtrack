@@ -508,3 +508,4 @@
 .jr-step b { color: #f0eeff; } .jr-step .jr-month, .jr-step .jr-bmname { color: #00ff41; }
 .jr-step2 { font-size: 0.85rem; color: #f0eeff; font-weight: 700; margin: 0.4rem 0; }
 .jr-nogaps { display: flex; align-items: center; gap: 0.3rem; color: #00ff41; font-weight: 400; margin: 0.3rem 0 0; }
+.jr-fill-title { color: #ffb000; font-size: 0.82rem; font-weight: 700; margin: 0; }
