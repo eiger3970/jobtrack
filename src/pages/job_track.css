@@ -480,3 +480,6 @@
 .orp-weeks { font-size: 0.8rem; color: #8a86a8; margin: 0.3rem 0 0.6rem; }
 .orp-weeks summary { cursor: pointer; }
 .orp-weeks ul { margin: 0.3rem 0 0; padding-left: 1.2rem; }
+.jts-step-pic { display: flex; gap: 0.6rem; align-items: center; }
+.jts-step-pic svg { flex-shrink: 0; }
+.jts-steps { list-style: none; padding-left: 0; } .jts-num { color: #00ff41; margin-right: 0.2rem; }

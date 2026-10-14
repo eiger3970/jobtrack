@@ -259,8 +259,16 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
   else body = (<>
     {/* 2026-10-14 owner: a clear hint - sync first, then clear the shared computer */}
     <ol className="jts-steps">
-      <li>{L('Phone -> Camera -> point at this QR -> tap the link', 'Telefon -> Kamera -> auf diesen QR richten -> Link tippen', 'Téléphone -> Appareil photo -> visez ce QR -> touchez le lien')}<br /><span className="jts-or">{L('or JobTrack app -> Sync phone + computer -> Scan the QR code', 'oder JobTrack-App -> Sync Telefon + Computer -> QR-Code scannen', 'ou app JobTrack -> Sync téléphone + ordinateur -> Scanner le code QR')}</span></li>
-      <li>{L('Shared or library computer: after the sync, tap the green button below the QR code', 'Fremder oder Bibliotheks-Computer: nach dem Sync den grünen Knopf unter dem QR-Code tippen', 'Ordinateur partagé ou de bibliothèque: après la synchro, touchez le bouton vert sous le code QR')}</li>
+      {/* 2026-10-14 owner: the LocalSync guide's picture - phone scanning the QR - left of the step */}
+      <li className="jts-step-pic"><svg viewBox="0 0 64 40" width="64" height="40" aria-hidden="true">
+        <rect x="2" y="4" width="18" height="32" rx="3.5" fill="none" stroke="#00ff41" strokeWidth="2.4" />
+        <circle cx="11" cy="31.5" r="1.4" fill="#00ff41" />
+        {[5, 10, 15].map(r => <path key={r} d={`M${25 + r * 0.4} ${20 - r} A${r * 1.15} ${r * 1.15} 0 0 1 ${25 + r * 0.4} ${20 + r}`} stroke="#00ff41" strokeWidth="2" fill="none" />)}
+        <rect x="44" y="8" width="18" height="18" rx="2" fill="#f0eeff" />
+        {[[46, 10], [55, 10], [46, 19]].map(([x, y]) => <rect key={`${x}${y}`} x={x} y={y} width="5" height="5" fill="none" stroke="#03020a" strokeWidth="1.4" />)}
+        <rect x="55" y="19" width="2.4" height="2.4" fill="#03020a" /><rect x="58" y="22" width="2.4" height="2.4" fill="#03020a" />
+      </svg><span><b className="jts-num">1.</b> {L('Phone -> Camera -> point at this QR -> tap the link', 'Telefon -> Kamera -> auf diesen QR richten -> Link tippen', 'Téléphone -> Appareil photo -> visez ce QR -> touchez le lien')}<br /><span className="jts-or">{L('or JobTrack app -> Sync phone + computer -> Scan the QR code', 'oder JobTrack-App -> Sync Telefon + Computer -> QR-Code scannen', 'ou app JobTrack -> Sync téléphone + ordinateur -> Scanner le code QR')}</span></span></li>
+      <li><b className="jts-num">2.</b> {L('Shared or library computer: after the sync, tap the amber button below the QR code', 'Fremder oder Bibliotheks-Computer: nach dem Sync den orangen Knopf unter dem QR-Code tippen', 'Ordinateur partagé ou de bibliothèque: après la synchro, touchez le bouton orange sous le code QR')}</li>
     </ol>
     {qr ? <img className="jts-qr" src={qr} alt={L('QR code to sync', 'QR-Code zum Synchronisieren', 'Code QR pour synchroniser')} /> : <div className="jts-qr" />}
     {state === 'syncing' && <p className="jts-wait"><span className="jts-spin" />{L('Syncing...', 'Synchronisiere...', 'Synchronisation...')}</p>}
