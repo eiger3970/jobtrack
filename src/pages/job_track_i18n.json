@@ -761,7 +761,7 @@
       "fr": "un cloud respectueux de la vie privée (auto-hébergé / chiffré de bout en bout, mieux que Google Drive ou Dropbox)"
     },
     "orp.details": {
-      "en": "ORP details (Job-Room / form 716.007)",
+      "en": "Unemployment office details (Job-Room / form 716.007)",
       "de": "RAV-Angaben (Job-Room / Formular 716.007)",
       "fr": "Détails ORP (Job-Room / formulaire 716.007)"
     },
@@ -801,7 +801,7 @@
       "fr": "Taux d'activité %"
     },
     "orp.assigned": {
-      "en": "Assigned by the ORP",
+      "en": "Assigned by the unemployment office",
       "de": "Zuweisung RAV",
       "fr": "Assignation ORP"
     },
@@ -816,12 +816,12 @@
       "fr": "Saisies pour l'office du chômage"
     },
     "orp.title": {
-      "en": "Unemployment office job entries - Switzerland: Job-Room (ORP/RAV)",
+      "en": "Unemployment office job entries - Switzerland: Job-Room",
       "de": "Einträge fürs Arbeitsamt - Schweiz: Job-Room (RAV)",
       "fr": "Saisies pour l'office du chômage - Suisse: Job-Room (ORP)"
     },
     "orp.name": {
-      "en": "Name and first name (as on your ORP letters)",
+      "en": "Name and first name (as on your unemployment office letters)",
       "de": "Name und Vorname (wie auf RAV-Briefen)",
       "fr": "Nom et prénom (comme sur vos lettres ORP)"
     },
@@ -831,7 +831,7 @@
       "fr": "No AVS (756.xxxx.xxxx.xx)"
     },
     "orp.registered": {
-      "en": "ORP registration date",
+      "en": "Unemployment office registration date",
       "de": "Datum der RAV-Anmeldung",
       "fr": "Date d'inscription ORP"
     },
@@ -911,7 +911,7 @@
       "fr": "Chaque mois: Un mois -> Job-Room avant le 5."
     },
     "orp.info.registered": {
-      "en": "from your ORP confirmation, enter once",
+      "en": "from your unemployment office confirmation, enter once",
       "de": "von der RAV-Bestätigung, einmal eingeben",
       "fr": "sur votre confirmation ORP, à saisir une fois"
     },

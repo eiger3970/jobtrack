@@ -58,7 +58,9 @@ function Choices({ L, onSync, onExport, onKeep }: { L: Tx; onSync: () => void; o
       </li>
       <li>
         <button className="btn-secondary" onClick={onExport}>{L('USB stick - save a file', 'USB-Stick - Datei speichern', 'Clé USB - enregistrer un fichier')}</button>
-        <Ease n={1} L={L} /><span className="jtb-why">{L('Needs a USB stick with you', 'Braucht einen USB-Stick dabei', 'Il faut une clé USB sur vous')}</span>
+        <Ease n={1} L={L} /><span className="jtb-why">{L('Needs a USB stick with you, locked with a passphrase', 'Braucht einen USB-Stick dabei, mit Passphrase verschlossen', 'Il faut une clé USB sur vous, verrouillée par une phrase de passe')}{' - '}
+          {/* 2026-10-14 owner: link to the USB-locking product once it's built (idea: memory project_secure_usb_idea); the passphrase page until then */}
+          <a href="/passphrase" target="_blank" rel="noopener">{L('Passphrase', 'Passphrase', 'Phrase de passe')}</a></span>
       </li>
     </ul>
   )
