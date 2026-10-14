@@ -822,8 +822,8 @@ export default function JobTrack() {
           <div className="toolbar-primary">
             {/* 2026-10-13 owner: ORP proofs (716.007 PDF + Job-Room) in one tap */}
             <button className="btn-secondary export-btn orp-btn" onClick={() => setOrpPanel(true)}>
-              {/* 2026-10-14 owner: an office building - the ORP is on the 3rd floor, those windows lit */}
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="1" /><path d="M10 21.5v-3h4v3" />{[5.5, 9, 12.5, 16].map(y => [7.5, 11, 14.5].map(x => <rect key={`${x}${y}`} x={x} y={y - (y === 16 ? 0 : 0)} width="2" height="1.8" rx="0.3" fill={y === 9 ? '#ffb000' : 'currentColor'} stroke="none" opacity={y === 9 ? 1 : 0.55} />))}</svg>
+              {/* 2026-10-14 owner: the ORP building - ground + 5 floors, ORP on the 3rd floor (4th level up), those windows lit */}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"><rect x="4.5" y="1" width="15" height="21.5" rx="1" /><path d="M10.5 22.5v-3h3v3" />{[2.6, 5.7, 8.8, 11.9, 15].map(y => [6.8, 11, 15.2].map(x => <rect key={`${x}${y}`} x={x} y={y} width="2.1" height="1.7" rx="0.3" fill={y === 8.8 ? '#ffb000' : 'currentColor'} stroke="none" opacity={y === 8.8 ? 1 : 0.5} />))}{[6.8, 15.2].map(x => <rect key={`g${x}`} x={x} y="18.6" width="2.1" height="1.7" rx="0.3" fill="currentColor" stroke="none" opacity="0.5" />)}</svg>
               <span className="export-btn-label">{t('orp.button')}</span>
             </button>
             <button className="btn-secondary export-btn" onClick={() => setBulkModal(true)}>
