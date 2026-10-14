@@ -92,22 +92,20 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t }: {
 
   return (
     <div className="jr">
-      <div className="jr-top">
-        <p className="jr-progress"><b>{done}</b> / {rows.length} {t('jr.entered')}</p>
-        <div className="jr-bar"><div style={{ width: `${(done / rows.length) * 100}%` }} /></div>
-        {/* 2026-10-14 owner: one line with the month - not repeated in the steps below */}
-        <p className="jr-where">{t('jr.where').split('{month}')[0]}<b>{monthLabel}</b>{t('jr.where').split('{month}')[1] ?? ''}</p>
-      </div>
-      {/* 2026-10-14 owner: Bitwarden-style fill - one bookmark, then one click per job on Job-Room */}
+      {/* 2026-10-14 owner: set-up first and small; then two lines, each saying WHERE you are */}
       <details className="jr-bm">
         <summary>{t('jr.bm.title')}</summary>
         <p>{t('jr.bm.once')}</p>
         <a ref={bm} className="jr-bm-link" onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }} title={t('jr.bm.drag')}>JobTrack fill</a>
-        <ol>
-          <li>{t('jr.bm.s1')}</li>
-          <li>{t('jr.bm.s3')}</li>
-        </ol>
       </details>
+      <div className="jr-top">
+        <p className="jr-progress"><b>{done}</b> / {rows.length} {t('jr.entered')}</p>
+        <div className="jr-bar"><div style={{ width: `${(done / rows.length) * 100}%` }} /></div>
+        <ol className="jr-flow">
+          <li><b>Job-Room:</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{t('jr.flow1').split('{month}')[1] ?? ''}</li>
+          <li><b>JobTrack:</b> {t('jr.flow2')}</li>
+        </ol>
+      </div>
       <div className="jr-dots" role="tablist">
         {rows.map((r, n) => (
           <button key={r.id} type="button" role="tab" aria-selected={n === idx} aria-label={`${n + 1}. ${r.company}`}

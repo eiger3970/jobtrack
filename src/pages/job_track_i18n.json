@@ -1166,9 +1166,9 @@
       "fr": "Chercher ce poste sur d'autres sites"
     },
     "jr.bm.title": {
-      "en": "Fill Job-Room in one click (set up once)",
-      "de": "Job-Room mit einem Klick ausfüllen (einmal einrichten)",
-      "fr": "Remplir Job-Room en un clic (à installer une fois)"
+      "en": "Set up one-click fill (once)",
+      "de": "Ein-Klick-Ausfüllen einrichten (einmal)",
+      "fr": "Installer le remplissage en un clic (une fois)"
     },
     "jr.bm.once": {
       "en": "Once: drag this green button to your bookmarks bar (Firefox: Ctrl+Shift+B shows the bar).",
@@ -1249,6 +1249,16 @@
       "en": "{n} weeks with fewer than 2 searches",
       "de": "{n} Wochen mit weniger als 2 Bewerbungen",
       "fr": "{n} semaines avec moins de 2 recherches"
+    },
+    "jr.flow1": {
+      "en": "work-efforts -> {month} -> +Enter -> click JobTrack fill (bookmarks bar) -> check the form -> Save (red, bottom right)",
+      "de": "work-efforts -> {month} -> +Enter -> JobTrack fill klicken (Lesezeichenleiste) -> Formular prüfen -> Speichern (rot, unten rechts)",
+      "fr": "work-efforts -> {month} -> +Enter -> cliquez JobTrack fill (favoris) -> vérifiez le formulaire -> Enregistrer (rouge, en bas à droite)"
+    },
+    "jr.flow2": {
+      "en": "below, on this job's card: Entered in Job-Room -> the next job opens",
+      "de": "unten, auf der Karte dieser Stelle: In Job-Room erfasst -> die nächste Stelle öffnet sich",
+      "fr": "en bas, sur la carte de ce poste: Saisie dans Job-Room -> le poste suivant s'ouvre"
     }
   }
 }

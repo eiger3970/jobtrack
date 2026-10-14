@@ -491,3 +491,5 @@
 .modal-content .orp-date input[type="text"] { margin: 0; flex: 1; }
 .orp-date-native { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; right: 0; bottom: 0; }
 .orp-date-btn { background: #1a1a2a; border: 1px solid #2a2a3a; border-radius: 6px; color: #00ff41; padding: 0.5rem; cursor: pointer; }
+.jr-flow { margin: 0.5rem 0 0; padding-left: 1.2rem; font-size: 0.82rem; color: #d0d0e0; display: flex; flex-direction: column; gap: 0.3rem; }
+.jr-flow b { color: #f0eeff; } .jr-flow .jr-month { color: #00ff41; }
