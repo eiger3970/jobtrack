@@ -36,6 +36,8 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
   const [copied, setCopied] = useState('')
   const done = rows.filter(a => a.jobroomDone).length
   const [ad, setAd] = useState('')
+  // which field is being edited (pencil): its value becomes a text box with the text in it
+  const [editKey, setEditKey] = useState('')
   if (rows.length === 0) return null
   const idx = Math.min(i, rows.length - 1)
   const a = rows[idx]
@@ -65,16 +67,20 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
   const Val = ({ k, label, field, value, required = false }: { k: string; label: string; field?: keyof Application; value: string; required?: boolean }) => (
     <div className={'jr-row' + (!value && required ? ' jr-need' : '') + (field && looksWrong(field, value) ? ' jr-odd' : '')}>
       <span className="jr-label">{label}{field && looksWrong(field, value) && <span className="jr-odd-tag">{t('jr.odd')}</span>}</span>
-      {value
+      {value && field && editKey === k
+        ? <input className="jr-input" autoFocus defaultValue={value}
+            onKeyDown={ev => { if (ev.key === 'Enter') (ev.target as HTMLInputElement).blur() }}
+            onBlur={ev => { onUpdate(a.id, { [field]: ev.target.value.trim() } as Patch); setEditKey('') }} />
+        : value
         ? <span className="jr-value">{value}</span>
         : field
           ? <input className="jr-input" placeholder={required ? t('jr.needed') : t('jr.optional')} defaultValue=""
               onBlur={ev => { const v = ev.target.value.trim(); if (v) onUpdate(a.id, { [field]: v } as Patch) }} />
           : <span className="jr-value jr-empty">-</span>}
-      {value && <span className="jr-acts">
+      {value && editKey !== k && <span className="jr-acts">
         <button type="button" className="jr-copy" onClick={() => copy(k, value)}>{copied === k ? ICON_CHECK : t('orp.copy')}</button>
         {/* 2026-10-14 owner: a wrong value ("asdf") had no way out - edit empties it to retype */}
-        {field && <button type="button" className="jr-edit" aria-label={t('action.edit')} title={t('action.edit')} onClick={() => onUpdate(a.id, { [field]: '' } as Patch)}>
+        {field && <button type="button" className="jr-edit" aria-label={t('action.edit')} title={t('action.edit')} onClick={() => setEditKey(k)}>
           <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" /></svg></button>}
       </span>}
     </div>
