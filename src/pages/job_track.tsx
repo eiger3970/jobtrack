@@ -6,7 +6,7 @@ import JobTrackPro from './job_track_pro'
 import { type Application, type OrpMethod, ORP_DEFAULTS, jobRoomEntry } from '../lib/orp'
 import OrpPanel from './orp_panel'
 import JobTrackSync, { clearComputer } from './job_track_sync'
-import BackupBar from './job_track_backup'
+import BackupBar, { notBackedUp } from './job_track_backup'
 import { linkFromHash, merge } from '../lib/jobtrack_sync'
 import { parseAd } from '../lib/ad_parse'
 import { planReminders } from '../lib/reminders'
@@ -824,16 +824,19 @@ export default function JobTrack() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>
               <span className="export-btn-label">{t('bulkAdd')}</span>
             </button>
-          </div>
-          <div className="toolbar-tools">
-            <button className="btn-secondary export-btn" onClick={() => setSyncOpen(true)}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="14" height="10" rx="1" /><path d="M6 18h6M9 14v4" /><rect x="17" y="8" width="5" height="12" rx="1" /></svg>
-              <span className="export-btn-label">{lang === 'de' ? 'Sync Telefon + Computer' : lang === 'fr' ? 'Sync téléphone + ordinateur' : 'Sync phone + computer'}</span>
-            </button>
+            {/* 2026-10-14 owner: Copy as list joins the left group */}
             <button className="btn-secondary export-btn" onClick={copyAsList} disabled={apps.length === 0} title={t('copyList')}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
               <span className="export-btn-label">{copiedList ? t('copyList.done') : t('copyList')}</span>
             </button>
+          </div>
+          <div className="toolbar-tools">
+            {/* 2026-10-14 owner: on a computer the "not backed up" bar already has Phone - scan a QR;
+                this button only shows when that bar is gone (and always on phones) */}
+            {(phoneDevice || notBackedUp(apps, backupSnapshot) === 0) && <button className="btn-secondary export-btn" onClick={() => setSyncOpen(true)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="14" height="10" rx="1" /><path d="M6 18h6M9 14v4" /><rect x="17" y="8" width="5" height="12" rx="1" /></svg>
+              <span className="export-btn-label">{lang === 'de' ? 'Sync Telefon + Computer' : lang === 'fr' ? 'Sync téléphone + ordinateur' : 'Sync phone + computer'}</span>
+            </button>}
           </div>
         </div>
 
@@ -870,6 +873,12 @@ export default function JobTrack() {
           </div>
         )}
 
+        {/* 2026-10-14 owner: "colours need a key, humans aren't mind readers" */}
+        {apps.length > 0 && <p className="jt-key">
+          <span><i className="jt-key-amber" />{t('key.amber')}</span>
+          <span><i className="jt-key-sort" />{t('key.sort')}</span>
+          <span className="jt-key-scroll">{t('key.scroll')}</span>
+        </p>}
         <div style={{ overflowX: 'auto' }}>
           <table className="applications-table">
             <thead><tr>

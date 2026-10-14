@@ -423,3 +423,11 @@
 .jts-confirm-btns { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
 .jts-confirm-btns .jts-clear-amber { flex: 1; }
 .jtb-synced .jts-clear-amber, .jtb-synced .jts-confirm { max-width: 32rem; }
+/* 2026-10-14 colour key above the table */
+.jt-key { display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; font-size: 0.75rem; color: #d0d0e0; margin: 0 0 0.5rem; }
+.jt-key span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.jt-key i { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 3px; }
+.jt-key-amber { background: #ffb000; }
+.jt-key-sort { background: rgba(0,255,65,0.25); box-shadow: inset 0 -2px 0 #00ff41; }
+.jt-key-scroll { color: #8a86a8; }
+@media (min-width: 1100px) { .jt-key-scroll { display: none !important; } }
