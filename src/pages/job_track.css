@@ -360,3 +360,6 @@
 .jt-min .jt-one { display: block; max-width: 22rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .jt-min .jt-cell-company .jt-one { max-width: 14rem; }
 @media (max-width: 700px) { .jt-min .jt-one { max-width: 11rem; } .jt-min .jt-cell-company .jt-one { max-width: 8rem; } }
+/* 2026-10-14 owner: Minimal - a stale date turns amber instead of a second-line "check" */
+.jt-min .jt-stale { display: none; }
+.jt-min .jt-stale-date { color: #ffb000; white-space: nowrap; }

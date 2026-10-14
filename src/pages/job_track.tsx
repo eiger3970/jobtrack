@@ -46,7 +46,7 @@ const STORAGE = 'kworld_jobtrack'
 
 function loadApps(): App[] {
   // DEV preview of the not-backed-up bar
-  if (import.meta.env.DEV && typeof window !== 'undefined' && window.location.hash === '#preview=backup') return [{ id: 1, company: 'Bergbahnen Rinerhorn AG', role: 'Ski lift operator', date: '2026-10-14', status: 'applied', cv: '', cover: '', nextDate: '', notes: 'Staff housing offered\nStart By agreement Permanent' }, { id: 2, company: 'Example Semiconductor GmbH', role: 'Shift Equipment Maintenance Engineer - Etching 80 - 100% (f/m/d) - R0129808', date: '2026-10-14', status: 'applied', cv: '', cover: '', nextDate: '', notes: '' }]
+  if (import.meta.env.DEV && typeof window !== 'undefined' && window.location.hash === '#preview=backup') return [{ id: 1, company: 'Bergbahnen Rinerhorn AG', role: 'Ski lift operator', date: '2026-09-12', status: 'applied', cv: '', cover: '', nextDate: '', notes: 'Staff housing offered\nStart By agreement Permanent' }, { id: 2, company: 'Example Semiconductor GmbH', role: 'Shift Equipment Maintenance Engineer - Etching 80 - 100% (f/m/d) - R0129808', date: '2026-10-14', status: 'applied', cv: '', cover: '', nextDate: '', notes: '' }]
   try { return JSON.parse(localStorage.getItem(STORAGE) || '[]') } catch { return [] }
 }
 
@@ -863,7 +863,7 @@ export default function JobTrack() {
                   {/* 2026-10-14 owner: Minimal = one line per cell (full text on hover), notes hidden */}
                   <td className="jt-cell-company" title={a.company}><span className="jt-one">{a.company}</span>{a.notes && <span className="jt-note">{a.notes.split('\n').filter(Boolean).pop()}</span>}</td>
                   <td className="jt-cell-role" title={a.role}><span className="jt-one">{a.role}</span></td>
-                  <td>{a.date}{isStale(a) && <span className="jt-stale" title={t('stale.hint')}>{t('stale')}</span>}</td>
+                  <td className={isStale(a) ? 'jt-stale-date' : undefined} title={isStale(a) ? t('stale.hint') : undefined}>{a.date}{isStale(a) && <span className="jt-stale" title={t('stale.hint')}>{t('stale')}</span>}</td>
                   <td>
                     <label className={`status-badge status-select-wrap status-${a.status}`}>
                       <StatusIcon status={a.status} />
