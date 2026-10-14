@@ -531,3 +531,4 @@
 .jr-edit { border: 1px solid #2a2a3a; background: #1a1a2a; color: #00ff41; border-radius: 6px; padding: 0.25rem 0.4rem; cursor: pointer; }
 .jr-odd .jr-value { color: #ffb000; }
 .jr-odd-tag { display: block; color: #ffb000; font-size: 0.68rem; }
+.jr-del { border: 1px solid #2a2a3a; background: #1a1a2a; color: #ff6b6b; border-radius: 6px; padding: 0.25rem 0.4rem; cursor: pointer; }
