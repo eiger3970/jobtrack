@@ -97,9 +97,9 @@
       "fr": "Aucune sauvegarde exportée pour l'instant."
     },
     "backup.import": {
-      "en": "Import data",
-      "de": "Daten importieren",
-      "fr": "Importer les données"
+      "en": "Open backup file",
+      "de": "Sicherungsdatei öffnen",
+      "fr": "Ouvrir une sauvegarde"
     },
     "backup.hint": {
       "en": "Full backup of everything - for moving to another device via USB or cloud storage, or helping someone without their own reliable device set this up once and hand it over.",
@@ -107,9 +107,9 @@
       "fr": "Sauvegarde complète de tout - pour transférer vers un autre appareil via USB ou stockage cloud, ou pour aider quelqu'un sans appareil fiable en le configurant une fois puis en le transmettant."
     },
     "backup.imported": {
-      "en": "Imported",
-      "de": "Importiert",
-      "fr": "Importé"
+      "en": "Opened",
+      "de": "Geöffnet",
+      "fr": "Ouverte"
     },
     "backup.importError": {
       "en": "Could not read that file - is it a JobTrack backup?",
@@ -122,9 +122,9 @@
       "fr": "Ce qui est accepté"
     },
     "backup.importInfo.point1": {
-      "en": "Only a JobTrack backup file - the .json from \"Export data\", made on this or another device",
-      "de": "Nur eine JobTrack-Sicherungsdatei - die .json von „Daten exportieren”, erstellt auf diesem oder einem anderen Gerät",
-      "fr": "Uniquement un fichier de sauvegarde JobTrack - le .json d'« Exporter les données », créé sur cet appareil ou un autre"
+      "en": "Only a JobTrack backup file - the .json from \"Save backup\", made on this or another device",
+      "de": "Nur eine JobTrack-Sicherungsdatei - die .json aus \"Backup speichern\", auf diesem oder einem anderen Gerät erstellt",
+      "fr": "Seulement un fichier de sauvegarde JobTrack - le .json de \"Sauvegarder\", fait sur cet appareil ou un autre"
     },
     "backup.importInfo.point2": {
       "en": "Not a CV, cover letter, spreadsheet, or any other JSON file",
@@ -132,9 +132,9 @@
       "fr": "Ni un CV, ni une lettre de motivation, ni un tableur, ni aucun autre fichier JSON"
     },
     "backup.importInfo.point3": {
-      "en": "Adds to what's already here - nothing gets overwritten",
-      "de": "Wird zum Vorhandenen hinzugefügt - nichts wird überschrieben",
-      "fr": "S'ajoute à ce qui existe déjà - rien n'est écrasé"
+      "en": "Merges with what's already here - the same entry is not added twice, nothing gets overwritten",
+      "de": "Wird mit dem Vorhandenen zusammengeführt - derselbe Eintrag kommt nicht doppelt, nichts wird überschrieben",
+      "fr": "Fusionne avec ce qui est déjà là - la même entrée n'est pas ajoutée deux fois, rien n'est écrasé"
     },
     "table.notes": {
       "en": "Notes",

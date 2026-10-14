@@ -7,7 +7,7 @@ import { type Application, type OrpMethod, ORP_DEFAULTS } from '../lib/orp'
 import OrpPanel from './orp_panel'
 import JobTrackSync from './job_track_sync'
 import BackupBar from './job_track_backup'
-import { linkFromHash } from '../lib/jobtrack_sync'
+import { linkFromHash, merge } from '../lib/jobtrack_sync'
 import { parseAd } from '../lib/ad_parse'
 import { planReminders } from '../lib/reminders'
 import { saveFile, stamp } from '../lib/save_file'
@@ -566,7 +566,9 @@ export default function JobTrack() {
         if (importedApps.length === 0) throw new Error('no apps')
         // Fresh ids on import - a backup made on another device could
         // collide with ids already used here.
-        setApps(prev => [...prev, ...importedApps.map((a, i) => ({ ...a, id: Date.now() + i }))])
+        // 2026-10-14 owner: same merge as Sync - opening the same backup twice no
+        // longer doubles the list; an entry that differs is kept twice (never lose data)
+        setApps(prev => merge(prev, {}, importedApps, {}).apps)
         if (!quota && parsed.quota) setQuota(parsed.quota)
         setBackupImported(true)
         setTimeout(() => setBackupImported(false), 2500)
@@ -688,6 +690,35 @@ export default function JobTrack() {
               </div>
             )}
           </div>
+          {/* 2026-10-14 owner: Import next to Save backup - save and open are a pair */}
+          <input type="file" accept="application/json" ref={backupInputRef} style={{ display: 'none' }} onChange={importBackup} />
+          <div className="howto-step howto-step-info import-btn-wrap" ref={importInfoRef}>
+            <button type="button" className="howto-go" onClick={() => backupInputRef.current?.click()} title={t('backup.hint')}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+              <span className="export-btn-label">{backupImported ? t('backup.imported') : t('backup.import')}</span>
+            </button>
+            <button type="button" className="info-btn" aria-label={t('backup.importInfo.title')} onClick={() => setShowImportInfo(v => !v)}>i</button>
+            {showImportInfo && (
+              <div className="info-popover import-info-popover">
+                <button type="button" className="info-popover-close" onClick={() => setShowImportInfo(false)} aria-label={t('close')}>✕</button>
+                <p className="info-popover-title">{t('backup.importInfo.title')}</p>
+                <ul className="info-popover-list">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><polyline points="9 15 11 17 15 13" /></svg>
+                    <span>{t('backup.importInfo.point1')}</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></svg>
+                    <span>{t('backup.importInfo.point2')}</span>
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg>
+                    <span>{t('backup.importInfo.point3')}</span>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 2026-10-14 owner: computers get the choices bar (phone recommended), visible without scrolling */}
@@ -773,41 +804,13 @@ export default function JobTrack() {
           </div>
           <div className="toolbar-tools">
             <button className="btn-secondary export-btn" onClick={() => setSyncOpen(true)}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" /></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="14" height="10" rx="1" /><path d="M6 18h6M9 14v4" /><rect x="17" y="8" width="5" height="12" rx="1" /></svg>
               <span className="export-btn-label">{lang === 'de' ? 'Sync Telefon + Computer' : lang === 'fr' ? 'Sync téléphone + ordinateur' : 'Sync phone + computer'}</span>
             </button>
             <button className="btn-secondary export-btn" onClick={copyAsList} disabled={apps.length === 0} title={t('copyList')}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
               <span className="export-btn-label">{copiedList ? t('copyList.done') : t('copyList')}</span>
             </button>
-            <input type="file" accept="application/json" ref={backupInputRef} style={{ display: 'none' }} onChange={importBackup} />
-            <div className="import-btn-wrap" ref={importInfoRef}>
-              <button className="btn-secondary export-btn" onClick={() => backupInputRef.current?.click()} title={t('backup.hint')}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-                <span className="export-btn-label">{backupImported ? t('backup.imported') : t('backup.import')}</span>
-              </button>
-              <button type="button" className="info-btn" aria-label={t('backup.importInfo.title')} onClick={() => setShowImportInfo(v => !v)}>i</button>
-              {showImportInfo && (
-                <div className="info-popover import-info-popover">
-                  <button type="button" className="info-popover-close" onClick={() => setShowImportInfo(false)} aria-label={t('close')}>✕</button>
-                  <p className="info-popover-title">{t('backup.importInfo.title')}</p>
-                  <ul className="info-popover-list">
-                    <li>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><polyline points="9 15 11 17 15 13" /></svg>
-                      <span>{t('backup.importInfo.point1')}</span>
-                    </li>
-                    <li>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></svg>
-                      <span>{t('backup.importInfo.point2')}</span>
-                    </li>
-                    <li>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg>
-                      <span>{t('backup.importInfo.point3')}</span>
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
