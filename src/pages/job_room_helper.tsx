@@ -91,7 +91,7 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
   return (
     <div className="jr">
       {/* 2026-10-14 owner: 3 steps in the order you do them - 1 pick here, 2 fill gaps here, 3 Job-Room */}
-      <p className="jr-step"><b className="jts-num">1.</b> <b>{t('jr.here')}</b> {t('jr.flow2')}</p>
+      <p className="jr-step"><b className="jts-num">3.1.</b> <b>{t('jr.here')}</b> {t('jr.flow2')}</p>
       <div className="jr-dots" role="tablist">
         {rows.map((r, n) => (
           <button key={r.id} type="button" role="tab" aria-selected={n === idx} aria-label={`${n + 1}. ${r.company}`}
@@ -100,7 +100,7 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
         ))}
       </div>
 
-      <div className="jr-step2"><b className="jts-num">2.</b> {a.company}
+      <div className="jr-step2"><b className="jts-num">3.2.</b> {a.company}
         {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}
         {gaps.length > 0 ? (
           // 2026-10-14 owner: only push when Job-Room NEEDS something; optional gaps stay a quiet fold
@@ -121,7 +121,7 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
           </details></>
         ) : <p className="jr-nogaps">{ICON_CHECK}{t('jr.nogaps')}</p>}
       </div>
-      <p className="jr-step"><b className="jts-num">3.</b> <b>Job-Room:</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[0]}<b className="jr-bmname">JobTrack fill</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[1] ?? ''}
+      <p className="jr-step"><b className="jts-num">3.3.</b> <b>Job-Room:</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[0]}<b className="jr-bmname">JobTrack fill</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[1] ?? ''}
         {/* 2026-10-14 owner: the bookmark step must stay findable */}
         {onSetup && <><br /><button type="button" className="btn-secondary jr-bm-back" onClick={onSetup}>{t('jr.noBookmark')}</button></>}</p>
       <div className="jr-card" key={a.id}>
