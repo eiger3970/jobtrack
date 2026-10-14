@@ -314,7 +314,8 @@ export default function JobTrack() {
   }
   // 2026-10-14 owner: make it clear which column drives the sort - the active one is
   // highlighted with a solid arrow; the other sortable one shows a faint up/down hint.
-  const sortMark = (col: 'date' | 'company') => (
+  // 2026-10-14 owner: no hint arrows on the inactive column - tapping the heading sorts
+  const sortMark = (col: 'date' | 'company') => sortBy.col !== col ? null : (
     <svg className={'jt-sort-ic' + (sortBy.col === col ? ' on' : '')} viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
       <path fill="currentColor" d={sortBy.col !== col ? 'M12 5l4 5H8zm0 14l-4-5h8z' : sortBy.asc ? 'M12 6l6 8H6z' : 'M12 18l-6-8h12z'} />
     </svg>
