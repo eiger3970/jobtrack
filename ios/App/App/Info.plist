@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Scan the QR code on your computer to sync your job list.</string>
 	<key>CFBundleDisplayName</key>
         <string>JobTrack</string>
 	<key>CFBundleExecutable</key>

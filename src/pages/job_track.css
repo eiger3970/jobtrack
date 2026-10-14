@@ -307,3 +307,25 @@
 .ad-paste { display: grid; gap: 0.5rem; margin-bottom: 0.8rem; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .ad-done { color: #19b86a; font-weight: 700; margin: 0; }
 .ad-step { margin: 0; color: #f0eeff; font-weight: 700; font-size: 0.9rem; }
+/* 2026-10-14 phone + computer sync panel */
+.jts-panel { max-width: 440px; }
+.jts-title { color: #00ff41; font-size: 1.15rem; margin: 0 0 0.8rem; }
+.jts-step { font-weight: 700; margin: 0 0 0.6rem; }
+.jts-qr { display: block; width: 240px; height: 240px; margin: 0 auto 0.6rem; border-radius: 8px; background: #fff; }
+.jts-match { font-size: 0.85rem; color: #d0d0e0; margin: 0.4rem 0 0.8rem; }
+.jts-match code { color: #00ff41; font-size: 0.95rem; }
+.jts-flow { display: block; width: 100%; max-width: 320px; margin: 0.6rem auto; }
+.jts-points { list-style: none; padding: 0; margin: 0.6rem 0; display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.85rem; color: #d0d0e0; }
+.jts-points b { color: #f0eeff; }
+.jts-wait { display: flex; align-items: center; gap: 0.6rem; font-weight: 700; margin: 0.6rem 0; }
+.jts-spin { width: 18px; height: 18px; border: 3px solid #8a86a8; border-top-color: #00ff41; border-radius: 50%; animation: jts-spin 0.9s linear infinite; }
+@keyframes jts-spin { to { transform: rotate(360deg) } }
+.jts-done { border: 1px solid #00ff41; border-radius: 8px; padding: 0.8rem 1rem; margin: 0.4rem 0 0.8rem; }
+.jts-done-title { color: #00ff41; font-weight: 700; margin: 0 0 0.4rem; }
+.jts-done ul, .jts-lost ol { margin: 0; padding-left: 1.2rem; }
+.jts-lost .btn { margin-top: 0.8rem; }
+.jts-steps { margin: 0 0 0.8rem; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; font-weight: 700; }
+.jts-cam { display: block; width: 100%; max-width: 320px; aspect-ratio: 1; object-fit: cover; margin: 0 auto 0.6rem; border-radius: 8px; background: #000; }
+.jts-shared { border-top: 1px solid #2a2a3a; padding-top: 0.8rem; margin-bottom: 0.6rem; }
+.jts-check { display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.85rem; margin: 0 0 0.6rem; }
+.modal-content .jts-check input { width: auto; margin: 0.15rem 0 0; }

@@ -5,6 +5,8 @@ import './job_track.css'
 import JobTrackPro from './job_track_pro'
 import { type Application, type OrpMethod, ORP_DEFAULTS } from '../lib/orp'
 import OrpPanel from './orp_panel'
+import JobTrackSync from './job_track_sync'
+import { linkFromHash } from '../lib/jobtrack_sync'
 import { parseAd } from '../lib/ad_parse'
 import { planReminders } from '../lib/reminders'
 import { saveFile, stamp } from '../lib/save_file'
@@ -181,6 +183,8 @@ export default function JobTrack() {
   const [adText, setAdText] = useState('')
   const [adFilled, setAdFilled] = useState(false)
   const [orpPanel, setOrpPanel] = useState(false)
+  // 2026-10-14: phone + computer sync - the phone arrives from the QR with #sync=
+  const [syncOpen, setSyncOpen] = useState(() => linkFromHash() !== null || (import.meta.env.DEV && window.location.hash === '#preview=sync'))
   const [showStorageInfo, setShowStorageInfo] = useState(false)
   const infoRef = useRef<HTMLDivElement>(null)
   const [showEmailInfo, setShowEmailInfo] = useState(false)
@@ -750,6 +754,10 @@ export default function JobTrack() {
             </button>
           </div>
           <div className="toolbar-tools">
+            <button className="btn-secondary export-btn" onClick={() => setSyncOpen(true)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" /></svg>
+              <span className="export-btn-label">{lang === 'de' ? 'Sync Telefon + Computer' : lang === 'fr' ? 'Sync téléphone + ordinateur' : 'Sync phone + computer'}</span>
+            </button>
             <button className="btn-secondary export-btn" onClick={copyAsList} disabled={apps.length === 0} title={t('copyList')}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
               <span className="export-btn-label">{copiedList ? t('copyList.done') : t('copyList')}</span>
@@ -889,6 +897,7 @@ export default function JobTrack() {
       </div>
 
       {orpPanel && <OrpPanel apps={apps} t={t} onClose={() => setOrpPanel(false)} />}
+      {syncOpen && <JobTrackSync lang={lang} apps={apps} quota={quota} setApps={setApps} setQuota={setQuota} onClose={() => setSyncOpen(false)} />}
 
       {modal && (
         <div className="modal" onClick={() => setModal(false)}>
