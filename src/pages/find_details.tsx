@@ -4,16 +4,14 @@ import { parseAd } from '../lib/ad_parse'
 import { useProKey, buyPro } from '../lib/pro'
 import { isApp } from '../lib/platform'
 import { PRO_KEY, PRO_USD, PRO_SCOPE } from './job_track_pro'
+import { aiFind, readSuggestion, saveSuggestion, type Loc } from '../lib/ai_find'
 
-// the iPhone app has no same-origin site, it calls the worker directly (phones reach workers.dev fine)
-const APP_FIND_URL = 'https://cvgen-writer.kinhswch-cloudflare.workers.dev/find-details'
 type AiState = 'idle' | 'busy' | 'result' | 'used' | 'cap' | 'none' | 'err'
 
 // 2026-10-19 owner: the two "missing" lists disagreed and 3.2 was disjointed. Now ONE list of what is missing (exact
 // Job-Room names, amber = needed) on top, then where to look from easiest to hardest, one paste box, typing as the last resort.
 type Patch = Partial<Application>
 type Rec = Record<string, string>
-type Loc = Record<string, any>  // an office from the AI: strings plus likelyForJob / headOffice flags and a count
 
 // exact names as on the Job-Room form (same as the card below); needed = Job-Room will not save without it
 const FIELDS: { k: string; label: string; needed?: boolean }[] = [
@@ -83,31 +81,28 @@ export default function FindDetails({ a, e, allApps, onUpdate, t, requiredMissin
 
   // mode: new search | check (same question again, to compare) | wrong ("Not right": look elsewhere)
   async function findWithAi(mode: 'new' | 'check' | 'wrong' = 'new') {
-    const retry = mode !== 'new'
     setAi('busy'); setAiErr(''); setAiMsg('')
-    let device = ''
-    try { device = localStorage.getItem('kworld_jobtrack_device') ?? ''; if (!device) { device = crypto.randomUUID(); localStorage.setItem('kworld_jobtrack_device', device) } } catch { /* private mode */ }
-    // 2026-10-19 owner: nobody waits on a busy AI. The best engine goes first; if it is busy the next one runs at once,
-    // and the person is told. Only engines that search the web are used - one without would guess an address.
-    for (const [i, engine] of ['claude', 'claude2', 'gemini'].entries()) {
-      try {
-        const r = await fetch(app ? APP_FIND_URL : '/api/jobtrack/find', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ company: a.company, role: a.role, device, proToken: tok, app, engine, retry, avoid: mode === 'wrong' ? aiLocs.map(l => [l.label, l.street, l.streetNo, l.postal, l.city].filter(Boolean).join(' ')).join(' | ') : '', hint: [a.adText, a.notes, a.city].filter(Boolean).join(' ') }), signal: AbortSignal.timeout(22000) })
-        const d = await r.json()
-        if (d.status === 'trial_used') { setAi('used'); return }
-        if (d.status === 'cap') { setAi('cap'); return }
-        if (d.status === 'ok') {
-          if (!d.found) { setAi('none'); return }
-          const locs: Loc[] = d.locations ?? []
-          const runs = mode === 'new' ? [locs] : [...aiRuns, locs]
-          setAiRuns(runs); setAiContact(c => ({ ...(mode === 'new' ? {} : c), ...(d.contact ?? {}) })); setAiSrc(s => mode === 'new' ? d.sources : [...s, ...d.sources].slice(0, 5)); setAiPick(0); setAi('result'); return
-        }
-        if (d.status === 'error') { setAiErr(d.detail || ''); setAi('err'); return }
-      } catch { /* busy or offline: try the next one */ }
-      if (i < 2) setAiMsg(t('ai.switch'))
-    }
-    setAi('err')
+    const out = await aiFind({
+      company: a.company, role: a.role, tok, app, retry: mode !== 'new',
+      avoid: mode === 'wrong' ? aiLocs.map(l => [l.label, l.street, l.streetNo, l.postal, l.city].filter(Boolean).join(' ')).join(' | ') : '',
+      hint: [a.adText, a.notes, a.city].filter(Boolean).join(' '),
+    }, () => setAiMsg(t('ai.switch')))
+    if (out.kind === 'used') { setAi('used'); return }
+    if (out.kind === 'cap') { setAi('cap'); return }
+    if (out.kind === 'paused') { setAiErr(t('ai.paused')); setAi('err'); return }
+    if (out.kind === 'none') { setAi('none'); return }
+    if (out.kind === 'err') { setAiErr(out.detail); setAi('err'); return }
+    const runs = mode === 'new' ? [out.locs] : [...aiRuns, out.locs]
+    const contact = { ...(mode === 'new' ? {} : aiContact), ...out.contact }
+    const sources = mode === 'new' ? out.sources : [...aiSrc, ...out.sources].slice(0, 5)
+    setAiRuns(runs); setAiContact(contact); setAiSrc(sources); setAiPick(0); setAi('result')
+    saveSuggestion(a.id, { runs, contact, sources, at: new Date().toISOString() })
   }
+  // a result the all-jobs run (or an earlier visit) already found is waiting here
+  useEffect(() => {
+    const s = readSuggestion(a.id)
+    if (s && s.runs.length) { setAiRuns(s.runs); setAiContact(s.contact); setAiSrc(s.sources); setAi('result') }
+  }, [a.id])
   // every office from every search; "found in n of N searches" = the same answer came back again
   const placeKey = (l: Loc) => (l.street + l.streetNo + l.postal).toLowerCase().replace(/[^a-z0-9]/g, '')
   const aiLocs: Loc[] = (() => {

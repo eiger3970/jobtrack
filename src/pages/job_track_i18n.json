@@ -1999,6 +1999,41 @@
       "en": "Your application email shows where the job was. Search it for the company:",
       "de": "Ihre Bewerbungs-E-Mail zeigt, wo die Stelle war. Suchen Sie darin nach der Firma:",
       "fr": "Votre e-mail de candidature indique où était le poste. Cherchez-y l'entreprise :"
+    },
+    "ai.paused": {
+      "en": "The AI find is paused for today (busy day). The steps below work now.",
+      "de": "Die KI-Suche ist für heute pausiert (viel los). Die Schritte unten funktionieren jetzt.",
+      "fr": "La recherche IA est en pause pour aujourd'hui (journée chargée). Les étapes ci-dessous fonctionnent."
+    },
+    "bulk.btn": {
+      "en": "AI: find missing details for all jobs ({n})",
+      "de": "KI: fehlende Angaben für alle Stellen finden ({n})",
+      "fr": "IA : trouver les infos manquantes pour tous les postes ({n})"
+    },
+    "bulk.run": {
+      "en": "Searching {n} of {of}: {who}",
+      "de": "Suche {n} von {of}: {who}",
+      "fr": "Recherche {n} sur {of} : {who}"
+    },
+    "bulk.stop": {
+      "en": "Stop",
+      "de": "Stopp",
+      "fr": "Arrêter"
+    },
+    "bulk.done": {
+      "en": "Found for {f}, nothing for {z}. Open each job (green ring) and check the address.",
+      "de": "Gefunden für {f}, nichts für {z}. Jede Stelle (grüner Ring) öffnen und die Adresse prüfen.",
+      "fr": "Trouvé pour {f}, rien pour {z}. Ouvrez chaque poste (anneau vert) et vérifiez l'adresse."
+    },
+    "bulk.used": {
+      "en": "Stopped: your free finds are used. Pro is US$5 once.",
+      "de": "Gestoppt: Ihre gratis Suchen sind verbraucht. Pro kostet US$5 einmalig.",
+      "fr": "Arrêté : vos recherches gratuites sont utilisées. Pro coûte US$5 une fois."
+    },
+    "bulk.cap": {
+      "en": "Stopped: all 20 Pro finds are used.",
+      "de": "Gestoppt: alle 20 Pro-Suchen sind verbraucht.",
+      "fr": "Arrêté : les 20 recherches Pro sont utilisées."
     }
   }
 }

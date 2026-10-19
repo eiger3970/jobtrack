@@ -1,12 +1,13 @@
 import FillRate from './fill_rate'
 import FindDetails from './find_details'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { swissDate, type Application, type JobRoomEntry, JR_METHOD, jobRoomEntry, jobRoomMissing, looksWrong } from '../lib/orp'
 import { parseAd } from '../lib/ad_parse'
 import { fillPayload, FILL_KEY } from '../lib/jobroom_fill'
 import { useProKey, buyPro } from '../lib/pro'
 import { isApp } from '../lib/platform'
 import { PRO_KEY, PRO_USD, PRO_SCOPE } from './job_track_pro'
+import { aiFind, readSuggestion, saveSuggestion } from '../lib/ai_find'
 
 // 2026-10-14: the date Job-Room's ENTER form was last checked against these fields
 const FORM_CHECKED = '14.10.2026'
@@ -67,8 +68,37 @@ export default function JobRoomHelper({ rows, allApps, monthLabel, onUpdate, t, 
   const missing = jobRoomMissing(e)
   // the card on screen is what JobTrack fill (on Job-Room) picks up
   // 2026-10-19 owner: auto fill is the paid tier (US$5 once), 1 free job as a trial; the fill window checks the trial on the server
-  const { pro: webPro } = useProKey(PRO_KEY, 'jobtrack-pro-')
+  const { pro: webPro, tok: proTok } = useProKey(PRO_KEY, 'jobtrack-pro-')
   const pro = webPro || isApp()
+  // 2026-10-19 owner: real-world test on ALL jobs - the AI looks for the missing details of every job in turn.
+  // Results wait on each job ("Use this address"); nothing is filled automatically.
+  const [bulk, setBulk] = useState<{ run: boolean; n: number; of: number; who: string; found: number; none: number; note: string } | null>(null)
+  const stopBulk = useRef(false)
+  const hasGap = (r: Application) => { const x = jobRoomEntry(r); return !r.jobroomDone && (!x.postal || !x.city || !x.street) }
+  const todo = rows.filter(r => hasGap(r) && !readSuggestion(r.id))
+  async function runBulk() {
+    stopBulk.current = false
+    const list = todo
+    let n = 0, found = 0, none = 0, fails = 0, note = ''
+    setBulk({ run: true, n: 0, of: list.length, who: '', found: 0, none: 0, note: '' })
+    const next = async (): Promise<void> => {
+      while (!stopBulk.current && !note) {
+        const r = list[n]; if (!r) return
+        n++
+        setBulk(b => b && { ...b, n, who: r.company })
+        const out = await aiFind({ company: r.company, role: r.role, tok: proTok, app: isApp(), hint: [r.adText, r.notes, r.city].filter(Boolean).join(' ') })
+        if (out.kind === 'ok') { saveSuggestion(r.id, { runs: [out.locs], contact: out.contact, sources: out.sources, at: new Date().toISOString() }); found++; fails = 0 }
+        else if (out.kind === 'none') none++
+        else if (out.kind === 'used') note = t('bulk.used')
+        else if (out.kind === 'cap') note = t('bulk.cap')
+        else if (out.kind === 'paused') note = t('ai.paused')
+        else if (++fails >= 3) note = t('ai.err')
+        setBulk(b => b && { ...b, found, none })
+      }
+    }
+    await Promise.all([next(), next()])  // two at a time
+    setBulk(b => b && { ...b, run: false, who: '', note })
+  }
   try { localStorage.setItem(FILL_KEY, JSON.stringify({ ...fillPayload(a), pro, card: String(a.id), device: deviceId() })) } catch { /* private mode */ }
   // empty fields Job-Room asks for (required or not) - the ones worth finding
   const gaps = ([['street', e.street], ['postal', e.postal], ['city', e.city], ['contactPerson', e.contactPerson], ['email', e.email], ['phone', e.phone], ['link', e.link]] as const)
@@ -171,6 +201,15 @@ export default function JobRoomHelper({ rows, allApps, monthLabel, onUpdate, t, 
     <div className="jr">
       {/* 2026-10-14 owner: 3 steps in the order you do them - 1 pick here, 2 fill gaps here, 3 Job-Room */}
       <p className={'jr-step' + (!picked ? ' jr-glow' : '')}><b className="jts-num">3.1.</b> <b>{t('jr.here')}</b> {t('jr.flow2')}</p>
+      {(todo.length > 0 || bulk) && <div className="jr-bulk">
+        {!bulk?.run && todo.length > 0 && <button type="button" className="btn btn-glow" onClick={runBulk}>{t('bulk.btn').replace('{n}', String(todo.length))}</button>}
+        {bulk?.run && <>
+          <span className="fd-busy" role="status"><span className="fd-dots"><i /><i /><i /></span>{t('bulk.run').replace('{n}', String(bulk.n)).replace('{of}', String(bulk.of)).replace('{who}', bulk.who)}</span>
+          <span className="jr-bulk-bar"><i style={{ width: (bulk.of ? (bulk.n / bulk.of) * 100 : 0) + '%' }} /></span>
+          <button type="button" className="btn-secondary" onClick={() => { stopBulk.current = true }}>{t('bulk.stop')}</button>
+        </>}
+        {bulk && !bulk.run && <span className="fd-t">{t('bulk.done').replace('{f}', String(bulk.found)).replace('{z}', String(bulk.none))} {bulk.note}</span>}
+      </div>}
       <p className="jr-legend">
         <span className="jr-leg"><span className="jr-lg cur" />{t('jr.leg.cur')}</span>
         <span className="jr-leg"><span className="jr-lg done" />{t('jr.leg.done')}</span>
@@ -180,7 +219,7 @@ export default function JobRoomHelper({ rows, allApps, monthLabel, onUpdate, t, 
       <div className="jr-dots" role="tablist">
         {rows.map((r, n) => (
           <button key={r.id} type="button" role="tab" aria-selected={n === idx} aria-label={`${n + 1}. ${r.company}`} title={`${n + 1}. ${r.company} - ${swissDate(r.date)}`}
-            className={'jr-dot' + (n === idx ? ' cur' : '') + (r.jobroomDone ? ' done' : '') + (jobRoomMissing(jobRoomEntry(r)).length ? ' need' : '')}
+            className={'jr-dot' + (n === idx ? ' cur' : '') + (r.jobroomDone ? ' done' : '') + (jobRoomMissing(jobRoomEntry(r)).length ? ' need' : '') + (readSuggestion(r.id) && hasGap(r) ? ' ai' : '')}
             onClick={() => { KEEP = { id: r.id, picked: true }; setI(n); setPicked(true); setVisited(false); setFolded(completeAt(n)) }}>{n + 1}</button>
         ))}
       </div>

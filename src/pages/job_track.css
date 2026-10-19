@@ -693,3 +693,8 @@
 
 .fd-by { display: inline-flex; gap: .35rem; align-items: center; } .fd-by .y { color: #00ff41; } .fd-by .n { color: #8a8aa0; text-decoration: line-through; }
 .fd-next { border-left: 3px solid #ffb000; padding: .4rem .7rem; margin: .5rem 0; background: rgba(255,176,0,.08); }
+
+/* all-jobs AI run */
+.jr-bulk { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin: .5rem 0 .8rem; }
+.jr-bulk-bar { flex: 1 1 8rem; height: 6px; background: #1a1a2a; border-radius: 3px; overflow: hidden; } .jr-bulk-bar i { display: block; height: 100%; background: #00ff41; transition: width .3s; }
+.jr-dot.ai { box-shadow: 0 0 0 2px #00ff41; }
