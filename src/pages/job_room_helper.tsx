@@ -1,10 +1,24 @@
-import { useState } from 'react'
-import { type Application, type JobRoomEntry, JR_METHOD, jobRoomEntry, jobRoomMissing, looksWrong } from '../lib/orp'
+import FillRate from './fill_rate'
+import FindDetails from './find_details'
+import { useEffect, useState } from 'react'
+import { swissDate, type Application, type JobRoomEntry, JR_METHOD, jobRoomEntry, jobRoomMissing, looksWrong } from '../lib/orp'
 import { parseAd } from '../lib/ad_parse'
 import { fillPayload, FILL_KEY } from '../lib/jobroom_fill'
+import { useProKey, buyPro } from '../lib/pro'
+import { isApp } from '../lib/platform'
+import { PRO_KEY, PRO_USD, PRO_SCOPE } from './job_track_pro'
 
 // 2026-10-14: the date Job-Room's ENTER form was last checked against these fields
 const FORM_CHECKED = '14.10.2026'
+
+// anonymous random id of this browser, only used to count the one free auto fill
+function deviceId(): string {
+  try {
+    let d = localStorage.getItem('kworld_jobtrack_device')
+    if (!d) { d = crypto.randomUUID(); localStorage.setItem('kworld_jobtrack_device', d) }
+    return d
+  } catch { return '' }
+}
 
 // 2026-10-14 owner: "build a proper complex product, with super simple user
 // UX ... as many details as possible to reduce kafkaesque bureaucracy push
@@ -28,11 +42,19 @@ const Q = {
 
 const ICON_CHECK = <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
 
-export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }: {
-  rows: Application[]; monthLabel: string; onUpdate: (id: number, patch: Patch) => void; t: (k: string) => string; onSetup?: () => void
+// remembers the selected job while the panel swaps to the set-up window and back (resets on page reload)
+let KEEP: { id: number; picked: boolean; visited?: boolean } | null = null
+
+export default function JobRoomHelper({ rows, allApps, monthLabel, onUpdate, t, onSetup }: {
+  allApps?: Application[]; rows: Application[]; monthLabel: string; onUpdate: (id: number, patch: Patch) => void; t: (k: string) => string; onSetup?: () => void
 }) {
   const firstOpen = Math.max(0, rows.findIndex(a => !a.jobroomDone))
-  const [i, setI] = useState(firstOpen)
+  const keptAt = KEEP ? rows.findIndex(r => r.id === KEEP!.id) : -1
+  const [i, setI] = useState(keptAt >= 0 ? keptAt : firstOpen)
+  // guidance: 3.1 glows until a square is tapped, then 3.3 (3.2 only when Job-Room's required details are missing)
+  const [picked, setPicked] = useState(keptAt >= 0 && KEEP!.picked)
+  // the Job-Room link in 3.3 has been tapped: 3.3 stops glowing and the Entered button glows next
+  const [visited, setVisited] = useState(keptAt >= 0 && !!KEEP!.visited)
   const [copied, setCopied] = useState('')
   const done = rows.filter(a => a.jobroomDone).length
   const [ad, setAd] = useState('')
@@ -44,18 +66,27 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
   const e = jobRoomEntry(a)
   const missing = jobRoomMissing(e)
   // the card on screen is what JobTrack fill (on Job-Room) picks up
-  try { localStorage.setItem(FILL_KEY, JSON.stringify(fillPayload(a))) } catch { /* private mode */ }
+  // 2026-10-19 owner: auto fill is the paid tier (US$5 once), 1 free job as a trial; the fill window checks the trial on the server
+  const { pro: webPro } = useProKey(PRO_KEY, 'jobtrack-pro-')
+  const pro = webPro || isApp()
+  try { localStorage.setItem(FILL_KEY, JSON.stringify({ ...fillPayload(a), pro, card: String(a.id), device: deviceId() })) } catch { /* private mode */ }
   // empty fields Job-Room asks for (required or not) - the ones worth finding
   const gaps = ([['street', e.street], ['postal', e.postal], ['city', e.city], ['contactPerson', e.contactPerson], ['email', e.email], ['phone', e.phone], ['link', e.link]] as const)
     .filter(([, v]) => !v).map(([k]) => t('jr.f.' + k))
-  function fillFromAd() {
-    const p = parseAd(ad)
+  const [adNote, setAdNote] = useState('')
+  const [found, setFound] = useState<{ statusHint: string; siteDomain: string; urls: string[] }>({ statusHint: '', siteDomain: '', urls: [] })
+  function fillFromAd(text: string = ad) {
+    const p = parseAd(text)
     const patch: Partial<Application> = {}
     const put = (k: keyof Application, v: string | undefined, have: string) => { if (v && !have) (patch as any)[k] = v }
     put('street', p.street, e.street); put('streetNo', p.streetNo, e.streetNo); put('postal', p.postal, e.postal); put('city', p.city, e.city)
     put('contactPerson', p.contactPerson, e.contactPerson); put('email', p.email, e.email); put('phone', p.phone, e.phone); put('link', p.link, e.link)
-    if (!a.adText) patch.adText = ad.slice(0, 20000) // kept as proof if the ad page goes 404
+    if (!a.adText) patch.adText = text.slice(0, 20000) // kept as proof if the ad page goes 404
+    setFound({ statusHint: p.statusHint, siteDomain: p.siteDomain, urls: p.urls })
+    const filled = Object.keys(patch).filter(k => k !== 'adText')
     if (Object.keys(patch).length) onUpdate(a.id, patch)
+    // 2026-10-15 owner: pasting fills straight away; say what happened (it only fills boxes that are empty)
+    setAdNote(filled.length ? t('jr.adDone').replace('{list}', filled.join(', ')) : (p.postal || p.city || p.street ? t('jr.adHave') : (p.statusHint || p.siteDomain ? t('jr.adEmailOnly') : t('jr.adNone'))))
     setAd('')
   }
 
@@ -106,91 +137,115 @@ export default function JobRoomHelper({ rows, monthLabel, onUpdate, t, onSetup }
     </div>
   )
 
+  // 2026-10-15 owner: coming back from Job-Room, fold up the job's details so "Entered in Job-Room" is right there (no scrolling)
+  // leaving this tab/window after picking a job = off to Job-Room by whatever route (link, own tab, other window)
+  useEffect(() => {
+    const away = () => { if (picked && !a.jobroomDone) { setVisited(true); if (KEEP) KEEP.visited = true } }
+    const vis = () => { if (document.visibilityState === 'hidden') away() }
+    document.addEventListener('visibilitychange', vis); window.addEventListener('blur', away)
+    return () => { document.removeEventListener('visibilitychange', vis); window.removeEventListener('blur', away) }
+  })
+  // 2026-10-15 owner: when everything Job-Room needs is there (the ticks), the details start folded
+  const completeAt = (n: number) => (rows[n] ? jobRoomMissing(jobRoomEntry(rows[n])).length === 0 : false)
+  const [lastOk, setLastOk] = useState<string | null>(null)  // '' = never, null = not loaded / offline
+  useEffect(() => { fetch('/api/fill-ok?country=CH').then(r => r.json()).then(d => setLastOk(typeof d.last === 'string' ? d.last : null)).catch(() => setLastOk(null)) }, [])
+  const [folded, setFolded] = useState(() => completeAt(firstOpen))
+  useEffect(() => {
+    const back = () => { if (document.visibilityState === 'visible' && picked && !a.jobroomDone && missing.length === 0) setFolded(true) }
+    document.addEventListener('visibilitychange', back); window.addEventListener('focus', back)
+    return () => { document.removeEventListener('visibilitychange', back); window.removeEventListener('focus', back) }
+  })
+
+  const incompleteNow = missing.length > 0
   function entered() {
+    fetch('/api/fill-ok', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ country: 'CH' }) }).catch(() => {})
+    setPicked(false); setVisited(false)
+    KEEP = null
     onUpdate(a.id, { jobroomDone: new Date().toISOString().slice(0, 10) })
     const next = rows.findIndex((r, n) => n > idx && !r.jobroomDone)
     setI(next >= 0 ? next : idx)
+    setFolded(completeAt(next >= 0 ? next : idx))
   }
 
   return (
     <div className="jr">
       {/* 2026-10-14 owner: 3 steps in the order you do them - 1 pick here, 2 fill gaps here, 3 Job-Room */}
-      <p className="jr-step"><b className="jts-num">3.1.</b> <b>{t('jr.here')}</b> {t('jr.flow2')}</p>
+      <p className={'jr-step' + (!picked ? ' jr-glow' : '')}><b className="jts-num">3.1.</b> <b>{t('jr.here')}</b> {t('jr.flow2')}</p>
+      <p className="jr-legend">
+        <span className="jr-leg"><span className="jr-lg cur" />{t('jr.leg.cur')}</span>
+        <span className="jr-leg"><span className="jr-lg done" />{t('jr.leg.done')}</span>
+        <span className="jr-leg"><span className="jr-lg todo" />{t('jr.leg.todo')}</span>
+        <span className="jr-leg"><span className="jr-lg need" />{t('jr.leg.need')}</span>
+      </p>
       <div className="jr-dots" role="tablist">
         {rows.map((r, n) => (
-          <button key={r.id} type="button" role="tab" aria-selected={n === idx} aria-label={`${n + 1}. ${r.company}`}
+          <button key={r.id} type="button" role="tab" aria-selected={n === idx} aria-label={`${n + 1}. ${r.company}`} title={`${n + 1}. ${r.company} - ${swissDate(r.date)}`}
             className={'jr-dot' + (n === idx ? ' cur' : '') + (r.jobroomDone ? ' done' : '') + (jobRoomMissing(jobRoomEntry(r)).length ? ' need' : '')}
-            onClick={() => setI(n)}>{n + 1}</button>
+            onClick={() => { KEEP = { id: r.id, picked: true }; setI(n); setPicked(true); setVisited(false); setFolded(completeAt(n)) }}>{n + 1}</button>
         ))}
       </div>
 
-      <div className="jr-step2"><b className="jts-num">3.2.</b> {a.company}
+      <div id="jr-step2" className={'jr-step2' + (picked && missing.length > 0 ? ' jr-glow' : '')}><b className="jts-num">3.2.</b> <b>{t('jr.appliedTo')}</b> {a.company}{a.role ? ' - ' + a.role : ''}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}
         {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}
-        {gaps.length > 0 ? (
-          // 2026-10-14 owner: only push when Job-Room NEEDS something; optional gaps stay a quiet fold
-          // 2026-10-14 owner: all required there -> only the green tick, nothing else to decide
-          missing.length === 0 ? <p className="jr-nogaps">{ICON_CHECK}{t('jr.allNeeded')}</p> : <>
-          <details className="jr-fill jr-fill-need" open>
-            <summary className="jr-fill-title">{missing.length ? `${t('jr.fill')} (${gaps.join(', ')})` : `${t('jr.optionalMore')} (${gaps.join(', ')})`}</summary>
-            <textarea className="jr-ad" rows={3} placeholder={t('jr.adPaste')} value={ad} onChange={ev => setAd(ev.target.value)} />
-            <button type="button" className="btn-secondary" disabled={!ad.trim()} onClick={fillFromAd}>{t('jr.adFill')}</button>
-            <div className="jr-find">
-              <a href={`https://www.zefix.ch/en/search/entity/list?mainSearch=${encodeURIComponent(a.company)}`} target="_blank" rel="noopener noreferrer">{t('jr.zefix')}</a>
-              <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(a.company)}`} target="_blank" rel="noopener noreferrer">{t('jr.map')}</a>
-              <button type="button" className="jr-copy" onClick={() => copy('sent', a.company)}>{copied === 'sent' ? ICON_CHECK : t('jr.sent')}</button>
-              <a href="https://www.job-room.ch/job-search" target="_blank" rel="noopener noreferrer">{t('jr.search')}</a>
-              {/* 2026-10-14 owner: a Jobup link was 404 - the same job was still live on ostjob.ch */}
-              <a href={`https://duckduckgo.com/?q=${encodeURIComponent(`${a.company} ${a.role}`)}`} target="_blank" rel="noopener noreferrer">{t('jr.other')}</a>
-            </div>
-          </details></>
-        ) : <p className="jr-nogaps">{ICON_CHECK}{t('jr.nogaps')}</p>}
+        {gaps.length === 0
+          ? <p className="jr-nogaps">{ICON_CHECK}{t('jr.nogaps')}</p>
+          : <>
+              {missing.length === 0 && t('jr.allNeeded').split('|').map(x => <p key={x} className="jr-nogaps">{ICON_CHECK}{x}</p>)}
+              <FindDetails key={a.id} a={a} e={e} allApps={allApps} onUpdate={onUpdate} t={t} requiredMissing={missing.length > 0} />
+            </>}
+        <div><button type="button" className="jr-bm-again" onClick={() => { if (folded) setTimeout(() => document.getElementById('jr-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60); setFolded(f => !f) }}>{folded ? t('jr.showDetails') : t('jr.hideDetails')}</button></div>
+        {!folded && <div className="jr-card" id="jr-card" key={a.id}>
+
+          {missing.length > 0 ? <p className="jr-warn">{t('jr.missing')}</p> : <p className="jr-ready">{ICON_CHECK}{t('jr.ready')}</p>}
+          <p className="jr-q">{Q.when}</p>
+          <Val k="date" label="Date" field="date" value={e.date} required />
+          <p className="jr-q">{Q.how}</p>
+          <Pick label="" options={['Elektronisch', 'Brieflich', 'Persönlich', 'Telefonisch']} chosen={JR_METHOD[e.method]} />
+          <p className="jr-q">{Q.where}</p>
+          <Val k="biz" label="Business" field="company" value={e.business} required />
+          <Val k="street" label="Street" field="street" value={e.street} />
+          <Val k="no" label="No." field="streetNo" value={e.streetNo} />
+          <Val k="po" label="PO box no." field="poBox" value={e.poBox} />
+          <Val k="country" label="Country" value={e.country} />
+          <Val k="postal" label="Postal code" field="postal" value={e.postal} required />
+          <Val k="city" label="City" field="city" value={e.city} required />
+          <Val k="person" label="Kontaktperson" field="contactPerson" value={e.contactPerson} />
+          <Val k="email" label="Email" field="email" value={e.email} />
+          <Val k="phone" label="Phone number" field="phone" value={e.phone} />
+          <p className="jr-q">{Q.job}</p>
+          <Val k="job" label="Job title" field="role" value={e.jobTitle} required />
+          <Val k="link" label="Link zum Online-Formular" field="link" value={e.link} />
+          <p className="jr-q">{Q.rav}</p>
+          <Pick label="" options={['No', 'Yes']} chosen={e.assigned ? 'Yes' : 'No'} />
+          <p className="jr-q">{Q.rate}</p>
+          <Pick label="" options={['Vollzeit', 'Teilzeit']} chosen={e.fullTime ? 'Vollzeit' : 'Teilzeit'} />
+          <p className="jr-q">{Q.result}</p>
+          <Pick label="" options={['Vorstellungsgespräch', 'Noch offen', 'Anstellung', 'Absage']} chosen={e.result} />
+        </div>}
       </div>
-      <p className="jr-step"><b className="jts-num">3.3.</b> <b>Job-Room:</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[0]}<b className="jr-bmname">JobTrack fill</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[1] ?? ''}
+      <p className={'jr-step' + (picked && !visited && missing.length === 0 ? ' jr-glow' : '')}><b className="jts-num">3.3.</b> <a className="jr-link" href="https://www.job-room.ch/dashboard/job-seeker" target="_blank" rel="noopener noreferrer" onClick={() => { setVisited(true); if (KEEP) KEEP.visited = true }}><b>Job-Room</b></a><b> ({t('jr.autoFill')}):</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[0]}<b className="jr-bmname">JobTrack fill</b>{(() => { const tail = (t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[1] ?? ''; const eb = t('jr.enteredBtn'); const k = tail.indexOf(eb); return k < 0 ? tail : <>{tail.slice(0, k)}<b className="jr-bmname">{eb}</b>{tail.slice(k + eb.length)}</> })()}
+        {!pro && <><br /><span className="jr-trial">{t('jr.trial')} <button type="button" className="btn-secondary jr-bm-back" onClick={() => buyPro({ scope: PRO_SCOPE, amount: PRO_USD, title: 'JobTrack Pro', subtitle: t('jr.proSub') })}>{t('jr.proBtn')}</button></span></>}
         {/* 2026-10-14 owner: the bookmark step must stay findable */}
         {onSetup && <><br /><button type="button" className="btn-secondary jr-bm-back" onClick={onSetup}>{t('jr.noBookmark')}</button></>}</p>
-      <div className="jr-card" key={a.id}>
-        <p className="jr-head">{idx + 1}. {a.company}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}</p>
-        {missing.length > 0 && <p className="jr-warn">{t('jr.missing')}</p>}
-
-        <p className="jr-q">{Q.when}</p>
-        <Val k="date" label="Date" field="date" value={e.date} required />
-        <p className="jr-q">{Q.how}</p>
-        <Pick label="" options={['Elektronisch', 'Brieflich', 'Persönlich', 'Telefonisch']} chosen={JR_METHOD[e.method]} />
-        <p className="jr-q">{Q.where}</p>
-        <Val k="biz" label="Business" field="company" value={e.business} required />
-        <Val k="street" label="Street" field="street" value={e.street} />
-        <Val k="no" label="No." field="streetNo" value={e.streetNo} />
-        <Val k="po" label="PO box no." field="poBox" value={e.poBox} />
-        <Val k="country" label="Country" value={e.country} />
-        <Val k="postal" label="Postal code" field="postal" value={e.postal} required />
-        <Val k="city" label="City" field="city" value={e.city} required />
-        <Val k="person" label="Kontaktperson" field="contactPerson" value={e.contactPerson} />
-        <Val k="email" label="Email" field="email" value={e.email} />
-        <Val k="phone" label="Phone number" field="phone" value={e.phone} />
-        <p className="jr-q">{Q.job}</p>
-        <Val k="job" label="Job title" field="role" value={e.jobTitle} required />
-        <Val k="link" label="Link zum Online-Formular" field="link" value={e.link} />
-        <p className="jr-q">{Q.rav}</p>
-        <Pick label="" options={['No', 'Yes']} chosen={e.assigned ? 'Yes' : 'No'} />
-        <p className="jr-q">{Q.rate}</p>
-        <Pick label="" options={['Vollzeit', 'Teilzeit']} chosen={e.fullTime ? 'Vollzeit' : 'Teilzeit'} />
-        <p className="jr-q">{Q.result}</p>
-        <Pick label="" options={['Vorstellungsgespräch', 'Noch offen', 'Anstellung', 'Absage']} chosen={e.result} />
-      </div>
-
       <div className="jr-nav">
         <button type="button" className="btn-secondary" disabled={idx === 0} onClick={() => setI(idx - 1)}>{t('jr.back')}</button>
         {a.jobroomDone
           ? <button type="button" className="btn-secondary" onClick={() => onUpdate(a.id, { jobroomDone: undefined })}>{t('jr.undo')}</button>
           : <>
-              <button type="button" className="btn btn-glow jr-entered" onClick={entered}>{ICON_CHECK}{t('jr.enteredBtn')}</button>
+              <button type="button" className={'btn jr-entered' + (visited && !incompleteNow ? ' btn-glow' : '')} onClick={entered}>{ICON_CHECK}{t('jr.enteredBtn')}</button>
             </>}
         <button type="button" className="btn-secondary" disabled={idx === rows.length - 1} onClick={() => setI(idx + 1)}>{t('jr.next')}</button>
       </div>
+      <FillRate country="CH" t={t} />
       {done === rows.length && <p className="jr-all">{ICON_CHECK}{t('jr.all')}</p>}
       {/* 2026-10-14 owner: "what happens when the gov changes a field?" - the fields live in one place; a changed form is one tap away */}
-      <p className="jr-form-check">{t('jr.formChecked').replace('{date}', FORM_CHECKED)}{' '}
-        <a target="_blank" rel="noopener noreferrer" href={'/contact?service=' + encodeURIComponent('JobTrack') + '&msg=' + encodeURIComponent("Job-Room's ENTER form has changed. Field: ")}>{t('jr.formTell')}</a></p>
+      <p className="jr-form-check">{(() => {
+          const parts = t('jr.formChecked').replace('{date}', FORM_CHECKED).split('|')
+          const fresh = lastOk && (Date.now() - new Date(lastOk + 'T12:00:00').getTime()) < 14 * 86400000
+          const first = lastOk === null ? parts[0] : fresh ? t('jr.formOk').replace('{date}', swissDate(lastOk)) : t('jr.formStale')
+          return <><span>{first}</span><br /><span>{parts[1]}</span></>
+        })()}{' '}
+        {!isApp() && <a target="_blank" rel="noopener noreferrer" href={'/contact?help=1&msg=' + encodeURIComponent("Job-Room's ENTER form has changed. Field: ")}>{t('jr.formTell')}</a>}</p>
     </div>
   )
 }

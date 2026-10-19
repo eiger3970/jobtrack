@@ -43,7 +43,7 @@ function Choices({ L, onSync, onExport, onKeep }: { L: Tx; onSync: () => void; o
     <ul className="jtb-choices">
       <li className="jtb-best">
         <button className="btn btn-glow" onClick={onSync}>{L('Phone - scan a QR', 'Telefon - QR scannen', 'Téléphone - scanner un QR')}</button>
-        <Ease n={3} L={L} /><span className="jtb-why">{L('Recommended - with you on the go, works on any computer or phone, no login', 'Empfohlen - unterwegs dabei, geht an jedem Computer oder Telefon, ohne Login', 'Recommandé - avec vous partout, marche sur tout ordinateur ou téléphone, sans connexion')}</span>
+        <Ease n={3} L={L} /><span className="jtb-why">{L('Recommended - with you on the go, your job data on any computer or phone, no login', 'Empfohlen - unterwegs dabei, Ihre Bewerbungsdaten an jedem Computer oder Telefon, ohne Login', 'Recommandé - avec vous partout, vos données de candidatures sur tout ordinateur ou téléphone, sans connexion')}</span>
       </li>
       <li>
         <button className="btn-secondary" onClick={onKeep}>{L('Browser auto storage', 'Browser-Autospeicher', 'Stockage auto du navigateur')}</button>

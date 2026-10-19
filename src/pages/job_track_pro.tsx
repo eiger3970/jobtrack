@@ -6,9 +6,9 @@ import { buyPro, makeL, ProBox, useProKey } from '../lib/pro'
 // only adds: what's working (reply rate, best CV), follow-ups in your own
 // calendar. All worked out in this browser; no application data leaves it.
 
-const PRO_KEY = 'kworld_jobtrack_pro'
-const PRO_CHF = 5
-const SCOPE = `jobtrack-pro-${PRO_CHF}`
+export const PRO_KEY = 'kworld_jobtrack_pro'
+export const PRO_USD = 5
+export const PRO_SCOPE = `jobtrack-pro-${PRO_USD}`
 
 interface App { id: number; company: string; role: string; date: string; status: string; cv: string; cover: string; nextDate: string; notes: string }
 
@@ -93,7 +93,7 @@ export default function JobTrackPro({ apps, lang }: { apps: App[]; lang: string 
           <p className="jt-pro-hint">{L('Opens in your phone or computer calendar - a reminder at 9:00 on each Next date. Download again after changes.', 'Öffnet sich im Kalender von Telefon oder Computer - Erinnerung um 9:00 an jedem Nächsten Datum. Nach Änderungen neu laden.', "S'ouvre dans le calendrier du téléphone ou de l'ordinateur - rappel à 9h00 à chaque date Suivante. Retéléchargez après chaque changement.")}</p>
         </div>
       ) : (
-        <ProBox L={L} title="JobTrack Pro" amount={PRO_CHF}
+        <ProBox L={L} title="JobTrack Pro" amount={PRO_USD}
           why={L('See which CV and letter actually get replies, and never miss a follow-up - so every application counts.', 'Sieh, welcher Lebenslauf und welches Anschreiben wirklich Antworten bekommen, und verpasse kein Nachfassen - damit jede Bewerbung zählt.', "Voyez quel CV et quelle lettre obtiennent vraiment des réponses, et ne manquez aucune relance - pour que chaque candidature compte.")}
           get={[
             L('Best CV and cover letter - which version gets the most replies', 'Bester Lebenslauf und Anschreiben - welche Version die meisten Antworten bekommt', 'Meilleur CV et lettre - quelle version obtient le plus de réponses'),
@@ -106,7 +106,7 @@ export default function JobTrackPro({ apps, lang }: { apps: App[]; lang: string 
             L('Free features, never taken away - JobTrack stays free', 'Gratis-Funktionen, nie weggenommen - JobTrack bleibt gratis', 'Fonctions gratuites, jamais retirées - JobTrack reste gratuit'),
             L('Payments, never again - one time only', 'Zahlungen, nie wieder - nur einmal', 'Paiements, plus jamais - une seule fois'),
           ]}
-          onBuy={() => buyPro({ scope: SCOPE, amount: PRO_CHF, title: 'JobTrack Pro', subtitle: L('Best CV + reply rates + calendar follow-ups, for good', 'Bester Lebenslauf + Antwortquoten + Kalender, für immer', 'Meilleur CV + taux de réponse + relances au calendrier, pour toujours') })} />
+          onBuy={() => buyPro({ scope: PRO_SCOPE, amount: PRO_USD, title: 'JobTrack Pro', subtitle: L('Best CV + reply rates + calendar follow-ups, for good', 'Bester Lebenslauf + Antwortquoten + Kalender, für immer', 'Meilleur CV + taux de réponse + relances au calendrier, pour toujours') })} />
       )}
     </section>
   )

@@ -112,7 +112,7 @@ export function fillJobRoom(d: FillPayload): Promise<string[]> {
 export const FILL_KEY = 'kworld_jobtrack_fill_next'
 export function bookmarklet(origin: string): string {
   const body = `(async()=>{const fill=${fillJobRoom.toString()};
-const done=async d=>{const m=await fill(d);alert(m.length?'JobTrack filled the form. Check these (amber): '+m.join(', ')+'. Then Save.':'JobTrack filled the form. Check it, then Save.')};
+const done=async d=>{const m=await fill(d);alert(m.length?'JobTrack filled the form.\\n\\n1. Check the amber fields: '+m.join(', ')+'.\\n2. Tap Save.\\n3. Back in JobTrack, tap Entered in Job-Room.':'JobTrack filled the form.\\n\\n1. Check the details look right.\\n2. Tap Save.\\n3. Back in JobTrack, tap Entered in Job-Room.')};
 let got=false;const on=e=>{if(e.origin!=='${origin}'||!e.data||!e.data.jobtrack||got)return;got=true;removeEventListener('message',on);done(e.data)};
 addEventListener('message',on);
 const w=open('${origin}/jobtrack_fill.html','jobtrackfill','width=360,height=200');

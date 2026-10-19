@@ -65,7 +65,7 @@ export function ProBox({ L, title, why, amount, get, never, onBuy, children }: {
       <h3>{STAR} {title}</h3>
       <p className="pro-box-why">{why}</p>
       <dl>
-        <dt>{L('You pay', 'Du zahlst', 'Vous payez')}</dt><dd>${amount}, {L('once - no subscription', 'einmal - kein Abo', "une fois - pas d'abonnement")}</dd>
+        <dt>{L('You pay', 'Du zahlst', 'Vous payez')}</dt><dd>US${amount}, {L('once - no subscription. Your payment method converts it to your local currency.', 'einmal - kein Abo. Ihre Zahlungsart rechnet in Ihre Währung um.', "une fois - pas d'abonnement. Votre moyen de paiement convertit dans votre devise.")}</dd>
         <dt>{L('You get', 'Du bekommst', 'Vous recevez')}</dt><dd><ul>{az(get).map(g => <li key={g}>{g}</li>)}</ul></dd>
         <dt>{L('We never', 'Wir nie', 'Jamais')}</dt><dd><ul>{az(never).map(g => <li key={g}>{g}</li>)}</ul></dd>
       </dl>

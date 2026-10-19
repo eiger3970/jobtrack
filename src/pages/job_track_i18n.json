@@ -932,7 +932,7 @@
     },
     "ad.fill": {
       "en": "Fill in from the ad",
-      "de": "Aus dem Inserat ausfüllen",
+      "de": "Aus dem Inserat füllen",
       "fr": "Remplir depuis l'annonce"
     },
     "ad.check": {
@@ -1011,9 +1011,9 @@
       "fr": "Job-Room -> work-efforts -> {month} -> +Enter -> cliquez JobTrack fill dans les favoris"
     },
     "jr.missing": {
-      "en": "Amber = Job-Room needs it - fill it in below first",
-      "de": "Orange = Job-Room braucht es - zuerst unten ausfüllen",
-      "fr": "Orange = Job-Room en a besoin - remplissez-le ci-dessous"
+      "en": "Amber = Job-Room requires it",
+      "de": "Orange = Job-Room verlangt es zwingend",
+      "fr": "Orange = Job-Room l'exige"
     },
     "jr.needed": {
       "en": "needed - type it here",
@@ -1086,9 +1086,9 @@
       "fr": "Combler les vides"
     },
     "jr.adPaste": {
-      "en": "Paste the job ad here (open the ad -> Ctrl+A -> Ctrl+C)",
-      "de": "Inserat hier einfügen (Inserat öffnen -> Ctrl+A -> Ctrl+C)",
-      "fr": "Collez l'annonce ici (ouvrir l'annonce -> Ctrl+A -> Ctrl+C)"
+      "en": "Paste an email, a job ad or an address here (Ctrl+V)",
+      "de": "E-Mail, Inserat oder Adresse hier einfügen (Strg+V)",
+      "fr": "Collez ici un e-mail, une annonce ou une adresse (Ctrl+V)"
     },
     "jr.adFill": {
       "en": "Fill from the ad",
@@ -1116,9 +1116,9 @@
       "fr": "Trouver l'annonce sur Job-Room"
     },
     "jr.formChecked": {
-      "en": "Matches Job-Room's ENTER form as of {date}. A field looks different?",
-      "de": "Entspricht dem ENTER-Formular von Job-Room, Stand {date}. Ein Feld sieht anders aus?",
-      "fr": "Correspond au formulaire ENTER de Job-Room au {date}. Un champ a changé?"
+      "en": "Matches Job-Room's ENTER form as of {date}.|A field looks different?",
+      "de": "Entspricht dem ENTER-Formular von Job-Room, Stand {date}.|Ein Feld sieht anders aus?",
+      "fr": "Correspond au formulaire ENTER de Job-Room au {date}.|Un champ a changé?"
     },
     "jr.formTell": {
       "en": "Tell us in one tap",
@@ -1216,9 +1216,9 @@
       "fr": "recherches"
     },
     "orp.beforeTip": {
-      "en": "Important: the office also counts your job searches from the 3 months BEFORE you registered. Enter them too - missing ones can cost days of benefits or delay your first payment, and nobody may warn you.",
-      "de": "Wichtig: Das Amt zählt auch Ihre Bewerbungen der 3 Monate VOR der Anmeldung. Tragen Sie sie ein - fehlende können Taggelder kosten oder die erste Zahlung verzögern, und niemand warnt Sie vielleicht.",
-      "fr": "Important: l'office compte aussi vos recherches des 3 mois AVANT votre inscription. Saisissez-les - celles qui manquent peuvent coûter des jours d'indemnités ou retarder le premier paiement, et personne ne vous préviendra peut-être."
+      "en": "Important: the office also counts your job searches from the 3 months BEFORE you registered.|Enter them too.|Missing ones can cost days of benefits or delay your first payment.|Nobody may warn you.",
+      "de": "Wichtig: Das Amt zählt auch Ihre Bewerbungen der 3 Monate VOR der Anmeldung.|Tragen Sie sie auch ein.|Fehlende können Taggelder kosten oder die erste Zahlung verzögern.|Niemand warnt Sie vielleicht.",
+      "fr": "Important: l'office compte aussi vos recherches des 3 mois AVANT votre inscription.|Saisissez-les aussi.|Celles qui manquent peuvent coûter des jours d'indemnités ou retarder le premier paiement.|Personne ne vous préviendra peut-être."
     },
     "dk.white": {
       "en": "this period - counts for your quota",
@@ -1250,15 +1250,220 @@
       "de": "{n} Wochen mit weniger als 2 Bewerbungen",
       "fr": "{n} semaines avec moins de 2 recherches"
     },
+    "ad.need": {
+      "en": "Job-Room needs now, while the ad is open:",
+      "de": "Job-Room braucht jetzt, solange die Anzeige offen ist:",
+      "fr": "Job-Room a besoin maintenant, tant que l'annonce est ouverte:"
+    },
+    "ad.nice": {
+      "en": "Also useful:",
+      "de": "Auch nützlich:",
+      "fr": "Aussi utile:"
+    },
+    "ad.allSet": {
+      "en": "Everything Job-Room needs is saved",
+      "de": "Alles, was Job-Room braucht, ist gespeichert",
+      "fr": "Tout ce dont Job-Room a besoin est enregistré"
+    },
+    "orp.country.ch": {
+      "en": "Switzerland: Job-Room",
+      "de": "Schweiz: Job-Room",
+      "fr": "Suisse: Job-Room"
+    },
+    "orp.country.au": {
+      "en": "Australia: Workforce Australia",
+      "de": "Australien: Workforce Australia",
+      "fr": "Australie: Workforce Australia"
+    },
+    "orp.title.au": {
+      "en": "Job search records - Australia: Workforce Australia (Centrelink)",
+      "de": "Bewerbungsnachweise - Australien: Workforce Australia (Centrelink)",
+      "fr": "Preuves de recherches - Australie: Workforce Australia (Centrelink)"
+    },
+    "au.note": {
+      "en": "Copy each field into your Workforce Australia job search record. Field names may differ - check against your own account.",
+      "de": "Jedes Feld in Ihren Workforce-Australia-Nachweis kopieren. Feldnamen können abweichen - mit Ihrem Konto vergleichen.",
+      "fr": "Copiez chaque champ dans votre relevé Workforce Australia. Les noms de champs peuvent différer - vérifiez dans votre compte."
+    },
+    "au.copyAll": {
+      "en": "Copy all fields",
+      "de": "Alle Felder kopieren",
+      "fr": "Copier tous les champs"
+    },
+    "au.reported": {
+      "en": "Reported",
+      "de": "Gemeldet",
+      "fr": "Déclaré"
+    },
+    "au.markReported": {
+      "en": "Mark as reported",
+      "de": "Als gemeldet markieren",
+      "fr": "Marquer comme déclaré"
+    },
+    "orp.country": {
+      "en": "Country",
+      "de": "Land",
+      "fr": "Pays"
+    },
+    "orp.title.other": {
+      "en": "Job search records - {country}",
+      "de": "Bewerbungsnachweise - {country}",
+      "fr": "Preuves de recherches - {country}"
+    },
+    "au.note.other": {
+      "en": "Copy each field into your unemployment agency's job search record. Field names may differ - check against your own account.",
+      "de": "Jedes Feld in den Nachweis Ihrer Arbeitsagentur kopieren. Feldnamen können abweichen - mit Ihrem Konto vergleichen.",
+      "fr": "Copiez chaque champ dans le relevé de votre agence pour l'emploi. Les noms de champs peuvent différer - vérifiez dans votre compte."
+    },
+    "share.title": {
+      "en": "{credit}: share your country's job-entry form",
+      "de": "{credit}: Formular Ihres Landes teilen",
+      "fr": "{credit} : partagez le formulaire de votre pays"
+    },
+    "share.get": {
+      "en": "You get:",
+      "de": "Sie erhalten:",
+      "fr": "Vous recevez:"
+    },
+    "share.getText": {
+      "en": "{credit} credit on any kworld product when your form is accepted, and the date of your submission on record.",
+      "de": "{credit} Guthaben für jedes kworld-Produkt, wenn Ihr Formular angenommen wird, und das Datum Ihrer Einsendung.",
+      "fr": "{credit} de crédit sur tout produit kworld si votre formulaire est accepté, et la date de votre envoi."
+    },
+    "share.pay": {
+      "en": "You pay:",
+      "de": "Sie zahlen:",
+      "fr": "Vous payez:"
+    },
+    "share.payText": {
+      "en": "Nothing.",
+      "de": "Nichts.",
+      "fr": "Rien."
+    },
+    "share.never": {
+      "en": "We never send:",
+      "de": "Wir senden nie:",
+      "fr": "Nous n'envoyons jamais:"
+    },
+    "share.neverText": {
+      "en": "What you typed. Only field names.",
+      "de": "Ihre Eingaben. Nur Feldnamen.",
+      "fr": "Ce que vous avez saisi. Seulement les noms de champs."
+    },
+    "share.s1": {
+      "en": "Drag this button to the bookmarks bar:",
+      "de": "Diesen Button in die Lesezeichenleiste ziehen:",
+      "fr": "Glissez ce bouton dans la barre de favoris:"
+    },
+    "share.s2": {
+      "en": "Computer: log in to your agency -> open the form where you enter a job search -> tap bookmark JobTrack share form -> tap OK.",
+      "de": "Computer: bei Ihrer Behörde anmelden -> das Formular öffnen, in dem Sie eine Bewerbung eintragen -> Lesezeichen JobTrack share form antippen -> OK antippen.",
+      "fr": "Ordinateur: connectez-vous à votre agence -> ouvrez le formulaire où vous saisissez une recherche -> touchez le favori JobTrack share form -> touchez OK."
+    },
+    "share.s3": {
+      "en": "Return here and paste below.",
+      "de": "Hierher zurückkehren und unten einfügen.",
+      "fr": "Revenez ici et collez ci-dessous."
+    },
+    "share.paste": {
+      "en": "Paste with Ctrl+V (Mac: Cmd+V) here",
+      "de": "Hier mit Strg+V einfügen (Mac: Cmd+V)",
+      "fr": "Collez ici avec Ctrl+V (Mac: Cmd+V)"
+    },
+    "share.bad": {
+      "en": "That is not a JobTrack field list - run step 2 again.",
+      "de": "Das ist keine JobTrack-Feldliste - Schritt 2 wiederholen.",
+      "fr": "Ce n'est pas une liste JobTrack - refaites l'étape 2."
+    },
+    "share.fields": {
+      "en": "field names found",
+      "de": "Feldnamen gefunden",
+      "fr": "noms de champs trouvés"
+    },
+    "share.send": {
+      "en": "Check the list, then send with my email",
+      "de": "Liste prüfen, dann mit meiner E-Mail senden",
+      "fr": "Vérifier la liste, puis envoyer avec mon e-mail"
+    },
+    "share.email": {
+      "en": "The contact form opens with this filled in. Add your email there and your code is emailed to you automatically.",
+      "de": "Das Kontaktformular öffnet sich vorausgefüllt. Dort Ihre E-Mail angeben - Ihr Code kommt automatisch per E-Mail.",
+      "fr": "Le formulaire de contact s'ouvre pré-rempli. Ajoutez-y votre e-mail - votre code arrive automatiquement."
+    },
+    "share.how": {
+      "en": "Share and claim now!",
+      "de": "Jetzt teilen und einlösen!",
+      "fr": "Partagez et réclamez maintenant!"
+    },
+    "share.anon": {
+      "en": "Anonymous:",
+      "de": "Anonym:",
+      "fr": "Anonyme:"
+    },
+    "share.anonText": {
+      "en": "blank form only, none of your details.",
+      "de": "nur das leere Formular, keine Ihrer Angaben.",
+      "fr": "formulaire vierge seulement, aucune de vos données."
+    },
+    "share.shared": {
+      "en": "Shared:",
+      "de": "Geteilt:",
+      "fr": "Partagé:"
+    },
+    "share.sharedText": {
+      "en": "field names only, to autofill job forms.",
+      "de": "nur Feldnamen, zum automatischen Ausfüllen von Bewerbungsformularen.",
+      "fr": "seulement les noms de champs, pour remplir automatiquement les formulaires d'emploi."
+    },
+    "share.rate": {
+      "en": "Rate your experience",
+      "de": "Bewerten Sie Ihre Erfahrung",
+      "fr": "Notez votre expérience"
+    },
+    "share.feedback": {
+      "en": "Any feedback? (optional)",
+      "de": "Rückmeldung? (optional)",
+      "fr": "Un commentaire? (facultatif)"
+    },
+    "rate.q": {
+      "en": "How well did JobTrack fill the form?",
+      "de": "Wie gut hat JobTrack das Formular ausgefüllt?",
+      "fr": "Comment JobTrack a-t-il rempli le formulaire?"
+    },
+    "rate.comment": {
+      "en": "Anything to improve? (optional)",
+      "de": "Was können wir verbessern? (optional)",
+      "fr": "À améliorer? (facultatif)"
+    },
+    "rate.send": {
+      "en": "Send rating",
+      "de": "Bewertung senden",
+      "fr": "Envoyer la note"
+    },
+    "rate.thanks": {
+      "en": "Thanks - positive Universe vibes sent your way :-)",
+      "de": "Danke - positive Universum-Vibes für Sie :-)",
+      "fr": "Merci - de bonnes ondes de l'Univers pour vous :-)"
+    },
+    "share.bar": {
+      "en": "Bookmarks bar not showing? Press Ctrl+Shift+B (Mac: Cmd+Shift+B).",
+      "de": "Keine Lesezeichenleiste? Strg+Umschalt+B drücken (Mac: Cmd+Umschalt+B).",
+      "fr": "Pas de barre de favoris? Ctrl+Maj+B (Mac: Cmd+Maj+B)."
+    },
+    "jr.assure": {
+      "en": "Job-Room sections: {folder} and {reg} only|{earlier} jobs: enter all under {folder}|Dates: real application date on each job|Test entries: leave out of Job-Room",
+      "de": "Job-Room-Bereiche: nur {folder} und {reg}|Stellen {earlier}: alle unter {folder} eintragen|Daten: echtes Bewerbungsdatum bei jeder Stelle|Testeinträge: nicht in Job-Room erfassen",
+      "fr": "Sections Job-Room: {folder} et {reg} seulement|Postes {earlier}: tous sous {folder}|Dates: vraie date de candidature sur chaque poste|Entrées de test: ne pas saisir dans Job-Room"
+    },
     "jr.flow1": {
-      "en": "tap Efforts to find work -> tap {month} -> tap +Enter -> tap JobTrack fill bookmark -> tap OK -> check details -> tap Save (red, bottom right) -> then here (bottom of the card): tap Entered in Job-Room",
-      "de": "Arbeitsbemühungen tippen -> {month} tippen -> +Enter tippen -> Lesezeichen JobTrack fill tippen -> OK tippen -> Angaben prüfen -> Speichern tippen (rot, unten rechts) -> dann hier (unten auf der Karte): In Job-Room erfasst tippen",
-      "fr": "touchez Recherches d'emploi -> touchez {month} -> touchez +Enter -> touchez le favori JobTrack fill -> touchez OK -> vérifiez les détails -> touchez Enregistrer (rouge, en bas à droite) -> puis ici (en bas de la carte): touchez Saisie dans Job-Room"
+      "en": "eServices RAV -> tap Efforts to find work -> Nachweis der persönlichen Arbeitsbemühungen -> tap {month} -> tap +Enter -> tap JobTrack fill bookmark -> tap OK -> check the form looks right -> tap Save (red, bottom right) -> return here (JobTrack) -> tap Entered in Job-Room",
+      "de": "eServices RAV -> Arbeitsbemühungen tippen -> Nachweis der persönlichen Arbeitsbemühungen -> {month} tippen -> +Enter tippen -> Lesezeichen JobTrack fill tippen -> OK tippen -> prüfen, ob das Formular stimmt -> Speichern tippen (rot, unten rechts) -> zurück hierher (JobTrack) -> In Job-Room erfasst tippen",
+      "fr": "touchez Recherches d'emploi -> touchez {month} -> touchez +Enter -> touchez le favori JobTrack fill -> touchez OK -> vérifiez le formulaire -> touchez Enregistrer (rouge, en bas à droite) -> retournez ici (JobTrack) -> touchez Saisie dans Job-Room"
     },
     "jr.flow2": {
-      "en": "tap a square below for the job to fill in",
-      "de": "unten ein Feld für die Stelle antippen",
-      "fr": "touchez un carré ci-dessous pour le poste à saisir"
+      "en": "tap a square with a number below, to autofill",
+      "de": "unten ein Feld mit einer Nummer antippen, zum automatischen Ausfüllen",
+      "fr": "touchez un carré avec un numéro ci-dessous, pour remplir automatiquement"
     },
     "jr.bm.again": {
       "en": "One-click fill is set up - set up again",
@@ -1271,9 +1476,9 @@
       "fr": "Terminé"
     },
     "jr.here": {
-      "en": "Here:",
-      "de": "Hier:",
-      "fr": "Ici:"
+      "en": "JobTrack:",
+      "de": "JobTrack:",
+      "fr": "JobTrack:"
     },
     "orp.next": {
       "en": "Next",
@@ -1296,14 +1501,14 @@
       "fr": "Aucun vide - rien à compléter"
     },
     "jr.noBookmark": {
-      "en": "JobTrack fill not in your bookmarks bar? Back to step 2",
-      "de": "JobTrack fill nicht in der Lesezeichenleiste? Zurück zu Schritt 2",
-      "fr": "JobTrack fill pas dans vos favoris? Retour à l'étape 2"
+      "en": "JobTrack fill not in your bookmarks bar? Add it",
+      "de": "JobTrack fill nicht in der Lesezeichenleiste? Hinzufügen",
+      "fr": "JobTrack fill pas dans vos favoris? L'ajouter"
     },
     "orp.step1of3": {
-      "en": "Step 1 of 3",
-      "de": "Schritt 1 von 3",
-      "fr": "Étape 1 sur 3"
+      "en": "Step 1 of 2",
+      "de": "Schritt 1 von 2",
+      "fr": "Étape 1 sur 2"
     },
     "orp.step2of3": {
       "en": "Step 2 of 3",
@@ -1311,9 +1516,9 @@
       "fr": "Étape 2 sur 3"
     },
     "orp.step3of3": {
-      "en": "Step 3 of 3",
-      "de": "Schritt 3 von 3",
-      "fr": "Étape 3 sur 3"
+      "en": "Step 2 of 2",
+      "de": "Schritt 2 von 2",
+      "fr": "Étape 2 sur 2"
     },
     "jr.bm.big": {
       "en": "Put JobTrack fill in your bookmarks bar",
@@ -1336,9 +1541,9 @@
       "fr": "Fait - il est dans ma barre de favoris"
     },
     "jr.allNeeded": {
-      "en": "Everything Job-Room needs is here",
-      "de": "Alles, was Job-Room braucht, ist da",
-      "fr": "Tout ce dont Job-Room a besoin est là"
+      "en": "Everything Job-Room needs is here|Blank optional boxes are fine to send",
+      "de": "Alles, was Job-Room braucht, ist da|Leere optionale Felder sind in Ordnung",
+      "fr": "Tout ce dont Job-Room a besoin est là|Les champs facultatifs vides sont acceptables"
     },
     "jr.optionalMore": {
       "en": "Add optional details",
@@ -1349,6 +1554,451 @@
       "en": "looks wrong - check?",
       "de": "sieht falsch aus - prüfen?",
       "fr": "semble faux - vérifier?"
+    },
+    "share.pasteBtn": {
+      "en": "Paste what I copied",
+      "de": "Kopiertes einfügen",
+      "fr": "Coller ce que j'ai copié"
+    },
+    "share.blank": {
+      "en": "Blank form only, none of your details. It helps build one-click forms for job seekers.",
+      "de": "Nur das leere Formular, keine Ihrer Angaben. Es hilft, Ein-Klick-Formulare für Jobsuchende zu bauen.",
+      "fr": "Formulaire vierge seulement, aucune de vos données. Il aide à créer des formulaires en un clic pour les chercheurs d'emploi."
+    },
+    "share.wrong": {
+      "en": "Only a few fields found - this looks like the wrong page. Open the screen where you ADD one job search, tap the bookmark again, then paste.",
+      "de": "Nur wenige Felder gefunden - das ist wohl die falsche Seite. Öffnen Sie die Seite, auf der Sie EINE Bewerbung erfassen, tippen Sie das Lesezeichen erneut und fügen Sie ein.",
+      "fr": "Peu de champs trouvés - ce n'est sans doute pas la bonne page. Ouvrez l'écran où vous AJOUTEZ une recherche, touchez à nouveau le favori, puis collez."
+    },
+    "share.page": {
+      "en": "page",
+      "de": "Seite",
+      "fr": "page"
+    },
+    "share.pages": {
+      "en": "pages",
+      "de": "Seiten",
+      "fr": "pages"
+    },
+    "share.more": {
+      "en": "More than one page? Open the next page, tap the bookmark, paste again.",
+      "de": "Mehr als eine Seite? Nächste Seite öffnen, Lesezeichen tippen, erneut einfügen.",
+      "fr": "Plus d'une page? Ouvrez la page suivante, touchez le favori, collez à nouveau."
+    },
+    "share.clear": {
+      "en": "Start over",
+      "de": "Neu beginnen",
+      "fr": "Recommencer"
+    },
+    "jr.leg.todo": {
+      "en": "add to Job-Room",
+      "de": "in Job-Room eintragen",
+      "fr": "saisir dans Job-Room"
+    },
+    "jr.leg.need": {
+      "en": "details missing",
+      "de": "Angaben fehlen",
+      "fr": "infos manquantes"
+    },
+    "jr.leg.done": {
+      "en": "entered",
+      "de": "erfasst",
+      "fr": "saisi"
+    },
+    "jr.leg.cur": {
+      "en": "selected",
+      "de": "gewählt",
+      "fr": "choisi"
+    },
+    "share.barLabel": {
+      "en": "Bookmarks bar (Ctrl+Shift+B)",
+      "de": "Lesezeichenleiste (Strg+Umschalt+B)",
+      "fr": "Barre de favoris (Ctrl+Maj+B)"
+    },
+    "jr.bm.have": {
+      "en": "I already have it - continue",
+      "de": "Habe ich schon - weiter",
+      "fr": "Je l'ai déjà - continuer"
+    },
+    "jr.showDetails": {
+      "en": "Show real form fields needed for Job-Room",
+      "de": "Echte Formularfelder für Job-Room anzeigen",
+      "fr": "Afficher les vrais champs du formulaire Job-Room"
+    },
+    "jr.appliedTo": {
+      "en": "Applied to:",
+      "de": "Beworben bei:",
+      "fr": "Candidature chez:"
+    },
+    "jr.hideDetails": {
+      "en": "Hide real form fields needed for Job-Room",
+      "de": "Echte Formularfelder für Job-Room ausblenden",
+      "fr": "Masquer les vrais champs du formulaire Job-Room"
+    },
+    "jr.formOk": {
+      "en": "Last confirmed working by a user: {date}.",
+      "de": "Zuletzt von einem Nutzer als funktionierend bestätigt: {date}.",
+      "fr": "Dernière confirmation par un utilisateur: {date}."
+    },
+    "jr.formStale": {
+      "en": "Not confirmed recently - check each field.",
+      "de": "Länger nicht bestätigt - jedes Feld prüfen.",
+      "fr": "Pas confirmé récemment - vérifiez chaque champ."
+    },
+    "jr.adDone": {
+      "en": "Filled in: {list}",
+      "de": "Ausgefüllt: {list}",
+      "fr": "Rempli: {list}"
+    },
+    "jr.adHave": {
+      "en": "Found an address, but those boxes already have values. Edit them with the pencil.",
+      "de": "Adresse gefunden, aber die Felder sind schon ausgefüllt. Mit dem Stift ändern.",
+      "fr": "Adresse trouvée, mais les champs sont déjà remplis. Modifiez-les avec le crayon."
+    },
+    "jr.adNone": {
+      "en": "Nothing found. Paste one address line, like: Place Bel-Air 1, 1003 Lausanne",
+      "de": "Nichts gefunden. Eine Adresszeile einfügen, z. B.: Place Bel-Air 1, 1003 Lausanne",
+      "fr": "Rien trouvé. Collez une ligne d'adresse, par ex.: Place Bel-Air 1, 1003 Lausanne"
+    },
+    "jr.sameCo": {
+      "en": "Same company in another job: {addr}.",
+      "de": "Gleiche Firma in einer anderen Bewerbung: {addr}.",
+      "fr": "Même entreprise dans une autre candidature: {addr}."
+    },
+    "jr.useIt": {
+      "en": "Use it",
+      "de": "Übernehmen",
+      "fr": "Utiliser"
+    },
+    "jr.mailDate": {
+      "en": "Email: look near {date} (application and reply), skip marketing.",
+      "de": "E-Mail: um {date} suchen (Bewerbung und Antwort), Werbung überspringen.",
+      "fr": "E-mail: cherchez vers le {date} (candidature et réponse), ignorez les pubs."
+    },
+    "jr.mailProton": {
+      "en": "Search Proton mail",
+      "de": "Proton-Mail durchsuchen",
+      "fr": "Chercher dans Proton"
+    },
+    "jr.mailGmail": {
+      "en": "Search Gmail",
+      "de": "Gmail durchsuchen",
+      "fr": "Chercher dans Gmail"
+    },
+    "jr.siteSearch": {
+      "en": "Search offices",
+      "de": "Standorte suchen",
+      "fr": "Chercher les bureaux"
+    },
+    "jr.setRejected": {
+      "en": "Looks like a rejection - set status: Rejected",
+      "de": "Sieht nach einer Absage aus - Status: Abgelehnt setzen",
+      "fr": "Ressemble à un refus - statut: Refusé"
+    },
+    "jr.adEmailOnly": {
+      "en": "No address in that text. Try the company website below.",
+      "de": "Keine Adresse in diesem Text. Firmen-Website unten versuchen.",
+      "fr": "Pas d'adresse dans ce texte. Essayez le site de l'entreprise ci-dessous."
+    },
+    "jr.quick.contactPerson": {
+      "en": "Contact person (paste, press Enter)",
+      "de": "Kontaktperson (einfügen, Enter drücken)",
+      "fr": "Personne de contact (coller, Entrée)"
+    },
+    "jr.quick.email": {
+      "en": "Email (paste, press Enter)",
+      "de": "E-Mail (einfügen, Enter drücken)",
+      "fr": "E-mail (coller, Entrée)"
+    },
+    "jr.quick.phone": {
+      "en": "Phone (paste, press Enter)",
+      "de": "Telefon (einfügen, Enter drücken)",
+      "fr": "Téléphone (coller, Entrée)"
+    },
+    "jr.quick.link": {
+      "en": "Link to the online form (paste, press Enter)",
+      "de": "Link zum Online-Formular (einfügen, Enter drücken)",
+      "fr": "Lien du formulaire en ligne (coller, Entrée)"
+    },
+    "fd.titleNeed": {
+      "en": "Find the missing details",
+      "de": "Fehlende Angaben finden",
+      "fr": "Trouver les infos manquantes"
+    },
+    "fd.titleMore": {
+      "en": "Add more details (optional)",
+      "de": "Weitere Angaben (optional)",
+      "fr": "Ajouter des infos (facultatif)"
+    },
+    "fd.twinH": {
+      "en": "Same company, another job - one tap",
+      "de": "Gleiche Firma, andere Bewerbung - ein Tipp",
+      "fr": "Même entreprise, autre candidature - un clic"
+    },
+    "fd.mailH": {
+      "en": "Email search",
+      "de": "E-Mail-Suche",
+      "fr": "Recherche par e-mail"
+    },
+    "fd.siteH": {
+      "en": "Company website Contact Us or About Us",
+      "de": "Firmen-Website Kontakt oder Über uns",
+      "fr": "Site de l'entreprise Contact ou À propos"
+    },
+    "fd.adH": {
+      "en": "Job-Room ad",
+      "de": "Inserat auf Job-Room",
+      "fr": "Annonce sur Job-Room"
+    },
+    "fd.addrH": {
+      "en": "Find the address",
+      "de": "Die Adresse finden",
+      "fr": "Trouver l'adresse"
+    },
+    "fd.zefix": {
+      "en": "Company register (Zefix)",
+      "de": "Handelsregister (Zefix)",
+      "fr": "Registre du commerce (Zefix)"
+    },
+    "fd.map": {
+      "en": "Map",
+      "de": "Karte",
+      "fr": "Carte"
+    },
+    "fd.otherH": {
+      "en": "Website or job agency application?",
+      "de": "Bewerbung über Website oder Vermittlung?",
+      "fr": "Candidature via un site ou une agence ?"
+    },
+    "fd.otherT": {
+      "en": "Search your email for the site names:",
+      "de": "In den E-Mails nach den Seitennamen suchen:",
+      "fr": "Chercher dans vos e-mails les noms de sites :"
+    },
+    "fd.otherBtn": {
+      "en": "Search the job",
+      "de": "Stelle suchen",
+      "fr": "Chercher le poste"
+    },
+    "fd.typeH": {
+      "en": "Type it yourself (once found)",
+      "de": "Selbst eintippen (wenn gefunden)",
+      "fr": "Saisir soi-même (une fois trouvé)"
+    },
+    "fd.otherMail": {
+      "en": "jobs.ch, jobup.ch, Indeed, LinkedIn, ostjob (Gmail)",
+      "de": "jobs.ch, jobup.ch, Indeed, LinkedIn, ostjob (Gmail)",
+      "fr": "jobs.ch, jobup.ch, Indeed, LinkedIn, ostjob (Gmail)"
+    },
+    "fd.needL": {
+      "en": "Job-Room requires it",
+      "de": "Job-Room verlangt es zwingend",
+      "fr": "Job-Room l'exige"
+    },
+    "fd.optL": {
+      "en": "Optional",
+      "de": "Optional",
+      "fr": "Facultatif"
+    },
+    "fd.copy": {
+      "en": "Copy",
+      "de": "Kopieren",
+      "fr": "Copier"
+    },
+    "fd.copied": {
+      "en": "Copied",
+      "de": "Kopiert",
+      "fr": "Copié"
+    },
+    "fd.adBtn": {
+      "en": "Open Job-Room",
+      "de": "Job-Room öffnen",
+      "fr": "Ouvrir Job-Room"
+    },
+    "jr.autoFill": {
+      "en": "auto fill form",
+      "de": "Formular automatisch ausfüllen",
+      "fr": "remplissage automatique du formulaire"
+    },
+    "fd.checkForm": {
+      "en": "Show the form below",
+      "de": "Formular unten anzeigen",
+      "fr": "Afficher le formulaire ci-dessous"
+    },
+    "fd.scoreL": {
+      "en": "Effort vs results (more green = ease level)",
+      "de": "Aufwand vs Ergebnis (mehr Grün = einfacher)",
+      "fr": "Facilité vs résultats (plus de vert = plus facile)"
+    },
+    "fd.flowMail": {
+      "en": "{copy} -> open email client {mail} -> tap search -> paste company name -> scroll/look near {date} (skip marketing) -> copy address (triple-click the address, Ctrl+C) -> return here -> paste:",
+      "de": "{copy} -> E-Mail-Programm öffnen {mail} -> Suche antippen -> Firmennamen einfügen -> um {date} blättern/suchen (Werbung überspringen) -> Adresse kopieren (Dreifachklick auf die Adresse, Strg+C) -> hierher zurückkehren -> einfügen:",
+      "fr": "{copy} -> ouvrir la messagerie {mail} -> appuyer sur recherche -> coller le nom -> chercher vers le {date} (ignorer les pubs) -> copier l'adresse (triple-clic sur l'adresse, Ctrl+C) -> revenir ici -> coller :"
+    },
+    "fd.flowAd": {
+      "en": "{copy} -> open {room} -> sign in -> tap search -> paste -> look through the results -> copy address (triple-click the address, Ctrl+C) -> return here -> paste:",
+      "de": "{copy} -> {room} öffnen -> anmelden -> Suche antippen -> einfügen -> Ergebnisse durchsehen -> Adresse kopieren (Dreifachklick auf die Adresse, Strg+C) -> hierher zurückkehren -> einfügen:",
+      "fr": "{copy} -> ouvrir {room} -> se connecter -> appuyer sur recherche -> coller -> parcourir les résultats -> copier l'adresse (triple-clic sur l'adresse, Ctrl+C) -> revenir ici -> coller :"
+    },
+    "fd.copyCompany": {
+      "en": "Copy company name",
+      "de": "Firmennamen kopieren",
+      "fr": "Copier le nom de l'entreprise"
+    },
+    "fd.copyJob": {
+      "en": "Copy job title and company",
+      "de": "Stellentitel und Firma kopieren",
+      "fr": "Copier le titre et l'entreprise"
+    },
+    "fd.pasteHere": {
+      "en": "Ctrl+V here",
+      "de": "Strg+V hier",
+      "fr": "Ctrl+V ici"
+    },
+    "jr.ready": {
+      "en": "Green = good to submit",
+      "de": "Grün = bereit zum Absenden",
+      "fr": "Vert = prêt à envoyer"
+    },
+    "fd.autoT": {
+      "en": "Tap buttons, search terms prefilled",
+      "de": "Tasten antippen, Suchbegriffe vorausgefüllt",
+      "fr": "Appuyez sur les boutons, termes de recherche préremplis"
+    },
+    "jr.trial": {
+      "en": "Your first auto fill is free: just use the JobTrack fill bookmark below. After that, Pro is US$5 once.",
+      "de": "Das erste automatische Ausfüllen ist gratis: einfach das Lesezeichen JobTrack fill unten benutzen. Danach Pro für US$5 einmalig.",
+      "fr": "Le premier remplissage automatique est gratuit : utilisez simplement le marque-page JobTrack fill ci-dessous. Ensuite, Pro coûte US$5 une fois."
+    },
+    "jr.proBtn": {
+      "en": "Get Pro - US$5",
+      "de": "Pro holen - US$5",
+      "fr": "Obtenir Pro - US$5"
+    },
+    "jr.proSub": {
+      "en": "Auto fill for Job-Room + reply rates + calendar, for good",
+      "de": "Automatisch ausfüllen für Job-Room + Antwortquoten + Kalender, für immer",
+      "fr": "Remplissage automatique Job-Room + taux de réponse + calendrier, pour toujours"
+    },
+    "ai.h": {
+      "en": "Find it for me (AI)",
+      "de": "Für mich finden (KI)",
+      "fr": "Trouver pour moi (IA)"
+    },
+    "ai.btn": {
+      "en": "Find address and contact",
+      "de": "Adresse und Kontakt finden",
+      "fr": "Trouver adresse et contact"
+    },
+    "ai.btnFree": {
+      "en": "Find address and contact (1 free)",
+      "de": "Adresse und Kontakt finden (1 gratis)",
+      "fr": "Trouver adresse et contact (1 gratuit)"
+    },
+    "ai.busy": {
+      "en": "Searching the web...",
+      "de": "Suche im Web...",
+      "fr": "Recherche sur le web..."
+    },
+    "ai.none": {
+      "en": "Nothing reliable found. Use the steps below.",
+      "de": "Nichts Verlässliches gefunden. Nutzen Sie die Schritte unten.",
+      "fr": "Rien de fiable trouvé. Utilisez les étapes ci-dessous."
+    },
+    "ai.err": {
+      "en": "All searches are busy right now. The steps below work without waiting.",
+      "de": "Alle Suchen sind gerade ausgelastet. Die Schritte unten funktionieren ohne Warten.",
+      "fr": "Toutes les recherches sont occupées. Les étapes ci-dessous fonctionnent sans attendre."
+    },
+    "ai.used": {
+      "en": "Your free find is used. Pro is US$5 once.",
+      "de": "Ihre gratis Suche ist verbraucht. Pro kostet US$5 einmalig.",
+      "fr": "Votre recherche gratuite est utilisée. Pro coûte US$5 une fois."
+    },
+    "ai.check": {
+      "en": "Found by AI. Check the source before you use it.",
+      "de": "Von KI gefunden. Quelle prüfen, bevor Sie es verwenden.",
+      "fr": "Trouvé par IA. Vérifiez la source avant de l'utiliser."
+    },
+    "ai.src": {
+      "en": "Check it here:",
+      "de": "Hier prüfen:",
+      "fr": "Vérifier ici :"
+    },
+    "ai.use": {
+      "en": "Use this address",
+      "de": "Diese Adresse verwenden",
+      "fr": "Utiliser cette adresse"
+    },
+    "ai.no": {
+      "en": "Not right",
+      "de": "Stimmt nicht",
+      "fr": "Incorrect"
+    },
+    "ai.cap": {
+      "en": "You used all 20 AI finds in Pro. Use the steps below, or contact us.",
+      "de": "Sie haben alle 20 KI-Suchen in Pro verbraucht. Nutzen Sie die Schritte unten oder kontaktieren Sie uns.",
+      "fr": "Vous avez utilisé les 20 recherches IA de Pro. Utilisez les étapes ci-dessous ou contactez-nous."
+    },
+    "ai.switch": {
+      "en": "Busy. Switching to a less busy search...",
+      "de": "Ausgelastet. Wechsle zu einer weniger ausgelasteten Suche...",
+      "fr": "Occupé. Passage à une recherche moins sollicitée..."
+    },
+    "ai.where": {
+      "en": "Which office is the job at?",
+      "de": "In welchem Büro ist die Stelle?",
+      "fr": "Dans quel bureau se trouve le poste ?"
+    },
+    "ai.head": {
+      "en": "Head office",
+      "de": "Hauptsitz",
+      "fr": "Siège"
+    },
+    "ai.likely": {
+      "en": "Likely",
+      "de": "Wahrscheinlich",
+      "fr": "Probable"
+    },
+    "ai.unsure": {
+      "en": "Tap the office where the job is. Not sure? Your sent email shows it:",
+      "de": "Tippen Sie das Büro an, wo die Stelle ist. Unsicher? Ihre gesendete E-Mail zeigt es:",
+      "fr": "Touchez le bureau où se trouve le poste. Pas sûr ? Votre e-mail envoyé l'indique :"
+    },
+    "ai.seen": {
+      "en": "found in {n} of {of} searches",
+      "de": "in {n} von {of} Suchen gefunden",
+      "fr": "trouvé dans {n} recherches sur {of}"
+    },
+    "ai.check2": {
+      "en": "Check again",
+      "de": "Nochmals prüfen",
+      "fr": "Vérifier encore"
+    },
+    "ai.card": {
+      "en": "Same town as your card",
+      "de": "Gleicher Ort wie Ihre Karte",
+      "fr": "Même ville que votre fiche"
+    },
+    "ai.run": {
+      "en": "Search {n}",
+      "de": "Suche {n}",
+      "fr": "Recherche {n}"
+    },
+    "ai.foundBy": {
+      "en": "Found by search",
+      "de": "Gefunden bei Suche",
+      "fr": "Trouvé par la recherche"
+    },
+    "ai.nextH": {
+      "en": "Not sure which one? Next: check your sent email",
+      "de": "Unsicher, welche? Nächster Schritt: gesendete E-Mail prüfen",
+      "fr": "Pas sûr lequel ? Étape suivante : vérifiez votre e-mail envoyé"
+    },
+    "ai.nextT": {
+      "en": "Your application email shows where the job was. Search it for the company:",
+      "de": "Ihre Bewerbungs-E-Mail zeigt, wo die Stelle war. Suchen Sie darin nach der Firma:",
+      "fr": "Votre e-mail de candidature indique où était le poste. Cherchez-y l'entreprise :"
     }
   }
 }

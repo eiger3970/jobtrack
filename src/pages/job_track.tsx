@@ -199,7 +199,8 @@ export default function JobTrack() {
   const [adFilled, setAdFilled] = useState(false)
   // how many duplicates the last Open backup file joined (shown on the button)
   const [importJoined, setImportJoined] = useState(0)
-  const [orpPanel, setOrpPanel] = useState(() => import.meta.env.DEV && typeof window !== 'undefined' && window.location.hash === '#preview=jobroom')
+  // ?share=1 (from the share-form bookmark) opens the unemployment panel straight on the share card
+  const [orpPanel, setOrpPanel] = useState(() => (import.meta.env.DEV && typeof window !== 'undefined' && window.location.hash === '#preview=jobroom') || (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('share') === '1'))
   const [minimal, setMinimal] = useState(() => readStored(MIN_STORAGE) === '1' || (import.meta.env.DEV && typeof window !== 'undefined' && window.location.search.includes('min')))
   useEffect(() => { try { localStorage.setItem(MIN_STORAGE, minimal ? '1' : '0') } catch { /* private mode */ } }, [minimal])
   // 2026-10-14: phone + computer sync - the phone arrives from the QR with #sync=
@@ -334,6 +335,9 @@ export default function JobTrack() {
   // 2026-10-14 owner: white = counts for this period's quota, amber = older; a thick line where the old ones start
   const cutoff = (() => { const d = quota ? periodStart(quota.period) : new Date(new Date().getFullYear(), new Date().getMonth(), 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` })()
   const isOld = (a: App) => a.date < cutoff
+  // 2026-10-15 owner: the thick line follows the quota colour (same rule as the quota card)
+  const lineColor = (() => { if (!quota) return '#ffb000'; const pct = Math.min(100, (countInPeriod(apps, quota.period) / quota.target) * 100); return pct >= 50 ? '#00ff41' : pct >= 15 ? '#f59e0b' : '#ef4444' })()
+  const [reward, setReward] = useState(false)
   const firstOldId = sortBy.col === 'date' && !sortBy.asc ? filtered.find(isOld)?.id : undefined
   const statusCounts = STATUSES.map(st => [st, apps.filter(a => a.status === st).length] as const).filter(([, n]) => n > 0)
 
@@ -345,6 +349,16 @@ export default function JobTrack() {
     const split = { street: a.street || e.street, streetNo: a.streetNo || e.streetNo, postal: a.postal || e.postal, city: a.city || e.city,
       contactPerson: a.contactPerson || e.contactPerson, email: a.email || e.email, phone: a.phone || e.phone }
     setEditing(a); setOrpOpen(false); setForm({ ...ORP_DEFAULTS, ...rest, ...split }); setModal(true)
+  }
+  // 2026-10-15 owner: automated - paste the ad and the fields fill themselves, then flag what is still missing while the ad is fresh
+  function applyAd(text: string) {
+    const ad = parseAd(text)
+    setForm(f => ({ ...f, role: ad.role || f.role, company: ad.company || f.company, address: ad.address || f.address,
+      contact: ad.contact || f.contact, rate: ad.rate ?? f.rate, notes: [f.notes, ad.notes].filter(Boolean).join(' · '),
+      street: ad.street || f.street, streetNo: ad.streetNo || f.streetNo, postal: ad.postal || f.postal, city: ad.city || f.city,
+      contactPerson: ad.contactPerson || f.contactPerson, email: ad.email || f.email, phone: ad.phone || f.phone, link: ad.link || f.link,
+      adText: text.slice(0, 20000) }))
+    setOrpOpen(true); setAdFilled(true)
   }
   function save() {
     if (!form.company || !form.role) return
@@ -507,7 +521,10 @@ export default function JobTrack() {
   }
   // Changing status is the single most common edit on this whole page -
   // it shouldn't need the full modal (pencil -> dropdown -> Save).
-  function updateStatus(id: number, status: string) { setApps(prev => prev.map(a => a.id === id ? { ...a, status } : a)) }
+  function updateStatus(id: number, status: string) {
+    if (status === 'accepted') { setReward(true); window.setTimeout(() => setReward(false), 7000) }
+    setApps(prev => prev.map(a => a.id === id ? { ...a, status } : a))
+  }
 
   const counts: Record<string, number> = {}
   apps.forEach(a => { counts[a.status] = (counts[a.status] || 0) + 1 })
@@ -621,6 +638,15 @@ export default function JobTrack() {
 
   return (
     <div className={'jobtrack-page' + (minimal ? ' jt-min' : '')}>
+      {reward && (
+        <div className="jt-reward" onClick={() => setReward(false)}>
+          <div className="confetti" aria-hidden="true">
+            {Array.from({ length: 12 }).map((_, i) => <span key={i} className="confetti-piece" />)}
+          </div>
+          <div className="jt-reward-title">ACCEPTED!</div>
+          <div className="jt-reward-sub">You got the job. Tap to close.</div>
+        </div>
+      )}
       <div className="container">
         {/* 2026-09-15: real feedback, live - "update emoji to svg
             image. JobTrack header is darkened for some strange
@@ -891,14 +917,14 @@ export default function JobTrack() {
         )}
 
         <div className="jt-table-wrap">
-          <table className="applications-table">
+          <table className="applications-table" style={{ ['--jt-line' as string]: lineColor }}>
             {/* 2026-10-14 owner: Date, Next, Status, Cover, CV, Company, Role, Actions - fits the screen, no sideways scroll */}
             <thead><tr>
               <th className={sortCls('date')} aria-sort={sortBy.col === 'date' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}<InfoTip label={t('stale.legend')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} text={
                 <span className="jt-datekey">
                   <span><b className="jt-dk-white">2026-10-14</b> = {t('dk.white')}</span>
                   <span><b className="jt-dk-amber">2026-09-19</b> <span className="jt-dk-amber">= {t('dk.amber')}</span></span>
-                  <span><i className="jt-dk-line" /> = {t('dk.line')}</span>
+                  <span><i className="jt-dk-line" style={{ background: lineColor }} /> = {t('dk.line')}</span>
                 </span>} /></th>
               <th><HeaderIcon col="next" />{t('table.next')}<InfoTip text={t('table.next.hint')} label={t('table.next.hint')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} /></th>
               <th><HeaderIcon col="status" />{t('table.status')}{statusCounts.length > 0 && <span className="jt-status-counts">{statusCounts.map(([st, n]) => <span key={st} className={`jt-sc jt-sc-${st}`}>{n} {STATUS_PLAIN[st]}</span>)}</span>}</th>
@@ -978,16 +1004,8 @@ export default function JobTrack() {
               <div className="ad-paste">
                 {/* 2026-10-13 owner: "that critical user step is needed, Ctrl+A and Ctrl+C" */}
                 <p className="ad-step">{t(/iPhone|iPad|Android/i.test(navigator.userAgent) ? 'ad.step.phone' : 'ad.step.computer')}</p>
-                <textarea rows={3} placeholder={t('ad.paste')} value={adText} onChange={e => { setAdText(e.target.value); setAdFilled(false) }} />
-                <button type="button" className="btn" disabled={!adText.trim()} onClick={() => {
-                  const ad = parseAd(adText)
-                  setForm(f => ({ ...f, role: ad.role || f.role, company: ad.company || f.company, address: ad.address || f.address,
-                    contact: ad.contact || f.contact, rate: ad.rate ?? f.rate, notes: [f.notes, ad.notes].filter(Boolean).join(' · '),
-                    street: ad.street || f.street, streetNo: ad.streetNo || f.streetNo, postal: ad.postal || f.postal, city: ad.city || f.city,
-                    contactPerson: ad.contactPerson || f.contactPerson, email: ad.email || f.email, phone: ad.phone || f.phone, link: ad.link || f.link,
-                    adText: adText.slice(0, 20000) }))
-                  setOrpOpen(true); setAdFilled(true)
-                }}>{t('ad.fill')}</button>
+                <textarea rows={3} placeholder={t('ad.paste')} value={adText} onChange={e => { setAdText(e.target.value); setAdFilled(false); if (e.target.value.trim().length > 40) applyAd(e.target.value) }} />
+                <button type="button" className="btn" disabled={!adText.trim()} onClick={() => applyAd(adText)}>{t('ad.fill')}</button>
                 {adFilled && <p className="ad-done">{t('ad.check')}</p>}
                 {/* 2026-10-13 owner: "all of it needs more automation" - save the entry,
                     then kworld's cover-letter writer opens with this ad and writes the
@@ -1006,6 +1024,15 @@ export default function JobTrack() {
                 )}
               </div>
             )}
+            {(adFilled || editing) && (() => {
+              const need = ([['company', form.company, 'field.company'], ['role', form.role, 'field.role'], ['postal', form.postal, 'orp.postal'], ['city', form.city, 'orp.city']] as const).filter(([, v]) => !(v ?? '').toString().trim()).map(([, , k]) => t(k))
+              const nice = ([['street', form.street, 'orp.street'], ['email', form.email, 'orp.email'], ['phone', form.phone, 'orp.phone']] as const).filter(([, v]) => !(v ?? '').toString().trim()).map(([, , k]) => t(k))
+              if (!need.length && !nice.length) return <p className="ad-done">{t('ad.allSet')}</p>
+              return <ul className="orp-before-tip jr-assure">
+                {need.length > 0 && <li><b>{t('ad.need')}</b> {need.join(', ')}</li>}
+                {nice.length > 0 && <li>{t('ad.nice')} {nice.join(', ')}</li>}
+              </ul>
+            })()}
             <input type="text" placeholder={t('field.company')} value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} required />
             <input type="text" placeholder={t('field.role')} value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} required />
             <label className="modal-label">{t('field.dateApplied')}</label>
