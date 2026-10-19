@@ -33,12 +33,14 @@ jobs:
           npm run build
           npx cap sync ios
 
+      # the App ID registered at Apple is com.kworld.jobtrack.L5FU39EDR5 (the profile says so), so this build carries it
       - name: Build iOS archive (no signing)
         run: |
           set -o pipefail
           xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release \
             -destination 'generic/platform=iOS' -archivePath build/App.xcarchive archive \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" | tail -40
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            PRODUCT_BUNDLE_IDENTIFIER=com.kworld.jobtrack.L5FU39EDR5 | tail -40
 
       - name: Install certificate and profile
         env:
