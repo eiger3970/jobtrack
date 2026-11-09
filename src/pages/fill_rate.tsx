@@ -23,11 +23,13 @@ export default function FillRate({ country, t }: { country: string; t: (k: strin
     <div className="jr-rate">
       <p className="orp-share-q">{t('rate.q')}{avg && avg.n > 0 ? <span className="jr-rate-avg"> {'\u2605'} {avg.avg} ({avg.n})</span> : null}</p>
       <div className="orp-stars" role="radiogroup" aria-label={t('rate.q')}>
-        {[1, 2, 3, 4, 5].map(n => <button key={n} type="button" role="radio" aria-checked={stars === n} className={n <= stars ? 'on' : ''} onClick={() => setStars(n)}>{'\u2605'}</button>)}
+        {[1, 2, 3, 4, 5].map(n => <button key={n} type="button" role="radio" aria-checked={stars === n} aria-label={t('rate.s' + n)} className={n <= stars ? 'on' : ''} onClick={() => setStars(n)}>{'\u2605'}</button>)}
       </div>
       {stars > 0 && <>
+        <p className="jr-rate-label">{t('rate.s' + stars)}</p>
         <textarea rows={2} maxLength={300} placeholder={t('rate.comment')} value={comment} onChange={e => setComment(e.target.value)} />
         <button type="button" className="btn-secondary" onClick={send}>{t('rate.send')}</button>
+        <p className="jr-rate-label">{t('rate.privacy')}</p>
       </>}
     </div>
   )

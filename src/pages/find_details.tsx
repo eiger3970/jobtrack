@@ -2,9 +2,10 @@ import { useState, useEffect, useRef, createContext, useContext, type ReactNode 
 import { createPortal } from 'react-dom'
 import { swissDate, jobRoomMissing, isJobLink, type Application, type JobRoomEntry } from '../lib/orp'
 import { parseAd } from '../lib/ad_parse'
-import { useProKey, buyPro } from '../lib/pro'
+import { useProKey } from '../lib/pro'
+import { PackList, openPacks, readPackToken } from '../lib/credit_packs'
 import { isApp } from '../lib/platform'
-import { PRO_KEY, PRO_USD, PRO_SCOPE } from './job_track_pro'
+import { PRO_KEY } from './job_track_pro'
 import { aiFind, aiTrialUsed, rankLocations, saveSuggestion, type Loc, BUY_CREDITS_LIVE } from '../lib/ai_find'
 
 type AiState = 'idle' | 'busy' | 'result' | 'used' | 'cap' | 'none' | 'err'
@@ -411,7 +412,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   async function findWithAi(mode: 'new' | 'check' | 'wrong' = 'new') {
     setFreeResult(false); setAi('busy'); setAiErr(''); setAiMsg('')
     const out = await atLeast(aiFind({
-      company: a.company, role: a.role, applicationLink: a.link || aiContact.link || (a.adText ? parseAd(a.adText).link : ''), tok, app, retry: mode !== 'new',
+      company: a.company, role: a.role, applicationLink: a.link || aiContact.link || (a.adText ? parseAd(a.adText).link : ''), tok: tok || readPackToken(), app, retry: mode !== 'new',
       avoid: mode === 'wrong' ? aiLocs.map(l => [l.label, l.street, l.streetNo, l.postal, l.city].filter(Boolean).join(' ')).join(' | ') : '',
       jobLocation: [a.postal, a.city || adWorkLocation].filter(Boolean).join(' '),
       hint: [a.adText, a.notes, a.city].filter(Boolean).join(' '),
@@ -548,7 +549,8 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   const failMsg = aiFail ? (aiFail.diag ? amberLead(t(/credit balance|insufficient|billing|\b402\b/i.test(aiFail.diag) ? 'fd.aiNoFunds' : /quota|\b429\b|exhausted/i.test(aiFail.diag) ? 'fd.aiQuota' : /overload|\b529\b|busy/i.test(aiFail.diag) ? 'fd.aiBusy' : 'fd.aiFailed') + ' (' + aiFail.diag + ')') : amberLead(t(pro ? 'fd.histProCap' : 'fd.histCap'))) : null   // 2026-11-09 owner: every search option shows the same AI-failed text
   const failNote = needsLink && aiFail && ai !== 'busy' ? <div className="fd-hist-box fd-ai-fail fd-slide-in">
         <span className="fd-side" role="alert">{failMsg}</span>
-        {BUY_CREDITS_LIVE && !pro && <button type="button" className="btn btn-glow fd-btn" onClick={() => buyPro({ scope: PRO_SCOPE, amount: PRO_USD, title: 'JobTrack Pro', subtitle: t('jr.proSub') })}>{t('fd.buyNow')}</button>}
+        {BUY_CREDITS_LIVE && !pro && <button type="button" className="btn btn-glow fd-btn" onClick={() => openPacks()}>{t('fd.buyNow')}</button>}
+        {BUY_CREDITS_LIVE && !pro && <PackList />}
       </div> : null
   // 2026-11-08 owner: the AI "searching" line follows the person too - it shows inside the open search option, like the failed note
   const aiBusyText = ai === 'busy' ? (aiMsg || t(pro ? 'ai.busyPaid' : 'ai.busy')) : hist.state === 'busy' && hist.src === 'ai' ? t(pro ? 'fd.histBusy' : 'fd.histBusyFree') : ''
@@ -561,12 +563,12 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   const resultBox = needsLink && (hist.state !== 'idle' || histPerm) ? (<div className="fd-unfold"><div className="fd-unfold-in"><div className="fd-hist-box" ref={histBoxRef}>
         {!statusBelow && histStatus}   {/* 2026-11-07 owner: with History search open, every status line shows under its green button - nothing flashes in at the top */}
         {hist.state === 'done' && !aiFail && (hist.diag || aiDiag.current) && <span className="fd-diag">{hist.diag ? '' : <><span className="fd-failword">AI search failed</span>. </>}{hist.diag || aiDiag.current}</span>}
-        {hist.state === 'done' && !aiFail && (hist.why === 'cap' || hist.why === 'err') && BUY_CREDITS_LIVE && !pro && <div className="fd-ai-buy"><button type="button" className="btn btn-glow fd-btn" onClick={() => buyPro({ scope: PRO_SCOPE, amount: PRO_USD, title: 'JobTrack Pro', subtitle: t('jr.proSub') })}>{t('bulk.buy')}</button></div>}
+        {hist.state === 'done' && !aiFail && (hist.why === 'cap' || hist.why === 'err') && BUY_CREDITS_LIVE && !pro && <div className="fd-ai-buy"><button type="button" className="btn btn-glow fd-btn" onClick={() => openPacks()}>{t('bulk.buy')}</button></div>}
         {foundHere && <div className="fd-reveal"><div className="fd-reveal-in">
         {hist.email && <><span className="fd-t fd-found">{t(pro ? 'fd.srcAi' : 'fd.srcAiFree')}</span><button type="button" className="btn btn-glow fd-btn fd-hist jt-use-link jt-guidance-glow" onClick={() => { onUpdate(a.id, { email: hist.email } as Patch); setHist({ state: 'idle', results: [] }) }}>{t('fd.emailUse')} {hist.email}</button></>}
         {hist.results.length > 0 && <span className="fd-t fd-found">{hist.src === 'history' ? t('fd.srcHist') : hist.web ? t('fd.srcWeb') : t(pro ? 'fd.srcAi' : 'fd.srcAiFree')}</span>}
         {hist.results.slice(0, 1).map(r => <button key={r.url} type="button" className="btn btn-glow fd-btn fd-hist jt-use-link jt-guidance-glow" onClick={() => { onUpdate(a.id, { link: cleanJobLink(r.url), linkFrom: 'user' } as Patch); setHist({ state: 'idle', results: [] }) }}>{t('fd.histUse')} {r.title || r.url}<small>{r.url.replace(/^https?:\/\/(www\.)?/, '').slice(0, 70)}</small></button>)}
-        {hist.state === 'done' && hist.web && hist.results.length > 0 && BUY_CREDITS_LIVE && !pro && <button type="button" className="btn btn-glow fd-btn" onClick={() => buyPro({ scope: PRO_SCOPE, amount: PRO_USD, title: 'JobTrack Pro', subtitle: t('jr.proSub') })}>{t('bulk.buy')}</button>}
+        {hist.state === 'done' && hist.web && hist.results.length > 0 && BUY_CREDITS_LIVE && !pro && <button type="button" className="btn btn-glow fd-btn" onClick={() => openPacks()}>{t('bulk.buy')}</button>}
         {hist.results.length > 1 && <details className="fd-hist-more" onToggle={x => { const d = x.currentTarget as HTMLDetailsElement; if (!d.open) requestAnimationFrame(() => d.scrollIntoView({ block: 'nearest' })) }}><summary>{t('fd.histMore')}</summary>
           {hist.results.slice(1).map(r => <button key={r.url} type="button" className="btn-secondary fd-btn fd-hist" onClick={() => { onUpdate(a.id, { link: cleanJobLink(r.url), linkFrom: 'user' } as Patch); setHist({ state: 'idle', results: [] }) }}>{r.title || r.url}<small>{r.url.replace(/^https?:\/\/(www\.)?/, '').slice(0, 70)}</small></button>)}
         </details>}
@@ -593,7 +595,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
           {pro && (ai === 'idle' || ai === 'err' || ai === 'none') && <button type="button" className="btn btn-glow fd-btn" onClick={() => findWithAi()}>{aiLabel()}</button>}
           {ai === 'none' && <span className="fd-t">{t('ai.none')}</span>}
           {ai === 'err' && !failNote && hist.state !== 'busy' && <span className="fd-t fd-ai-notice fd-ai-warn" role="alert"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#ffb000" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" /></svg><span><span className="fd-failword">{t('fd.aiFailed').replace(/\.$/, '')}</span>: {aiErr || t('ai.err')}</span></span>}
-          {ai === 'err' && BUY_CREDITS_LIVE && !pro && aiErr && <div className="fd-ai-buy"><button type="button" className="btn btn-glow fd-btn" onClick={() => buyPro({ scope: PRO_SCOPE, amount: PRO_USD, title: 'JobTrack Pro', subtitle: t('jr.proSub') })}>{t('ai.skipWait')}</button></div>}
+          {ai === 'err' && BUY_CREDITS_LIVE && !pro && aiErr && <div className="fd-ai-buy"><button type="button" className="btn btn-glow fd-btn" onClick={() => openPacks()}>{t('ai.skipWait')}</button></div>}
           {ai === 'used' && <>
             <span className="fd-t fd-ai-notice" role="status">{t('ai.used')}</span>
           </>}
@@ -621,7 +623,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
             </div>
           </>}
           </div>}
-          {BUY_CREDITS_LIVE && !pro && ai !== 'idle' && ai !== 'busy' && !(ai === 'err' && aiErr) && <div className="fd-ai-buy"><button type="button" className="btn fd-btn" onClick={() => buyPro({ scope: PRO_SCOPE, amount: PRO_USD, title: 'JobTrack Pro', subtitle: t('jr.proSub') })}>{t(ai === 'result' && freeResult ? 'ai.buyResult' : 'bulk.buy')}</button></div>}
+          {BUY_CREDITS_LIVE && !pro && ai !== 'idle' && ai !== 'busy' && !(ai === 'err' && aiErr) && <div className="fd-ai-buy"><button type="button" className="btn fd-btn" onClick={() => openPacks()}>{t(ai === 'result' && freeResult ? 'ai.buyResult' : 'bulk.buy')}</button></div>}
         </li>
 
         {/* 2026-11-03 owner: order is pills, free AI search, Easiest first, manual searches - and Easiest first sits closer to the list below it */}

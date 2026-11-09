@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { getOwnerPassphrase, setOwnerPassphrase, clearOwnerPassphrase } from './owner_passphrase'
 import './pro.css'
 
 // 2026-10-06: one-time Pro unlocks (Transfer Pro pattern, reused per tool).
@@ -29,14 +30,19 @@ export function useProKey(storageKey: string, scopePrefix: string): { pro: boole
     let tok = ''
     try {
       const u = new URLSearchParams(window.location.search).get('t')
-      if (u) { localStorage.setItem(storageKey, u); history.replaceState(null, '', window.location.pathname + window.location.hash) }
+      if (u) {
+        // a pack link (AI finds) is kept apart: it must not unlock Pro
+        let sc = ''; try { sc = String(JSON.parse(atob(u.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).scope) } catch { /* not a token */ }
+        localStorage.setItem(sc.startsWith('jobtrack-pack-') ? 'kworld_jobtrack_pack_token' : storageKey, u)
+        history.replaceState(null, '', window.location.pathname + window.location.hash)
+      }
       tok = localStorage.getItem(storageKey) ?? ''
     } catch { /* private mode */ }
     const check = tok ? proValid(tok, scopePrefix) : Promise.resolve(false)
     check.then(ok => {
       if (ok) { setState({ pro: true, tok }); return }
-      // the owner's browser (it holds the owner key, set once at /free) needs no purchase and no link: ask for a key
-      ownerKeyFor(scopePrefix).then(t => { if (t) { try { localStorage.setItem(storageKey, t) } catch { /* ignore */ } setState({ pro: true, tok: t }) } })
+      // the owner's browser (it holds the owner passphrase, set once at /free) needs no purchase and no link: ask for a key
+      ownerPassphraseFor(scopePrefix).then(t => { if (t) { try { localStorage.setItem(storageKey, t) } catch { /* ignore */ } setState({ pro: true, tok: t }) } })
     })
     // a promo code typed into the page: unlock in place, so a PDF already chosen on the page is not lost
     const onUnlock = (e: Event) => {
@@ -49,12 +55,12 @@ export function useProKey(storageKey: string, scopePrefix: string): { pro: boole
   return state
 }
 
-// 2026-10-21 owner: a browser that holds the owner key unlocks every product by itself. The site checks the key and
+// 2026-10-21 owner: a browser that holds the owner passphrase unlocks every product by itself. The site checks the passphrase and
 // hands back a no-limit key for just that product; nobody else can ask for one.
 const OWNER_PRODUCT: Record<string, string> = { 'bookmarks-pro-': 'bookmarks-pro', 'sign-pro-': 'sign-pro', 'sign-design-': 'sign-art', 'jobtrack-pro-': 'jobtrack', 'divorce-forms-': 'divorce', 'transfer-pro-': 'transfer' }
-export async function ownerKeyFor(scopePrefix: string): Promise<string> {
+export async function ownerPassphraseFor(scopePrefix: string): Promise<string> {
   try {
-    const key = localStorage.getItem('kworld_owner_key'); const product = OWNER_PRODUCT[scopePrefix]
+    const key = getOwnerPassphrase(); const product = OWNER_PRODUCT[scopePrefix]
     if (!key || !product) return ''
     const r = await fetch('/owner/grant', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ key, product, days: 0 }) })
     const j = await r.json()
@@ -83,7 +89,7 @@ const STAR = <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" 
 // Upfront, before paying: what's in it for you / you pay / you get / we never.
 // "You get" and "We never" are sorted A-Z (main noun first in every line).
 // Free way in: a one-time code (four words with hyphens: word1-word2-word3-word4) goes to /redeem, which uses it up and opens the product;
-// the owner key (no hyphens) is kept in this browser, checked now, and unlocks every product by itself.
+// the owner passphrase (no hyphens) is kept in this browser, checked now, and unlocks every product by itself.
 export function FreeEntry({ L, scopePrefix }: { L: Tx; scopePrefix: string }) {
   const [val, setVal] = useState('')
   const [show, setShow] = useState(false)   // eye button: show the typed code or hide it
@@ -107,10 +113,10 @@ export function FreeEntry({ L, scopePrefix }: { L: Tx; scopePrefix: string }) {
         return done(tok, j.status === 'slow')
       } catch { return done('') }
     }
-    let prev: string | null = null
-    try { prev = localStorage.getItem('kworld_owner_key'); localStorage.setItem('kworld_owner_key', v) } catch { /* private mode */ }
-    const tok = await ownerKeyFor(scopePrefix)
-    if (!tok) { try { if (prev) localStorage.setItem('kworld_owner_key', prev); else localStorage.removeItem('kworld_owner_key') } catch { /* ignore */ } }
+    const prev = getOwnerPassphrase()
+    setOwnerPassphrase(v)
+    const tok = await ownerPassphraseFor(scopePrefix)
+    if (!tok) { if (prev) setOwnerPassphrase(prev); else clearOwnerPassphrase() }
     return done(tok)
   }
   return (

@@ -43,7 +43,7 @@
     "share.phoneNote": {"en": "{credit}: share your country's job-entry form. On the empty form: Select all, Copy, then tap here and Paste.", "de": "{credit}: Teilen Sie das Formular Ihres Landes. Im leeren Formular: Alles auswählen, Kopieren, dann hier tippen und Einfügen.", "fr": "{credit} : partagez le formulaire de votre pays. Sur le formulaire vide : Tout sélectionner, Copier, puis touchez ici et Collez."},
     "share.phone": {"en": "Share-form setup: use a computer.", "de": "Formularfreigabe am Computer einrichten.", "fr": "Configurer le partage du formulaire sur ordinateur."},
     "jr.openAgency": {"en": "Open Job-Room", "de": "Job-Room öffnen", "fr": "Ouvrir Job-Room"},
-    "jr.phoneEntry": {"en": "Copy the fields into Job-Room for {month}. Autofill: computer only.", "de": "Felder für {month} in Job-Room kopieren. Automatisches Ausfüllen: nur am Computer.", "fr": "Copiez les champs dans Job-Room pour {month}. Remplissage automatique : sur ordinateur."},
+    "jr.phoneEntry": {"en": "Copy the fields into Job-Room for {month}. Autofill works on a computer only. Your first autofill is free. More autofills need Pro: US$5 paid one time, yours for good, with unlimited autofills. Keep the email link we send.", "de": "Felder für {month} in Job-Room kopieren. Automatisches Ausfüllen geht nur am Computer. Das erste Ausfüllen ist gratis. Weitere brauchen Pro: US$5, einmal bezahlt, für immer, mit unbegrenztem Ausfüllen. Den E-Mail-Link, den wir senden, aufbewahren.", "fr": "Copiez les champs dans Job-Room pour {month}. Le remplissage automatique fonctionne sur ordinateur uniquement. Le premier remplissage est gratuit. Les suivants demandent Pro : US$5 payés une seule fois, pour toujours, avec remplissages illimités. Gardez le lien reçu par e-mail."},
     "jr.emptyPeriod": {"en": "No jobs in this period. Change the month or check all jobs.", "de": "Keine Bewerbungen in diesem Zeitraum. Monat ändern oder alle prüfen.", "fr": "Aucune candidature pour cette période. Changez le mois ou vérifiez toutes les candidatures."},
     "cleanup.allButton": {"en": "Complete details across all applications", "de": "Angaben aller Bewerbungen ergänzen", "fr": "Compléter toutes les candidatures"},
     "cleanup.help": {"en": "Search and AI tools save changes in JobTrack. This does not enter applications in your agency account.", "de": "Such- und KI-Werkzeuge speichern Änderungen in JobTrack. Dies trägt keine Bewerbungen in Ihrem Amtskonto ein.", "fr": "La recherche et l’IA enregistrent les modifications dans JobTrack, sans saisir les candidatures dans votre compte auprès de l’office."},
@@ -1519,19 +1519,49 @@
       "fr": "Un commentaire? (facultatif)"
     },
     "rate.q": {
-      "en": "How well did JobTrack fill the form?",
-      "de": "Wie gut hat JobTrack das Formular ausgefüllt?",
-      "fr": "Comment JobTrack a-t-il rempli le formulaire?"
+      "en": "How well did JobTrack fill your form?",
+      "de": "Wie gut hat JobTrack Ihr Formular ausgefüllt?",
+      "fr": "Comment JobTrack a-t-il rempli votre formulaire?"
     },
     "rate.comment": {
       "en": "Anything to improve? (optional)",
       "de": "Was können wir verbessern? (optional)",
       "fr": "À améliorer? (facultatif)"
     },
+    "rate.privacy": {
+      "en": "Anonymous: no name, no email.",
+      "de": "Anonym: kein Name, keine E-Mail.",
+      "fr": "Anonyme: ni nom, ni e-mail."
+    },
+    "rate.s1": {
+      "en": "Poor: I filled most of it myself",
+      "de": "Schlecht: das meiste selbst ausgefüllt",
+      "fr": "Mauvais: j'ai rempli presque tout"
+    },
+    "rate.s2": {
+      "en": "Weak: many fields were wrong",
+      "de": "Schwach: viele Felder falsch",
+      "fr": "Faible: beaucoup de champs faux"
+    },
+    "rate.s3": {
+      "en": "OK: some fields needed fixing",
+      "de": "OK: einige Felder korrigiert",
+      "fr": "Correct: quelques champs à corriger"
+    },
+    "rate.s4": {
+      "en": "Good: one or two fixes",
+      "de": "Gut: ein oder zwei Korrekturen",
+      "fr": "Bien: une ou deux corrections"
+    },
+    "rate.s5": {
+      "en": "Perfect: nothing to fix",
+      "de": "Perfekt: nichts zu korrigieren",
+      "fr": "Parfait: rien à corriger"
+    },
     "rate.send": {
-      "en": "Send rating",
-      "de": "Bewertung senden",
-      "fr": "Envoyer la note"
+      "en": "Send to kworld.space",
+      "de": "An kworld.space senden",
+      "fr": "Envoyer à kworld.space"
     },
     "rate.thanks": {
       "en": "Thanks - positive Universe vibes sent your way :-)",
@@ -2058,9 +2088,9 @@
       "fr": "Obtenir Pro - US$5"
     },
     "jr.proSub": {
-      "en": "Job-Room auto fill, reply rates and calendar. Pay once.",
-      "de": "Job-Room automatisch ausfüllen, Antwortquoten und Kalender. Einmal zahlen.",
-      "fr": "Remplissage automatique Job-Room, taux de réponse et calendrier. Un seul paiement."
+      "en": "Job-Room auto fill and reply rates. Pay once.",
+      "de": "Job-Room automatisch ausfüllen und Antwortquoten. Einmal zahlen.",
+      "fr": "Remplissage automatique Job-Room et taux de réponse. Un seul paiement."
     },
     "ai.h": {
       "en": "AI: fix this 1 job only",

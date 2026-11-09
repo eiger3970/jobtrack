@@ -1398,3 +1398,4 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jtb-choices.jtb-simple .jtb-note { grid-template-columns: 1fr; }
 @media (max-width: 640px) { .jtb-choices.jtb-simple li { grid-template-columns: 1fr; } }
 .jts-panel .jtb-choices.jtb-simple li { grid-template-columns: 1fr; }
+.jr-rate-label { margin: 0.2rem 0 0.4rem; font-size: 0.9rem; color: #b8b4c8; }

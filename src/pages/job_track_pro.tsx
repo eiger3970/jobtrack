@@ -97,7 +97,6 @@ export default function JobTrackPro({ apps, lang }: { apps: App[]; lang: string 
           why={L('See which CV and letter actually get replies, and never miss a follow-up - so every application counts.', 'Sieh, welcher Lebenslauf und welches Anschreiben wirklich Antworten bekommen, und verpasse kein Nachfassen - damit jede Bewerbung zählt.', "Voyez quel CV et quelle lettre obtiennent vraiment des réponses, et ne manquez aucune relance - pour que chaque candidature compte.")}
           get={[
             L('Best CV and cover letter - which version gets the most replies', 'Bester Lebenslauf und Anschreiben - welche Version die meisten Antworten bekommt', 'Meilleur CV et lettre - quelle version obtient le plus de réponses'),
-            L('Calendar, every follow-up with a 9:00 reminder - phone or computer', 'Kalender, jedes Nachfassen mit Erinnerung um 9:00 - Telefon oder Computer', 'Calendrier, chaque relance avec rappel à 9h00 - téléphone ou ordinateur'),
             L('Reply and interview rates, worked out for you', 'Antwort- und Interviewquote, für dich berechnet', "Taux de réponse et d'entretien, calculés pour vous"),
             L('Overdue follow-ups, counted so none slip', 'Überfälliges Nachfassen, gezählt, damit nichts untergeht', 'Relances en retard, comptées pour ne rien oublier'),
           ]}
@@ -106,7 +105,7 @@ export default function JobTrackPro({ apps, lang }: { apps: App[]; lang: string 
             L('Free features, never taken away - JobTrack stays free', 'Gratis-Funktionen, nie weggenommen - JobTrack bleibt gratis', 'Fonctions gratuites, jamais retirées - JobTrack reste gratuit'),
             L('Payments, never again - one time only', 'Zahlungen, nie wieder - nur einmal', 'Paiements, plus jamais - une seule fois'),
           ]}
-          onBuy={() => buyPro({ scope: PRO_SCOPE, amount: PRO_USD, title: 'JobTrack Pro', subtitle: L('Best CV + reply rates + calendar follow-ups, for good', 'Bester Lebenslauf + Antwortquoten + Kalender, für immer', 'Meilleur CV + taux de réponse + relances au calendrier, pour toujours') })} />
+          onBuy={() => buyPro({ scope: PRO_SCOPE, amount: PRO_USD, title: 'JobTrack Pro', subtitle: L('Best CV + reply rates + Job-Room autofill, for good', 'Bester Lebenslauf + Antwortquoten + Job-Room-Ausfüllen, für immer', 'Meilleur CV + taux de réponse + remplissage Job-Room, pour toujours') })} />
       )}
     </section>
   )
