@@ -1385,3 +1385,16 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .fd-fold-out { display: grid; grid-template-rows: 1fr; opacity: 1; animation: fd-foldout .8s ease forwards; pointer-events: none; }
 @keyframes fd-foldout { from { grid-template-rows: 1fr; opacity: 1; } to { grid-template-rows: 0fr; opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .fd-fold-out { display: none; } }
+
+/* 2026-11-09 website-or-app fold: one quiet line closed, three icon lines open */
+.jt-where { margin: 8px 0 12px; font-size: .9rem; }
+.jt-where summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--nebula-teal); }
+.jt-where ul { list-style: none; margin: 0; padding: 0; }
+.jt-where li { display: flex; gap: 12px; align-items: flex-start; padding: 6px 0; color: var(--text-mid); }
+.jt-where svg { flex: none; color: var(--nebula-teal); margin-top: 1px; }
+
+/* 2026-11-09 simple backup bar: button left, one grey line right; on a phone they stack */
+.jtb-choices.jtb-simple li { grid-template-columns: 15rem 1fr; }
+.jtb-choices.jtb-simple .jtb-note { grid-template-columns: 1fr; }
+@media (max-width: 640px) { .jtb-choices.jtb-simple li { grid-template-columns: 1fr; } }
+.jts-panel .jtb-choices.jtb-simple li { grid-template-columns: 1fr; }

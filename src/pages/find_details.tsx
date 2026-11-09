@@ -57,6 +57,7 @@ const GUIDE_CLIPS: Record<string, { file: string; label?: string }[]> = {}
 function GuideVideo({ t, group }: { t: (k: string) => string; group: string }) {
   const [bad, setBad] = useState<string[]>([])
   const clips = GUIDE_CLIPS[group] || [{ file: group }]
+  if (isApp()) return <p className="fd-flow">{t('fd.g.web')}</p>   // the guide videos live on the website, not inside the app
   const shown = clips.filter(c => !bad.includes(c.file))
   if (!shown.length) return <p className="fd-flow">{t('fd.g.soon')}</p>
   const fail = (f: string) => setBad(b => b.includes(f) ? b : [...b, f])
@@ -659,6 +660,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
                 {needsLink && statusBelow && (hist.state !== 'idle' || histPerm) && <div className="fd-hist-box">{histStatus}</div>}
               </>
               : <>
+                {app && <p className="fd-flow">{t('fd.addonWeb')}</p>}
                 {canAddon && <>
                   <a className="btn btn-glow fd-btn" href="/free/bookmarks_search.xpi">{t('fd.addonInstall')}</a>
                 </>}

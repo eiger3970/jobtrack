@@ -1,4 +1,5 @@
 import { Fragment, useState, useEffect, useRef, type ReactNode } from 'react'
+import { countAdClick, useAdView } from '../lib/ad_count'
 import { useLanguage } from '../context/language'
 import jobTrackI18n from './job_track_i18n.json'
 import './job_track.css'
@@ -224,6 +225,10 @@ function senderDomains(text: string): string[] {
 }
 
 export default function JobTrack() {
+  const adCv = useRef<HTMLAnchorElement>(null)
+  const adCl = useRef<HTMLAnchorElement>(null)
+  useAdView(adCv, 'jobtrack:cv', !isApp())
+  useAdView(adCl, 'jobtrack:cl', !isApp())
   // phone: lock page zoom on this page only (iOS Firefox restores a zoomed view after refresh); restored on leave
   useEffect(() => {
     const m = document.querySelector('meta[name="viewport"]'); if (!m) return
@@ -1035,6 +1040,15 @@ export default function JobTrack() {
           </button>
           <button type="button" className="jt-settings-toggle" aria-label={t('settings.title')} title={t('settings.title')} onClick={() => settingsDialogRef.current?.showModal()}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="#0f0d1a"/><circle cx="15" cy="17" r="3" fill="#0f0d1a"/></svg></button></span>
         </h1>
+        {/* 2026-11-09 owner: website or app, one fold, three lines with icons (website only; the app itself needs no pitch) */}
+        {!isApp() && <details className="jt-where">
+          <summary>{t('where.title')}</summary>
+          <ul>
+            <li><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v10z" /></svg><span>{t('where.web')}</span></li>
+            <li><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" /></svg><span>{t('where.backup')}</span></li>
+            <li><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z" /></svg><span>{t('where.app')}</span></li>
+          </ul>
+        </details>}
         <div className="stats">
           {quota && !editingQuota && (() => {
             const count = countInPeriod(apps, quota.period)
@@ -1398,22 +1412,23 @@ export default function JobTrack() {
           </div>
         </div>
 
-        <div className="jt-tool-strip">
-          <a href="/cv-gen/" className="jt-tool-card">
-            <span className="jt-tool-label">{t('ad.label')}</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-            <p className="jt-tool-title">{t('ad.cv.title')}</p>
-            <p className="jt-tool-desc">{t('ad.cv.desc')}</p>
-            <span className="jt-tool-cta">{t('ad.cv.cta')}</span>
-          </a>
-          <a href="/cl-gen" className="jt-tool-card">
-            <span className="jt-tool-label">{t('ad.label')}</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></svg>
-            <p className="jt-tool-title">{t('ad.cl.title')}</p>
-            <p className="jt-tool-desc">{t('ad.cl.desc')}</p>
-            <span className="jt-tool-cta">{t('ad.cl.cta')}</span>
-          </a>
-        </div>
+        {/* 2026-11-09 owner: website promo cards stay out of the app */}
+        {!isApp() && <div className="jt-tool-strip">
+            <a href="/cv-gen/" className="jt-tool-card" ref={adCv} onClick={() => countAdClick('jobtrack:cv')}>
+              <span className="jt-tool-label">{t('ad.label')}</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+              <p className="jt-tool-title">{t('ad.cv.title')}</p>
+              <p className="jt-tool-desc">{t('ad.cv.desc')}</p>
+              <span className="jt-tool-cta">{t('ad.cv.cta')}</span>
+            </a>
+            <a href="/cl-gen" className="jt-tool-card" ref={adCl} onClick={() => countAdClick('jobtrack:cl')}>
+              <span className="jt-tool-label">{t('ad.label')}</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></svg>
+              <p className="jt-tool-title">{t('ad.cl.title')}</p>
+              <p className="jt-tool-desc">{t('ad.cl.desc')}</p>
+              <span className="jt-tool-cta">{t('ad.cl.cta')}</span>
+            </a>
+          </div>}
       </div>
 
       {orpPanel && <OrpPanel apps={apps} onSync={() => setSyncOpen(true)} initialCleanup={orpCleanup} t={t} onClose={() => setOrpPanel(false)} onUpdate={(id, patch) => setApps(prev => prev.map(x => x.id === id ? { ...x, ...patch } : x))} />}

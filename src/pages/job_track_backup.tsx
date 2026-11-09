@@ -1,7 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import PassphraseIcon from '../components/passphrase_icon'
-import { TapCount } from './find_details'
 import { ShieldLink } from '../components/security_shield'
 import { type Application } from '../lib/orp'
 import { baseOf, key } from '../lib/jobtrack_sync'
@@ -34,11 +33,6 @@ export function notBackedUp(apps: Application[], snapshot: string | null): numbe
 // Phone: Sync, open Camera, tap QR link; transfer itself is automatic.
 // Cloud: export, open cloud, Upload, Files, select backup, Open.
 // USB: export, open Downloads, select backup, Cut, open USB, Paste, Eject.
-const BACKUP_TAPS = { browser: 0, phone: 3, cloud: 6, usb: 7 } as const
-function BackupClicks({ kind, L }: { kind: keyof typeof BACKUP_TAPS; L: Tx }) {
-  return <TapCount n={BACKUP_TAPS[kind]} maxCount={7} label={kind === 'browser' ? L('{n} clicks; saved automatically in this browser', '{n} Klicks; automatisch in diesem Browser gespeichert', '{n} clics ; enregistré automatiquement dans ce navigateur') : L('About {n} clicks; setup and extra prompts excluded', 'Etwa {n} Klicks; Einrichtung und zusätzliche Abfragen nicht enthalten', 'Environ {n} clics ; configuration et demandes supplémentaires exclues')} />
-}
-
 function ChoiceIcon({ kind }: { kind: 'devices' | 'phoneOff' | 'cloud' | 'cloudOff' | 'key' | 'usb' }) {
   if (kind === 'key') return <PassphraseIcon className="jtb-detail-icon" size={.85} />
   const shapes = {
@@ -51,29 +45,21 @@ function ChoiceIcon({ kind }: { kind: 'devices' | 'phoneOff' | 'cloud' | 'cloudO
   return <svg className="jtb-detail-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{shapes[kind]}</svg>
 }
 
+// 2026-11-09 owner: the bar was too confusing (4 rows, tap-count hands, Cloud and USB were the same file). Now: one main button, the phone QR second, one grey line about the browser.
 function Choices({ L, onSync, onExport }: { L: Tx; onSync: () => void; onExport: () => void }) {
   return (
-    <ul className="jtb-choices">
-      <li>
-        <strong className="jtb-browser-label">{L('Browser auto stored', 'Automatisch im Browser gespeichert', 'Enregistré automatiquement dans le navigateur')}</strong>
-        <BackupClicks kind="browser" L={L} /><span className="jtb-why"><ChoiceIcon kind="phoneOff" />{L('Not on your phone.', 'Nicht auf Ihrem Telefon.', 'Pas sur votre téléphone.')} <b className="jtb-warn"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" /></svg>{L('Lost on shared or public computers.', 'Auf fremden oder öffentlichen Computern verloren.', 'Perdu sur un ordinateur partagé ou public.')}</b></span>
-      </li>
+    <ul className="jtb-choices jtb-simple">
       <li className="jtb-best">
-        <button className="btn btn-glow" onClick={onSync}>{L('Phone - scan a QR', 'Telefon - QR scannen', 'Téléphone - scanner un QR')}</button>
-        <BackupClicks kind="phone" L={L} /><span className="jtb-why"><ChoiceIcon kind="devices" />{L('Latest list saved on your phone and this computer. No separate backup file needed. No login.', 'Aktuelle Liste auf Ihrem Telefon und diesem Computer gespeichert. Keine separate Sicherungsdatei nötig. Ohne Login.', 'Liste à jour enregistrée sur votre téléphone et cet ordinateur. Aucun fichier de sauvegarde séparé nécessaire. Sans connexion.')}</span>
-      </li>
-      <li>
-        <button className="btn-secondary" onClick={onExport}>{L('Cloud drive - save a file', 'Cloud-Speicher - Datei speichern', 'Cloud - enregistrer un fichier')}</button>
-        <BackupClicks kind="cloud" L={L} /><span className="jtb-why"><ChoiceIcon kind="cloud" />{L('Cloud account and passphrase ready - then upload the file.', 'Cloud-Konto und Passphrase bereit - dann die Datei hochladen.', 'Compte cloud et phrase de passe prêts - puis téléversez le fichier.')}{' '}<ChoiceIcon kind="cloudOff" />{L('No cloud?', 'Keine Cloud?', 'Pas de cloud?')}{' '}
-          <a href="/security/personal#digital-life" target="_blank" rel="noopener">{L('Digital life in order', 'Digitaler Alltag im Griff', 'Vie numérique en ordre')}</a>{' + '}
-          <a href="/passphrase" target="_blank" rel="noopener"><ChoiceIcon kind="key" />{L('Passphrase', 'Passphrase', 'Phrase de passe')}</a>
-        </span>
-      </li>
-      <li>
-        <button className="btn-secondary" onClick={onExport}>{L('USB stick - save a file', 'USB-Stick - Datei speichern', 'Clé USB - enregistrer un fichier')}</button>
-        <BackupClicks kind="usb" L={L} /><span className="jtb-why"><ChoiceIcon kind="usb" />{L('Needs a USB stick with you, locked with a passphrase', 'Braucht einen USB-Stick dabei, mit Passphrase verschlossen', 'Il faut une clé USB sur vous, verrouillée par une phrase de passe')}{' - '}
-          {/* 2026-10-14 owner: link to the USB-locking product once it's built (idea: memory project_secure_usb_idea); the passphrase page until then */}
+        <button className="btn btn-glow" onClick={onExport}>{L('Save backup file', 'Sicherungsdatei speichern', 'Enregistrer un fichier de sauvegarde')}</button>
+        <span className="jtb-why"><ChoiceIcon kind="cloud" />{L('Keep it on a cloud drive or a USB stick.', 'Auf einem Cloud-Speicher oder USB-Stick aufbewahren.', 'Gardez-le sur un cloud ou une clé USB.')}{' '}
           <a href="/passphrase" target="_blank" rel="noopener"><ChoiceIcon kind="key" />{L('Passphrase', 'Passphrase', 'Phrase de passe')}</a></span>
+      </li>
+      <li>
+        <button className="btn-secondary" onClick={onSync}>{L('Phone - scan a QR', 'Telefon - QR scannen', 'Téléphone - scanner un QR')}</button>
+        <span className="jtb-why"><ChoiceIcon kind="devices" />{L('Latest list on your phone and this computer. No separate file.', 'Aktuelle Liste auf Telefon und Computer. Keine separate Datei.', 'Liste à jour sur votre téléphone et cet ordinateur. Pas de fichier séparé.')}</span>
+      </li>
+      <li className="jtb-note">
+        <span className="jtb-why"><ChoiceIcon kind="phoneOff" />{L('Browser: saved automatically, but not on your phone.', 'Browser: automatisch gespeichert, aber nicht auf Ihrem Telefon.', 'Navigateur : enregistré automatiquement, mais pas sur votre téléphone.')}</span>
       </li>
     </ul>
   )

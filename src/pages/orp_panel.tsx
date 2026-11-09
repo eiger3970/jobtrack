@@ -12,6 +12,7 @@ import { sortedCountries, countryName } from '../lib/countries'
 import { bookmarklet } from '../lib/jobroom_fill'
 import { saveFile, stamp } from '../lib/save_file'
 import { isApp } from '../lib/platform'
+import { countAdClick, useAdView } from '../lib/ad_count'
 import { useProKey, buyPro } from '../lib/pro'
 import { PRO_KEY, PRO_USD, PRO_SCOPE } from './job_track_pro'
 
@@ -42,6 +43,10 @@ export default function OrpPanel({ apps, t, onClose, onUpdate, initialCleanup = 
   const [profile, setProfile] = useState<Saved>(loadProfile)
   const [cleanup, setCleanup] = useState(initialCleanup)
   const mobile = isApp() || (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) || (typeof window !== 'undefined' && !!window.matchMedia?.('(max-width: 760px)').matches)
+  const adLs = useRef<HTMLAnchorElement>(null)
+  const adYou = useRef<HTMLAnchorElement>(null)
+  useAdView(adLs, 'jobtrack:localsync', !cleanup && !isApp() && mobile)
+  useAdView(adYou, 'jobtrack:yourad', !cleanup && !isApp() && mobile)
 
   const now = new Date()
   const [month, setMonth] = useState((import.meta.env.DEV && window.location.hash === '#preview=jobroom' && new URLSearchParams(window.location.search).get('view') === 'report' ? '2026-10' : '') || profile.registered?.slice(0, 7) || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
@@ -330,8 +335,8 @@ export default function OrpPanel({ apps, t, onClose, onUpdate, initialCleanup = 
           </>}
 
           {!cleanup && !isApp() && (mobile ? <a className="orp-hint orp-share-note" style={{ display: 'block', textDecoration: 'none' }} href={`/contact?help=1&msg=${encodeURIComponent(`Job-entry form fields (${country}):\n`)}`} target="_blank" rel="noopener noreferrer">{t('share.phoneNote').replace('{credit}', SHARE_CREDIT)}</a> : <OrpShare country={country} mobile={mobile} t={t} />)}
-          {!cleanup && !isApp() && mobile && <a className="orp-ad" href="https://apps.apple.com/us/app/localsync/id6815725499" target="_blank" rel="noopener noreferrer"><img src={localSyncIcon} alt="" width="40" height="40" /><span><b>LocalSync</b> {t('ad.localsync')}</span></a>}
-          {!cleanup && !isApp() && mobile && <a className="orp-ad orp-ad-you" href="/contact?help=1&focus=contact&msg=I%20would%20like%20to%20advertise%20on%20JobTrack." target="_blank" rel="noopener noreferrer"><span><b>{t('ad.yoursH')}</b> {t('ad.yours')}</span></a>}   {/* 2026-11-04 owner: internal ad in the blank space under the 5% off note */}
+          {!cleanup && !isApp() && mobile && <a className="orp-ad" ref={adLs} onClick={() => countAdClick('jobtrack:localsync')} href="https://apps.apple.com/us/app/localsync/id6815725499" target="_blank" rel="noopener noreferrer"><img src={localSyncIcon} alt="" width="40" height="40" /><span><b>LocalSync</b> {t('ad.localsync')}</span></a>}
+          {!cleanup && !isApp() && mobile && <a className="orp-ad orp-ad-you" ref={adYou} onClick={() => countAdClick('jobtrack:yourad')} href="/contact?help=1&focus=contact&msg=I%20would%20like%20to%20advertise%20on%20JobTrack." target="_blank" rel="noopener noreferrer"><span><b>{t('ad.yoursH')}</b> {t('ad.yours')}</span></a>}   {/* 2026-11-04 owner: internal ad in the blank space under the 5% off note */}
         </>)}
         </div>
         {step !== 'setup' && <div className="modal-buttons"><button className={step === 'ask' ? 'btn jt-period-next' + (periodChosen && periodValid ? ' btn-glow' : '') : 'btn-secondary'} disabled={step === 'ask' && !periodValid} onClick={() => {
