@@ -26,6 +26,8 @@ export interface OrpFields {
   email?: string
   phone?: string
   link?: string        // ad or online application form
+  linkFrom?: 'company' | 'user' // 2026-11-03: 'company' = from the AI / a Contact page (not the application form); 'user' = typed or pasted by the person; none = older data, judged by its address
+  addrUnknown?: boolean // 2026-10-26: person could not find the street - stop asking (Job-Room needs only postcode + city)
   jobroomDone?: string // ISO date it was entered in Job-Room
   adText?: string      // 2026-10-14: the ad as pasted - proof if the ad page disappears (404)
 }
@@ -89,12 +91,28 @@ export interface JobRoomEntry {
   date: string; method: OrpMethod
   business: string; street: string; streetNo: string; poBox: string; country: string; postal: string; city: string
   contactPerson: string; email: string; phone: string
-  jobTitle: string; link: string
+  jobTitle: string; link: string; linkIsJob: boolean
   assigned: boolean; fullTime: boolean
   result: 'Vorstellungsgespräch' | 'Noch offen' | 'Anstellung' | 'Absage'
 }
 
 // One application as Job-Room wants it - new fields first, old one-liners split as a fallback.
+// 2026-11-03 owner: a company homepage / Contact / About / addresses page is not the online application form.
+// 'user' links always count; 'company' links never; older links (no tag) are judged by their address.
+const COMPANY_PAGE = /\/(contact|kontakt|contatto|about|locations?|addresses|offices?|impressum|ueber-uns|a-propos|company)(\/|$|[-_.?#])/i
+// job-board result lists (e.g. indeed .../q-nestle-emplois.html) list many jobs: never the one applied for, even if the user picked it
+const LIST_PAGE = /\/q-[^/]*(emplois|jobs|stellen)|\/(jobs|emplois|stellenangebote|stellen|offres(-emploi)?|jobsuche)\/?$|\/(jobs|emplois)\/search|\/search\/?$/i
+// 2026-11-05 owner: a link the person picked and pasted is trusted, even when it ends in /jobs - only real search results stay refused
+const LIST_SEARCH = /\/q-[^/]*(emplois|jobs|stellen)|\/(jobs|emplois)\/search|\/search\/?$/i
+export function isJobLink(link: string | undefined, from?: 'company' | 'user'): boolean {
+  if (!link) return false
+  try { const u = new URL(/^https?:/i.test(link) ? link : 'https://' + link); if ((from === 'user' ? LIST_SEARCH : LIST_PAGE).test(u.pathname) || (/^\/(jobs|emplois|stellen)?\/?$/i.test(u.pathname) && /[?&](q|l|query|keywords?)=/i.test(u.search))) return false } catch { return false }
+  if (from === 'user') return true
+  if (from === 'company') return false
+  try { const u = new URL(/^https?:/i.test(link) ? link : 'https://' + link); return u.pathname.replace(/\/+$/, '') !== '' && !COMPANY_PAGE.test(u.pathname) }
+  catch { return false }
+}
+
 export function jobRoomEntry(a: Application): JobRoomEntry {
   const split = splitAddress(a.address ?? '')
   const contact = a.contact ?? ''
@@ -107,7 +125,7 @@ export function jobRoomEntry(a: Application): JobRoomEntry {
     business: a.company, street: a.street || split.street, streetNo: a.streetNo || split.streetNo, poBox: a.poBox ?? '',
     country: a.country || 'Schweiz', postal: a.postal || split.postal, city: a.city || split.city,
     contactPerson: person, email, phone,
-    jobTitle: a.role, link: a.link ?? '',
+    jobTitle: a.role, link: a.link ?? '', linkIsJob: isJobLink(a.link, a.linkFrom) || (!!a.link && a.linkFrom === 'user'),   // 2026-11-05 owner: one of email or link is enough - a link the person pasted always counts
     assigned: !!a.assigned, fullTime: (a.rate ?? 100) >= 100,
     result: r === 'négatif' ? 'Absage' : r === 'engagement' ? 'Anstellung' : r === 'entretien' ? 'Vorstellungsgespräch' : 'Noch offen',
   }
@@ -117,7 +135,10 @@ export const JR_METHOD: Record<OrpMethod, string> = { electronic: 'Elektronisch'
 
 // Required by Job-Room's form - empty ones show amber before you get there.
 export function jobRoomMissing(e: JobRoomEntry): string[] {
-  return (['date', 'business', 'postal', 'city', 'jobTitle'] as const).filter(k => !e[k])
+  const need: ('date' | 'business' | 'postal' | 'city' | 'jobTitle' | 'email')[] = ['date', 'business', 'postal', 'city', 'jobTitle']
+  // 2026-11-03: Job-Room blocks an electronic entry with neither an email nor an online-form link ('email' here means email or link)
+  if (e.method === 'electronic' && !e.email && !e.linkIsJob) need.push('email')
+  return need.filter(k => !e[k])
 }
 
 // 2026-10-14 owner: "can code pick up these obvious errors?" ("asdf" saved as a street).

@@ -1,13 +1,11 @@
 import FillRate from './fill_rate'
-import FindDetails from './find_details'
-import { useEffect, useRef, useState } from 'react'
-import { swissDate, type Application, type JobRoomEntry, JR_METHOD, jobRoomEntry, jobRoomMissing, looksWrong } from '../lib/orp'
-import { parseAd } from '../lib/ad_parse'
+import FindDetails, { MissingDetailsKey } from './find_details'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { swissDate, type Application, JR_METHOD, jobRoomEntry, jobRoomMissing, looksWrong } from '../lib/orp'
 import { fillPayload, FILL_KEY } from '../lib/jobroom_fill'
 import { useProKey, buyPro } from '../lib/pro'
 import { isApp } from '../lib/platform'
 import { PRO_KEY, PRO_USD, PRO_SCOPE } from './job_track_pro'
-import { aiFind, readSuggestion, saveSuggestion } from '../lib/ai_find'
 
 // 2026-10-14: the date Job-Room's ENTER form was last checked against these fields
 const FORM_CHECKED = '14.10.2026'
@@ -45,80 +43,82 @@ const ICON_CHECK = <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="
 
 // remembers the selected job while the panel swaps to the set-up window and back (resets on page reload)
 let KEEP: { id: number; picked: boolean; visited?: boolean } | null = null
+export function resetJobRoomSelection() { KEEP = null }
 
-export default function JobRoomHelper({ rows, allApps, monthLabel, onUpdate, t, onSetup }: {
-  allApps?: Application[]; rows: Application[]; monthLabel: string; onUpdate: (id: number, patch: Patch) => void; t: (k: string) => string; onSetup?: () => void
-}) {
-  const firstOpen = Math.max(0, rows.findIndex(a => !a.jobroomDone))
-  const keptAt = KEEP ? rows.findIndex(r => r.id === KEEP!.id) : -1
+type JobRoomHelperProps = {
+  allApps?: Application[]; rows: Application[]; monthLabel: string; onUpdate: (id: number, patch: Patch) => void; t: (k: string) => string; onSetup?: () => void; cleanupOnly?: boolean; mobile?: boolean; manual?: boolean; fillChoice?: ReactNode; fillNext?: (glow: boolean) => ReactNode; fillReady?: boolean
+}
+
+export default function JobRoomHelper(props: JobRoomHelperProps) {
+  // Keep hook order stable when changing between empty and populated months.
+  if (!props.rows.length) return <p className="orp-empty-period" role="status">{props.t('jr.emptyPeriod')}</p>
+  return <JobRoomHelperContent {...props} />
+}
+
+function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup, cleanupOnly = false, mobile = false, manual = false, fillChoice, fillNext, fillReady = true }: JobRoomHelperProps) {
+  const firstMissing = rows.findIndex(a => !a.jobroomDone && jobRoomMissing(jobRoomEntry(a)).length > 0)
+  const firstAmber = rows.findIndex(a => !a.jobroomDone && jobRoomMissing(jobRoomEntry(a)).length === 0)
+  const nextSquare = firstMissing >= 0 ? firstMissing : firstAmber
+  const firstOpen = Math.max(0, nextSquare)
+  const keptAt = !cleanupOnly && KEEP ? rows.findIndex(r => r.id === KEEP!.id) : -1
   const [i, setI] = useState(keptAt >= 0 ? keptAt : firstOpen)
-  // guidance: 3.1 glows until a square is tapped, then 3.3 (3.2 only when Job-Room's required details are missing)
+  // After choosing a job, guide the user through 3.2, then 3.3.
   const [picked, setPicked] = useState(keptAt >= 0 && KEEP!.picked)
   // the Job-Room link in 3.3 has been tapped: 3.3 stops glowing and the Entered button glows next
   const [visited, setVisited] = useState(keptAt >= 0 && !!KEEP!.visited)
   const [copied, setCopied] = useState('')
   const done = rows.filter(a => a.jobroomDone).length
-  const [ad, setAd] = useState('')
   // which field is being edited (pencil): its value becomes a text box with the text in it
   const [editKey, setEditKey] = useState('')
-  if (rows.length === 0) return null
   const idx = Math.min(i, rows.length - 1)
   const a = rows[idx]
-  const e = jobRoomEntry(a)
-  const missing = jobRoomMissing(e)
-  // the card on screen is what JobTrack fill (on Job-Room) picks up
+  const storedEntry = jobRoomEntry(a)
+  const [aiPreview, setAiPreview] = useState<{ id: number; patch: Patch } | null>(null)
+  const previewFields = aiPreview?.id === a.id ? Object.fromEntries(Object.entries(aiPreview.patch).filter(([key]) => !(a as unknown as Record<string, unknown>)[key])) : {}
+  const e = jobRoomEntry({ ...a, ...previewFields })
+  const missing = jobRoomMissing(storedEntry)
+  // the card on screen is what Job-Room fill (on Job-Room) picks up
   // 2026-10-19 owner: auto fill is the paid tier (US$5 once), 1 free job as a trial; the fill window checks the trial on the server
-  const { pro: webPro, tok: proTok } = useProKey(PRO_KEY, 'jobtrack-pro-')
+  const { pro: webPro } = useProKey(PRO_KEY, 'jobtrack-pro-')
   const pro = webPro || isApp()
-  // 2026-10-19 owner: real-world test on ALL jobs - the AI looks for the missing details of every job in turn.
-  // Results wait on each job ("Use this address"); nothing is filled automatically.
-  const [bulk, setBulk] = useState<{ run: boolean; n: number; of: number; who: string; found: number; none: number; note: string } | null>(null)
-  const stopBulk = useRef(false)
-  const hasGap = (r: Application) => { const x = jobRoomEntry(r); return !r.jobroomDone && (!x.postal || !x.city || !x.street) }
-  const todo = rows.filter(r => hasGap(r) && !readSuggestion(r.id))
-  async function runBulk() {
-    stopBulk.current = false
-    const list = todo
-    let n = 0, found = 0, none = 0, fails = 0, note = ''
-    setBulk({ run: true, n: 0, of: list.length, who: '', found: 0, none: 0, note: '' })
-    const next = async (): Promise<void> => {
-      while (!stopBulk.current && !note) {
-        const r = list[n]; if (!r) return
-        n++
-        setBulk(b => b && { ...b, n, who: r.company })
-        const out = await aiFind({ company: r.company, role: r.role, tok: proTok, app: isApp(), hint: [r.adText, r.notes, r.city].filter(Boolean).join(' ') })
-        if (out.kind === 'ok') { saveSuggestion(r.id, { runs: [out.locs], contact: out.contact, sources: out.sources, at: new Date().toISOString() }); found++; fails = 0 }
-        else if (out.kind === 'none') none++
-        else if (out.kind === 'used') note = t('bulk.used')
-        else if (out.kind === 'cap') note = t('bulk.cap')
-        else if (out.kind === 'paused') note = t('ai.paused')
-        else if (++fails >= 3) note = t('ai.err')
-        setBulk(b => b && { ...b, found, none })
-      }
+  const allEntered = rows.every(r => !!r.jobroomDone)
+  const readyForForm = missing.length === 0 || allEntered
+  const enteringForm = !cleanupOnly && readyForForm && fillReady
+  // Next was tapped: step 3.3 is now the thing to do, so put it at the top of the panel (the blank room below it lets it reach the top)
+  const wasFill = useRef(false)   // false on mount too: the Auto route comes back from the setup step with the fill already ready
+  useEffect(() => {
+    if (!wasFill.current && fillReady && readyForForm && !cleanupOnly && !mobile) {
+      // content above 3.3 can still grow (a late AI result), so keep it pinned to the top for a few seconds unless the person scrolls
+      const body = document.querySelector('.orp-body')
+      let tick: ReturnType<typeof setInterval> | undefined
+      const stop = () => { clearInterval(tick); for (const ev of ['wheel', 'touchstart', 'mousedown', 'keydown']) body?.removeEventListener(ev, stop) }
+      setTimeout(() => {
+        document.getElementById('jr-step3')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        if (!body) return
+        for (const ev of ['wheel', 'touchstart', 'mousedown', 'keydown']) body.addEventListener(ev, stop, { once: true })
+        let n = 0
+        tick = setInterval(() => {
+          const el = document.getElementById('jr-step3')
+          if (!el || ++n > 20) return stop()
+          if (Math.abs(el.getBoundingClientRect().top - body.getBoundingClientRect().top) > 12) el.scrollIntoView({ behavior: 'auto', block: 'start' })
+        }, 500)
+      }, 150)
     }
-    await Promise.all([next(), next()])  // two at a time
-    setBulk(b => b && { ...b, run: false, who: '', note })
-  }
+    wasFill.current = fillReady
+  }, [fillReady]) // eslint-disable-line react-hooks/exhaustive-deps
+  // the card just became complete (e.g. "Use this address"): the next action is the Auto/Manual choice below, so bring it into view
+  const tappedIn32 = useRef(false)   // 2026-11-09 owner: a card the auto-search completes by itself must stay at 1.2 on the phone - only a tap inside 1.2 (e.g. Use this address) moves on to 1.3
+  const wasReady = useRef({ id: a.id, ready: readyForForm })   // same card only: picking another job must not jump to the choice
+  useEffect(() => {
+    if (wasReady.current.id === a.id && !wasReady.current.ready && readyForForm && !cleanupOnly && (mobile ? tappedIn32.current : !fillReady)) setTimeout(() => (mobile ? document.getElementById('jr-step3') : document.querySelector('.orp-entry-choice'))?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150)   // phone: no choice, the next step is 3.3 itself
+    wasReady.current = { id: a.id, ready: readyForForm }
+  }, [readyForForm, a.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  const hasGap = (r: Application) => !r.jobroomDone && jobRoomMissing(jobRoomEntry(r)).length > 0   // red squares only, so the count matches what the user sees
+  const hasMissingDetails = missing.length > 0 || [storedEntry.street, storedEntry.postal, storedEntry.city, storedEntry.contactPerson, storedEntry.email, storedEntry.phone, storedEntry.link].some(value => !value)
+  const [s32Seen, setS32Seen] = useState(false)
+  const glow32 = picked && !s32Seen && !visited
+  const glow33 = !visited   // 3.3 only renders once the job is ready: glow until the Job-Room link is tapped
   try { localStorage.setItem(FILL_KEY, JSON.stringify({ ...fillPayload(a), pro, card: String(a.id), device: deviceId() })) } catch { /* private mode */ }
-  // empty fields Job-Room asks for (required or not) - the ones worth finding
-  const gaps = ([['street', e.street], ['postal', e.postal], ['city', e.city], ['contactPerson', e.contactPerson], ['email', e.email], ['phone', e.phone], ['link', e.link]] as const)
-    .filter(([, v]) => !v).map(([k]) => t('jr.f.' + k))
-  const [adNote, setAdNote] = useState('')
-  const [found, setFound] = useState<{ statusHint: string; siteDomain: string; urls: string[] }>({ statusHint: '', siteDomain: '', urls: [] })
-  function fillFromAd(text: string = ad) {
-    const p = parseAd(text)
-    const patch: Partial<Application> = {}
-    const put = (k: keyof Application, v: string | undefined, have: string) => { if (v && !have) (patch as any)[k] = v }
-    put('street', p.street, e.street); put('streetNo', p.streetNo, e.streetNo); put('postal', p.postal, e.postal); put('city', p.city, e.city)
-    put('contactPerson', p.contactPerson, e.contactPerson); put('email', p.email, e.email); put('phone', p.phone, e.phone); put('link', p.link, e.link)
-    if (!a.adText) patch.adText = text.slice(0, 20000) // kept as proof if the ad page goes 404
-    setFound({ statusHint: p.statusHint, siteDomain: p.siteDomain, urls: p.urls })
-    const filled = Object.keys(patch).filter(k => k !== 'adText')
-    if (Object.keys(patch).length) onUpdate(a.id, patch)
-    // 2026-10-15 owner: pasting fills straight away; say what happened (it only fills boxes that are empty)
-    setAdNote(filled.length ? t('jr.adDone').replace('{list}', filled.join(', ')) : (p.postal || p.city || p.street ? t('jr.adHave') : (p.statusHint || p.siteDomain ? t('jr.adEmailOnly') : t('jr.adNone'))))
-    setAd('')
-  }
 
   // the date is shown DD.MM.YYYY but stored YYYY-MM-DD; a date that doesn't parse is ignored
   function save(field: keyof Application, v: string) {
@@ -128,7 +128,7 @@ export default function JobRoomHelper({ rows, allApps, monthLabel, onUpdate, t, 
       v = `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`
     }
     if ((field === 'company' || field === 'role') && !v) return
-    onUpdate(a.id, { [field]: v } as Patch)
+    onUpdate(a.id, (field === 'link' ? { link: v, linkFrom: 'user' } : { [field]: v }) as Patch)
   }
 
   async function copy(key: string, value: string) {
@@ -154,7 +154,7 @@ export default function JobRoomHelper({ rows, allApps, monthLabel, onUpdate, t, 
       {value && editKey !== k && <span className="jr-acts">
         <button type="button" className="jr-copy" onClick={() => copy(k, value)}>{copied === k ? ICON_CHECK : t('orp.copy')}</button>
         {/* 2026-10-14 owner: a quick delete as well as edit */}
-        {field && !['date', 'company', 'role'].includes(field) && <button type="button" className="jr-del" aria-label={t('action.delete')} title={t('action.delete')} onClick={() => onUpdate(a.id, { [field]: '' } as Patch)}>
+        {field && !['date', 'company', 'role'].includes(field) && <button type="button" className="jr-del" aria-label={t('action.delete')} title={t('action.delete')} onClick={() => onUpdate(a.id, (field === 'link' ? { link: '', linkFrom: undefined } : { [field]: '' }) as Patch)}>
           <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" /></svg></button>}
       </span>}
     </div>
@@ -180,11 +180,16 @@ export default function JobRoomHelper({ rows, allApps, monthLabel, onUpdate, t, 
   const [lastOk, setLastOk] = useState<string | null>(null)  // '' = never, null = not loaded / offline
   useEffect(() => { fetch('/api/fill-ok?country=CH').then(r => r.json()).then(d => setLastOk(typeof d.last === 'string' ? d.last : null)).catch(() => setLastOk(null)) }, [])
   const [folded, setFolded] = useState(() => completeAt(firstOpen))
-  useEffect(() => {
-    const back = () => { if (document.visibilityState === 'visible' && picked && !a.jobroomDone && missing.length === 0) setFolded(true) }
-    document.addEventListener('visibilitychange', back); window.addEventListener('focus', back)
-    return () => { document.removeEventListener('visibilitychange', back); window.removeEventListener('focus', back) }
-  })
+  const showAiPreview = useCallback((id: number, patch: Patch) => { setAiPreview({ id, patch }); setFolded(false); setS32Seen(true) }, [])
+  function chooseJob(n: number) {
+    if (!rows[n]) return
+    KEEP = { id: rows[n].id, picked: true }
+    tappedIn32.current = false; setI(n); setPicked(true); setVisited(false); setFolded(completeAt(n)); setS32Seen(false)
+    // no gaps: the next action is the Auto/Manual choice or 3.3, so go there; otherwise 3.2
+    if (completeAt(n) && !rows[n].jobroomDone) setTimeout(() => (document.querySelector('.orp-entry-choice') || document.getElementById('jr-step3') || document.getElementById('jr-step2'))?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200)
+    else requestAnimationFrame(() => document.getElementById('jr-step2')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+  }
+  // 2026-11-03 owner: coming back from Job-Room must not change the view - no fold, no scroll
 
   const incompleteNow = missing.length > 0
   function entered() {
@@ -200,42 +205,35 @@ export default function JobRoomHelper({ rows, allApps, monthLabel, onUpdate, t, 
   return (
     <div className="jr">
       {/* 2026-10-14 owner: 3 steps in the order you do them - 1 pick here, 2 fill gaps here, 3 Job-Room */}
-      <p className={'jr-step' + (!picked ? ' jr-glow' : '')}><b className="jts-num">3.1.</b> <b>{t('jr.here')}</b> {t('jr.flow2')}</p>
-      {(todo.length > 0 || bulk) && <div className="jr-bulk">
-        {!bulk?.run && todo.length > 0 && <button type="button" className="btn btn-glow" onClick={runBulk}>{t('bulk.btn').replace('{n}', String(todo.length))}</button>}
-        {bulk?.run && <>
-          <span className="fd-busy" role="status"><span className="fd-dots"><i /><i /><i /></span>{t('bulk.run').replace('{n}', String(bulk.n)).replace('{of}', String(bulk.of)).replace('{who}', bulk.who)}</span>
-          <span className="jr-bulk-bar"><i style={{ width: (bulk.of ? (bulk.n / bulk.of) * 100 : 0) + '%' }} /></span>
-          <button type="button" className="btn-secondary" onClick={() => { stopBulk.current = true }}>{t('bulk.stop')}</button>
-        </>}
-        {bulk && !bulk.run && <span className="fd-t">{t('bulk.done').replace('{f}', String(bulk.found)).replace('{z}', String(bulk.none))} {bulk.note}</span>}
-      </div>}
+      <div className="jr-head">
+      <p className="jr-step"><b className="jts-num">{mobile ? '1.1.' : cleanupOnly ? '1.' : '3.1.'}</b> <b>{t(mobile ? 'jr.phoneChoose' : 'jr.here')}</b></p>
+      </div>
       <p className="jr-legend">
-        <span className="jr-leg"><span className="jr-lg cur" />{t('jr.leg.cur')}</span>
         <span className="jr-leg"><span className="jr-lg done" />{t('jr.leg.done')}</span>
         <span className="jr-leg"><span className="jr-lg todo" />{t('jr.leg.todo')}</span>
         <span className="jr-leg"><span className="jr-lg need" />{t('jr.leg.need')}</span>
       </p>
       <div className="jr-dots" role="tablist">
+        <svg className="jr-tapme" viewBox="0 0 24 24" width="26" height="26" role="img" aria-label={t('jr.flow2')}><path fill="#00ff41" d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.69-5.1c.01-.07.02-.13.02-.2 0-.62-.38-1.16-.91-1.38z" /></svg>
         {rows.map((r, n) => (
           <button key={r.id} type="button" role="tab" aria-selected={n === idx} aria-label={`${n + 1}. ${r.company}`} title={`${n + 1}. ${r.company} - ${swissDate(r.date)}`}
-            className={'jr-dot' + (n === idx ? ' cur' : '') + (r.jobroomDone ? ' done' : '') + (jobRoomMissing(jobRoomEntry(r)).length ? ' need' : '') + (readSuggestion(r.id) && hasGap(r) ? ' ai' : '')}
-            onClick={() => { KEEP = { id: r.id, picked: true }; setI(n); setPicked(true); setVisited(false); setFolded(completeAt(n)) }}>{n + 1}</button>
+            className={'jr-dot' + (!picked && nextSquare >= 0 && n === nextSquare ? ' glow jt-guidance-glow' : '') + (r.jobroomDone ? ' done' : '') + (jobRoomMissing(jobRoomEntry(r)).length ? ' need' : '')}
+            onClick={() => chooseJob(n)}>{n + 1}</button>
         ))}
       </div>
 
-      <div id="jr-step2" className={'jr-step2' + (picked && missing.length > 0 ? ' jr-glow' : '')}><b className="jts-num">3.2.</b> <b>{t('jr.appliedTo')}</b> {a.company}{a.role ? ' - ' + a.role : ''}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}
+      <div key={`${a.id}-${idx}`} id="jr-step2" hidden={allEntered} className={'jr-step2' + (glow32 ? ' jr-glow jt-guidance-glow' : '')} onClick={() => { tappedIn32.current = true; setS32Seen(true) }}><b className="jts-num">{mobile ? '1.2.' : cleanupOnly ? '2.' : '3.2.'}</b> <b>{t('jr.appliedTo')}</b> {a.company}{a.role ? ' - ' + a.role : ''}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}
         {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}
-        {gaps.length === 0
-          ? <p className="jr-nogaps">{ICON_CHECK}{t('jr.nogaps')}</p>
-          : <>
-              {missing.length === 0 && t('jr.allNeeded').split('|').map(x => <p key={x} className="jr-nogaps">{ICON_CHECK}{x}</p>)}
-              <FindDetails key={a.id} a={a} e={e} allApps={allApps} onUpdate={onUpdate} t={t} requiredMissing={missing.length > 0} />
-            </>}
-        <div><button type="button" className="jr-bm-again" onClick={() => { if (folded) setTimeout(() => document.getElementById('jr-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60); setFolded(f => !f) }}>{folded ? t('jr.showDetails') : t('jr.hideDetails')}</button></div>
+        {hasMissingDetails
+          ? <FindDetails mobile={mobile} autoSearch={picked && !a.jobroomDone && !allEntered} key={`${a.id}-${idx}`} a={a} e={storedEntry} live={e} onPreview={showAiPreview} allApps={allApps} onUpdate={onUpdate} t={t} requiredMissing={missing.length > 0} />
+          : <p className="jr-nogaps">{ICON_CHECK}{t('jr.nogaps')}</p>}
+      </div>
+      <div hidden={allEntered}>
+        <details className="fd-fold" open={!folded} onToggle={x => { const isOpen = (x.target as HTMLDetailsElement).open; if (isOpen && folded) setTimeout(() => document.getElementById('jr-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60); setFolded(!isOpen) }}><summary className="fd-fold-ico"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" /></svg><span>{t('jr.replica')}</span></summary></details>
         {!folded && <div className="jr-card" id="jr-card" key={a.id}>
 
-          {missing.length > 0 ? <p className="jr-warn">{t('jr.missing')}</p> : <p className="jr-ready">{ICON_CHECK}{t('jr.ready')}</p>}
+          <MissingDetailsKey e={storedEntry} t={t} />
+          {missing.length === 0 && <p className="jr-ready">{ICON_CHECK}{t('jr.ready')}</p>}
           <p className="jr-q">{Q.when}</p>
           <Val k="date" label="Date" field="date" value={e.date} required />
           <p className="jr-q">{Q.how}</p>
@@ -249,11 +247,11 @@ export default function JobRoomHelper({ rows, allApps, monthLabel, onUpdate, t, 
           <Val k="postal" label="Postal code" field="postal" value={e.postal} required />
           <Val k="city" label="City" field="city" value={e.city} required />
           <Val k="person" label="Kontaktperson" field="contactPerson" value={e.contactPerson} />
-          <Val k="email" label="Email" field="email" value={e.email} />
+          <Val k="email" label="Email" field="email" value={e.email} required={e.method === 'electronic' && !e.linkIsJob} />
           <Val k="phone" label="Phone number" field="phone" value={e.phone} />
           <p className="jr-q">{Q.job}</p>
           <Val k="job" label="Job title" field="role" value={e.jobTitle} required />
-          <Val k="link" label="Link zum Online-Formular" field="link" value={e.link} />
+          <Val k="link" label="Link zum Online-Formular" field="link" value={e.link} required={e.method === 'electronic' && !e.email} />
           <p className="jr-q">{Q.rav}</p>
           <Pick label="" options={['No', 'Yes']} chosen={e.assigned ? 'Yes' : 'No'} />
           <p className="jr-q">{Q.rate}</p>
@@ -261,32 +259,46 @@ export default function JobRoomHelper({ rows, allApps, monthLabel, onUpdate, t, 
           <p className="jr-q">{Q.result}</p>
           <Pick label="" options={['Vorstellungsgespräch', 'Noch offen', 'Anstellung', 'Absage']} chosen={e.result} />
         </div>}
+      {/* 2026-10-14 owner: "what happens when the gov changes a field?" - the fields live in one place; a changed form is one tap away */}
+      {!folded && <p className="jr-form-check">{(() => {
+          const parts = t('jr.formChecked').replace('{date}', FORM_CHECKED).split('|')
+          const fresh = lastOk && (Date.now() - new Date(lastOk + 'T12:00:00').getTime()) < 60 * 86400000
+          const first = !lastOk ? parts[0] : fresh ? t('jr.formOk').replace('{date}', swissDate(lastOk)) : t('jr.formStale').replace('{date}', swissDate(lastOk))
+          return <><span>{first}</span><br /><span>{parts[1]}</span></>
+        })()}{' '}
+        {!isApp() && <a target="_blank" rel="noopener noreferrer" href={'/contact?help=1&msg=' + encodeURIComponent("Job-Room's ENTER form has changed. Field: ")}>{t('jr.formTell')}</a>}</p>}
       </div>
-      <p className={'jr-step' + (picked && !visited && missing.length === 0 ? ' jr-glow' : '')}><b className="jts-num">3.3.</b> <a className="jr-link" href="https://www.job-room.ch/dashboard/job-seeker" target="_blank" rel="noopener noreferrer" onClick={() => { setVisited(true); if (KEEP) KEEP.visited = true }}><b>Job-Room</b></a><b> ({t('jr.autoFill')}):</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[0]}<b className="jr-bmname">JobTrack fill</b>{(() => { const tail = (t('jr.flow1').split('{month}')[1] ?? '').split('JobTrack fill')[1] ?? ''; const eb = t('jr.enteredBtn'); const k = tail.indexOf(eb); return k < 0 ? tail : <>{tail.slice(0, k)}<b className="jr-bmname">{eb}</b>{tail.slice(k + eb.length)}</> })()}
+      {!cleanupOnly && readyForForm && fillChoice}
+      {!cleanupOnly && readyForForm && fillReady && (mobile || manual ? <p id="jr-step3" className={'jr-step' + (glow33 ? ' jr-glow jt-guidance-glow' : '')}><b className="jts-num">{mobile ? '1.3.' : '3.3.'}</b> <a className={'jr-link' + (glow33 ? ' jt-guidance-glow' : '')} href="https://www.job-room.ch/dashboard/job-seeker" target="_blank" rel="noopener noreferrer" onClick={() => { setVisited(true); if (KEEP) KEEP.visited = true }}><b>Job-Room</b></a>{glow33 && <small className="jr-newtab"> {t('jr.newTab')}</small>}<b>:</b> {(() => { const [pre, post = ''] = t('jr.flowCopy').split('{month}'); const eb = t('jr.enteredBtn'); const k = post.indexOf(eb); return <>{pre}<b className="jr-month">{monthLabel}</b>{k < 0 ? post : <>{post.slice(0, k)}<b className="jr-bmname">{eb}</b>{post.slice(k + eb.length)}</>}</> })()}</p> : <>
+      <p id="jr-step3" className={'jr-step' + (glow33 ? ' jr-glow jt-guidance-glow' : '')}><b className="jts-num">3.3.</b> <a className={'jr-link' + (glow33 ? ' jt-guidance-glow' : '')} href="https://www.job-room.ch/dashboard/job-seeker" target="_blank" rel="noopener noreferrer" onClick={() => { setVisited(true); if (KEEP) KEEP.visited = true }}><b>Job-Room</b></a>{glow33 && <small className="jr-newtab"> {t('jr.newTab')}</small>}<b> ({t('jr.autoFill')}):</b> {t('jr.flow1').split('{month}')[0]}<b className="jr-month">{monthLabel}</b>{(t('jr.flow1').split('{month}')[1] ?? '').split('Job-Room fill')[0]}<b className="jr-bmname">Job-Room fill</b>{(() => { const tail = (t('jr.flow1').split('{month}')[1] ?? '').split('Job-Room fill')[1] ?? ''; const eb = t('jr.enteredBtn'); const k = tail.indexOf(eb); return k < 0 ? tail : <>{tail.slice(0, k)}<b className="jr-bmname">{eb}</b>{tail.slice(k + eb.length)}</> })()}
         {!pro && <><br /><span className="jr-trial">{t('jr.trial')} <button type="button" className="btn-secondary jr-bm-back" onClick={() => buyPro({ scope: PRO_SCOPE, amount: PRO_USD, title: 'JobTrack Pro', subtitle: t('jr.proSub') })}>{t('jr.proBtn')}</button></span></>}
         {/* 2026-10-14 owner: the bookmark step must stay findable */}
         {onSetup && <><br /><button type="button" className="btn-secondary jr-bm-back" onClick={onSetup}>{t('jr.noBookmark')}</button></>}</p>
+      </>)}
+
       <div className="jr-nav">
-        <button type="button" className="btn-secondary" disabled={idx === 0} onClick={() => setI(idx - 1)}>{t('jr.back')}</button>
-        {a.jobroomDone
+        <button type="button" className="btn-secondary" disabled={idx === 0} onClick={() => chooseJob(idx - 1)}>{t('jr.back')}</button>
+        {!cleanupOnly && readyForForm && fillReady && (a.jobroomDone
           ? <button type="button" className="btn-secondary" onClick={() => onUpdate(a.id, { jobroomDone: undefined })}>{t('jr.undo')}</button>
           : <>
-              <button type="button" className={'btn jr-entered' + (visited && !incompleteNow ? ' btn-glow' : '')} onClick={entered}>{ICON_CHECK}{t('jr.enteredBtn')}</button>
-            </>}
-        <button type="button" className="btn-secondary" disabled={idx === rows.length - 1} onClick={() => setI(idx + 1)}>{t('jr.next')}</button>
+              <button type="button" className={(visited && !incompleteNow ? 'btn btn-glow jt-guidance-glow' : 'btn-secondary') + ' jr-entered'} onClick={entered}>{ICON_CHECK}{t('jr.enteredBtn')}</button>
+            </>)}
+        {enteringForm
+          ? (a.jobroomDone
+              ? <button type="button" className="btn-secondary" disabled={idx === rows.length - 1} onClick={() => chooseJob(idx + 1)}>{t('jr.next')}</button>   // Entered in Job-Room already moves on, so Next is only for a done job
+              : (() => {
+                  const order = [...rows.keys()].map(k => (idx + 1 + k) % rows.length).filter(n => n !== idx && hasGap(rows[n]))
+                  return order.length > 0 && <button type="button" id="jr-nextgap" className="btn-secondary" onClick={() => chooseJob(order[0])}>{t('jr.nextGap')} ({order.length} {t('jr.toGo')})</button>
+                })())
+          : (() => {
+              const order = [...rows.keys()].map(k => (idx + 1 + k) % rows.length).filter(n => n !== idx && hasGap(rows[n]))
+              return <button type="button" className={'btn-secondary' + (order.length ? ' btn-glow jt-guidance-glow' : '')} disabled={!order.length} onClick={() => chooseJob(order[0])}>{t('jr.nextGap')} ({order.length} {t('jr.toGo')})</button>
+            })()}
+        {!cleanupOnly && readyForForm && fillNext?.(!rows.some(hasGap))}
       </div>
-      <FillRate country="CH" t={t} />
+      {!mobile && !manual && !cleanupOnly && readyForForm && fillReady && <FillRate country="CH" t={t} />}
       {done === rows.length && <p className="jr-all">{ICON_CHECK}{t('jr.all')}</p>}
-      {/* 2026-10-14 owner: "what happens when the gov changes a field?" - the fields live in one place; a changed form is one tap away */}
-      <p className="jr-form-check">{(() => {
-          const parts = t('jr.formChecked').replace('{date}', FORM_CHECKED).split('|')
-          const fresh = lastOk && (Date.now() - new Date(lastOk + 'T12:00:00').getTime()) < 14 * 86400000
-          const first = lastOk === null ? parts[0] : fresh ? t('jr.formOk').replace('{date}', swissDate(lastOk)) : t('jr.formStale')
-          return <><span>{first}</span><br /><span>{parts[1]}</span></>
-        })()}{' '}
-        {!isApp() && <a target="_blank" rel="noopener noreferrer" href={'/contact?help=1&msg=' + encodeURIComponent("Job-Room's ENTER form has changed. Field: ")}>{t('jr.formTell')}</a>}</p>
+
     </div>
   )
 }
-
-export type { JobRoomEntry }

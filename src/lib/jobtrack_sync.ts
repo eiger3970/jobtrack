@@ -92,18 +92,33 @@ export function merge(pc: Application[], pcBase: Base, phone: Application[], pho
 // ... can this not be auto checked?" Same job = same date + company + role (case,
 // accents, spaces, "100%" ignored). Copies are joined: empty fields filled from the
 // other copy; a different value for the same detail goes into the notes - never lost.
-const norm = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\d+\s*(-\s*\d+\s*)?%/g, '').replace(/[^a-z0-9]+/g, '')
+const norm = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\d+\s*([-–—]\s*\d+\s*)?%/g, '').replace(/[^a-z0-9]+/g, '')
+// 2026-10-25 owner: 6 of 41 jobs stayed doubled - the same job saved twice with small differences
+// (en dash vs hyphen in "50-100%", "Un(e) Serveur(euse)" vs "Serveur(euse)", a shorter company name,
+// "d'Android" vs "Android", a trimmed city list). Same date, similar company and similar role = same job.
+const FILLER = new Set(['une', 'der', 'die', 'das', 'les', 'des', 'und', 'and', 'the', 'saison', 'wintersaison', 'sommersaison', 'winter', 'hiver', 'season', 'sommer', 'summer', 'team', 'group', 'groupe', 'gmbh', 'sagl', 'cdi', 'cdd'])
+const words = (x: string) => new Set(x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  .replace(/\d+\s*([-–—]\s*\d+\s*)?%/g, ' ').replace(/[^a-z]+/g, ' ').split(' ')
+  .filter(w => w.length >= 3 && !FILLER.has(w)))
+function alike(a: string, b: string, needSubset: boolean): boolean {
+  if (norm(a) === norm(b)) return true
+  const x = words(a), y = words(b)
+  if (!x.size || !y.size) return false
+  const [small, big] = x.size <= y.size ? [x, y] : [y, x]
+  const shared = [...small].filter(w => big.has(w)).length
+  if (shared === small.size && (small.size >= 2 || !needSubset)) return true   // the shorter name sits inside the longer
+  return shared / new Set([...x, ...y]).size >= 0.6
+}
+const sameJob = (a: Application, b: Application) => a.date === b.date && !!norm(a.company) && alike(a.company, b.company, false) && alike(a.role, b.role, true)
 const SKIP = new Set(['id', 'notes'])
 function filled(a: Application) { return Object.entries(a).filter(([k, v]) => !SKIP.has(k) && v !== '' && v !== undefined && v !== null).length }
 
 export function dedupe(apps: Application[]): { apps: Application[]; joined: number } {
-  const byKey = new Map<string, Application>()
   const out: Application[] = []
   let joined = 0
   for (const a of apps) {
-    const k = `${a.date}|${norm(a.company)}|${norm(a.role)}`
-    const first = byKey.get(k)
-    if (!first || !norm(a.company)) { byKey.set(k, a); out.push(a); continue }
+    const first = out.find(x => sameJob(x, a))
+    if (!first) { out.push(a); continue }
     // keep the fuller copy, fill its gaps from the other
     const [keep, other] = filled(a) > filled(first) ? [a, first] : [first, a]
     const m: Record<string, unknown> = { ...keep }
@@ -112,13 +127,11 @@ export function dedupe(apps: Application[]): { apps: Application[]; joined: numb
       if (SKIP.has(f) || v === '' || v === undefined || v === null) continue
       const cur = m[f]
       if (cur === '' || cur === undefined || cur === null) m[f] = v
-      else if ((f === 'company' || f === 'role') && norm(String(cur)) === norm(String(v))) continue // only spelling differs
+      else if (f === 'company' || f === 'role') continue // only the spelling differs: they matched as the same job
       else if (JSON.stringify(cur) !== JSON.stringify(v)) extra.push(`${f} = ${v}`)
     }
     const notes = [keep.notes, other.notes && other.notes !== keep.notes ? other.notes : '', extra.length ? `Other copy: ${extra.join(', ')}` : ''].filter(Boolean).join('\n')
-    const joinedApp = { ...(m as unknown as Application), notes }
-    out[out.indexOf(first)] = joinedApp
-    byKey.set(k, joinedApp)
+    out[out.indexOf(first)] = { ...(m as unknown as Application), notes }
     joined++
   }
   return { apps: out, joined }

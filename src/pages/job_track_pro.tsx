@@ -93,7 +93,7 @@ export default function JobTrackPro({ apps, lang }: { apps: App[]; lang: string 
           <p className="jt-pro-hint">{L('Opens in your phone or computer calendar - a reminder at 9:00 on each Next date. Download again after changes.', 'Öffnet sich im Kalender von Telefon oder Computer - Erinnerung um 9:00 an jedem Nächsten Datum. Nach Änderungen neu laden.', "S'ouvre dans le calendrier du téléphone ou de l'ordinateur - rappel à 9h00 à chaque date Suivante. Retéléchargez après chaque changement.")}</p>
         </div>
       ) : (
-        <ProBox L={L} title="JobTrack Pro" amount={PRO_USD}
+        <ProBox L={L} scopePrefix="jobtrack-pro-" title="JobTrack Pro" amount={PRO_USD}
           why={L('See which CV and letter actually get replies, and never miss a follow-up - so every application counts.', 'Sieh, welcher Lebenslauf und welches Anschreiben wirklich Antworten bekommen, und verpasse kein Nachfassen - damit jede Bewerbung zählt.', "Voyez quel CV et quelle lettre obtiennent vraiment des réponses, et ne manquez aucune relance - pour que chaque candidature compte.")}
           get={[
             L('Best CV and cover letter - which version gets the most replies', 'Bester Lebenslauf und Anschreiben - welche Version die meisten Antworten bekommt', 'Meilleur CV et lettre - quelle version obtient le plus de réponses'),

@@ -81,6 +81,15 @@ export function fillJobRoom(d: FillPayload): Promise<string[]> {
     if (box) { if (!box.checked) box.click() } else mark(null, 'Vorstellungsgespräch')
   }
 
+  // 2026-11-03: Job-Room's "email or link" check ran when only one field was set and stayed red.
+  // Once every field has its value, re-fire input + blur on both so the cross-field check re-runs.
+  const recheck = () => ['contact.email', 'online-form-url'].forEach(part => {
+    const el = q(part)
+    if (el && el.value) { el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('blur', { bubbles: true })) }
+  })
+  recheck()
+  setTimeout(recheck, 400)
+
   // Postal code / City is a lookup: type the postal code WITHOUT leaving the field (leaving
   // closed the suggestion list - owner's test 2026-10-14: "1820" left red), wait for the
   // list, click the matching city. No list in time -> cursor left in the field to pick by hand.

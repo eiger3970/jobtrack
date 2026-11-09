@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import QRCode from 'qrcode'
+import type { ReactNode } from 'react'
 import { type Application } from '../lib/orp'
 import { isApp } from '../lib/platform'
 import SyncFlow from '../components/sync_flow'
@@ -42,22 +43,33 @@ function Points({ L }: { L: Tx }) {
       <li><b>{L('Changed on both devices?', 'Auf beiden Geräten geändert?', 'Modifié sur les deux appareils?')}</b> {L('Merged automatically into one entry. If the same detail differs, the other value is written into the notes - nothing is lost, no duplicates to hunt for.', 'Automatisch zu einem Eintrag zusammengeführt. Weicht dieselbe Angabe ab, steht der andere Wert in den Notizen - nichts geht verloren, keine Doppelten zu suchen.', "Fusionné automatiquement en une entrée. Si le même détail diffère, l'autre valeur est notée - rien n'est perdu, aucun doublon à chercher.")}</li>
       <li><b>{L('The key', 'Der Schlüssel', 'La clé')}</b> {L('(middle of the picture): one secret key, made on this computer and handed to your phone inside the QR code - never over the internet. Only these two can open the locked list.', '(Mitte des Bildes): ein geheimer Schlüssel, auf diesem Computer erstellt und im QR-Code ans Telefon übergeben - nie übers Internet. Nur diese zwei öffnen die verschlossene Liste.', "(au milieu de l'image): une clé secrète, créée sur cet ordinateur et remise au téléphone dans le code QR - jamais par internet. Seuls ces deux peuvent ouvrir la liste verrouillée.")}</li>
       <li><b>{L('Our server', 'Unser Server', 'Notre serveur')}</b> {L('passes on the locked list, sees only that 2 devices linked, keeps nothing.', 'reicht die verschlossene Liste weiter, sieht nur 2 verbundene Geräte, speichert nichts.', 'transmet la liste verrouillée, voit seulement 2 appareils liés, ne garde rien.')}</li>
+      {/* 2026-10-25 owner: a chance to point at LocalSync - website only, the app is LocalSync's sibling */}
+      {!isApp() && <li><b>LocalSync</b> {L('syncs your Obsidian notes between phone and computer the same way, with no cloud.', 'synchronisiert Ihre Obsidian-Notizen genauso zwischen Telefon und Computer, ohne Cloud.', 'synchronise vos notes Obsidian de la même façon entre téléphone et ordinateur, sans cloud.')} <a href="/localsync">{L('See LocalSync', 'LocalSync ansehen', 'Voir LocalSync')}</a></li>}
     </ul>
   )
 }
 
+// 2026-11-05 owner: "too much verbose text, just make svg images" - one tick, the job count, then icon + number chips (full wording on tap/hover and for screen readers)
+const SV = { viewBox: '0 0 24 24', width: 22, height: 22, fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true }
+const ICON_PHONE = <svg {...SV}><rect x="7" y="2" width="10" height="20" rx="2" /><path d="M11 18h2" /></svg>
+const ICON_PC = <svg {...SV}><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 21h8M12 16v5" /></svg>
+const ICON_JOIN = <svg {...SV}><path d="M9 15l6-6M10 6l1-1a4 4 0 015.7 5.7l-1 1M14 18l-1 1a4 4 0 01-5.7-5.7l1-1" /></svg>
+const ICON_BOTH = <svg {...SV}><rect x="3" y="6" width="11" height="14" rx="2" /><rect x="10" y="3" width="11" height="14" rx="2" /></svg>
+const ICON_MERGE = <svg {...SV}><path d="M6 4v6a6 6 0 006 6h0a6 6 0 006-6V4M12 16v5" /></svg>
+const ICON_BIN = <svg {...SV}><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" /></svg>
 function Done({ r, L }: { r: MergeResult; L: Tx }) {
+  const chip = (icon: ReactNode, n: number, label: string) => <span className="jts-chip" title={label} aria-label={`${label}: ${n}`} role="img">{icon}<b>{n}</b></span>
   return (
     <div className="jts-done">
-      <p className="jts-done-title">{L('Synced - both devices now have the same list', 'Synchronisiert - beide Geräte haben jetzt dieselbe Liste', 'Synchronisé - les deux appareils ont maintenant la même liste')} ({r.apps.length})</p>
-      <ul>
-        <li>{L('From the phone', 'Vom Telefon', 'Du téléphone')}: {r.fromPhone}</li>
-        <li>{L('From the computer', 'Vom Computer', "De l'ordinateur")}: {r.fromComputer}</li>
-        {(r.joined ?? 0) > 0 && <li>{L('Duplicates joined (same job, date and company)', 'Doppelte zusammengelegt (gleiche Stelle, Datum, Firma)', 'Doublons réunis (même poste, date, entreprise)')}: {r.joined}</li>}
-        {(r.merged ?? 0) > 0 && <li>{L('Merged automatically (different details changed)', 'Automatisch zusammengeführt (verschiedene Angaben geändert)', 'Fusionné automatiquement (détails différents modifiés)')}: {r.merged}</li>}
-        {r.both > 0 && <li>{L('Kept both (changed on both)', 'Beide behalten (auf beiden geändert)', 'Gardé les deux (modifié des deux côtés)')}: {r.both}</li>}
-        {r.removed > 0 && <li>{L('Deleted (deleted on one device)', 'Gelöscht (auf einem Gerät gelöscht)', 'Supprimé (supprimé sur un appareil)')}: {r.removed}</li>}
-      </ul>
+      <p className="jts-done-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg> {L('Synced', 'Synchronisiert', 'Synchronisé')} · {r.apps.length}</p>
+      <div className="jts-chips">
+        {chip(<>{ICON_PHONE}</>, r.fromPhone, L('From the phone', 'Vom Telefon', 'Du téléphone'))}
+        {chip(<>{ICON_PC}</>, r.fromComputer, L('From the computer', 'Vom Computer', "De l'ordinateur"))}
+        {(r.joined ?? 0) > 0 && chip(ICON_JOIN, r.joined ?? 0, L('Duplicates joined (same job, date and company)', 'Doppelte zusammengelegt (gleiche Stelle, Datum, Firma)', 'Doublons réunis (même poste, date, entreprise)'))}
+        {(r.merged ?? 0) > 0 && chip(ICON_MERGE, r.merged ?? 0, L('Merged automatically (different details changed)', 'Automatisch zusammengeführt (verschiedene Angaben geändert)', 'Fusionné automatiquement (détails différents modifiés)'))}
+        {r.both > 0 && chip(ICON_BOTH, r.both, L('Kept both (changed on both)', 'Beide behalten (auf beiden geändert)', 'Gardé les deux (modifié des deux côtés)'))}
+        {r.removed > 0 && chip(ICON_BIN, r.removed, L('Deleted (deleted on one device)', 'Gelöscht (auf einem Gerät gelöscht)', 'Supprimé (supprimé sur un appareil)'))}
+      </div>
     </div>
   )
 }
@@ -130,7 +142,7 @@ export function ClearBox({ L, n, at, onClear, extra }: { L: Tx; n: number; at: n
   return ask ? (
     <div className="jts-confirm">
       <p className="jts-confirm-title">{WARN}{L('Delete JobTrack from this computer?', 'JobTrack von diesem Computer löschen?', 'Effacer JobTrack de cet ordinateur?')}</p>
-      <p>{L(`Your ${n} entries are safe on your phone (synced ${time}). Only this computer's copy is deleted.`, `Ihre ${n} Einträge sind sicher auf Ihrem Telefon (synchronisiert ${time}). Nur die Kopie auf diesem Computer wird gelöscht.`, `Vos ${n} entrées sont en sécurité sur votre téléphone (synchro ${time}). Seule la copie de cet ordinateur est effacée.`)}</p>
+      <p>{n === 1 ? L(`Your 1 entry is safe on your phone (synced ${time}). Only this computer's copy is deleted.`, `Ihr 1 Eintrag ist sicher auf Ihrem Telefon (synchronisiert ${time}). Nur die Kopie auf diesem Computer wird gelöscht.`, `Votre 1 entrée est en sécurité sur votre téléphone (synchro ${time}). Seule la copie de cet ordinateur est effacée.`) : L(`Your ${n} entries are safe on your phone (synced ${time}). Only this computer's copy is deleted.`, `Ihre ${n} Einträge sind sicher auf Ihrem Telefon (synchronisiert ${time}). Nur die Kopie auf diesem Computer wird gelöscht.`, `Vos ${n} entrées sont en sécurité sur votre téléphone (synchro ${time}). Seule la copie de cet ordinateur est effacée.`)}</p>
       {extra}
       <div className="jts-confirm-btns">
         <button className="btn-secondary" onClick={() => setAsk(false)}>{L('Keep it', 'Behalten', 'Garder')}</button>
@@ -288,7 +300,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
             label={L('The lock key lives only on your phone and computer. Our server passes the list on, locked, and sees only that two devices linked.', 'Der Schlüssel liegt nur auf Telefon und Computer. Unser Server reicht die Liste verschlossen weiter und sieht nur, dass zwei Geräte verbunden sind.', "La clé n'existe que sur votre téléphone et votre ordinateur. Notre serveur transmet la liste verrouillée et voit seulement que deux appareils sont liés.")}
             lockTip={L('The secret key - tap to learn about passphrases', 'Der geheime Schlüssel - tippen, mehr über Passphrasen', 'La clé secrète - touchez pour en savoir plus')}
             onLock={() => window.open('/passphrase#why', '_blank', 'noopener')} />
-          <Points L={L} />
+          {state !== 'done' && <Points L={L} />}
         </>}
         <div className="modal-buttons"><button className="btn-secondary" onClick={close}>{L('Close', 'Schliessen', 'Fermer')}</button></div>
       </div>

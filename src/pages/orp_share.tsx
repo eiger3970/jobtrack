@@ -1,3 +1,4 @@
+import { GiftIcon } from '../components/security_shield'
 import { useEffect, useRef, useState } from 'react'
 import { shareBookmarklet } from '../lib/form_share'
 import { countryName } from '../lib/countries'
@@ -8,16 +9,17 @@ import BookmarkPic from './bookmark_pic'
 // person's email. Credit is stated up front; nothing leaves before the person taps Send there.
 export const SHARE_CREDIT = '5% off'
 
-export default function OrpShare({ country, t }: { country: string; t: (k: string) => string }) {
+export default function OrpShare({ country, t, mobile = false }: { country: string; t: (k: string) => string; mobile?: boolean }) {
   const bm = useRef<HTMLAnchorElement>(null)
   const sendRef = useRef<HTMLAnchorElement>(null)
   useEffect(() => { bm.current?.setAttribute('href', shareBookmarklet(window.location.origin)) }, [])
-  const card = useRef<HTMLDivElement>(null)
+  const card = useRef<HTMLDetailsElement>(null)
+  const [expanded, setExpanded] = useState(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('share') === '1')
   const pasteBox = useRef<HTMLTextAreaElement>(null)
   useEffect(() => { if (new URLSearchParams(window.location.search).get('share') === '1') setTimeout(() => { card.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); pasteBox.current?.focus({ preventScroll: true }) }, 400) }, [])
   type Fld = { label: string; id: string; type: string; options?: string[] }
   type Page = { site?: string; scanned?: string; fields: Fld[] }
-  useEffect(() => { const back = () => { if (document.visibilityState === 'visible') pasteBox.current?.focus({ preventScroll: true }) }; document.addEventListener('visibilitychange', back); window.addEventListener('focus', back); return () => { document.removeEventListener('visibilitychange', back); window.removeEventListener('focus', back) } }, [])
+  useEffect(() => { const back = () => { if (document.visibilityState === 'visible' && card.current?.open) pasteBox.current?.focus({ preventScroll: true }) }; document.addEventListener('visibilitychange', back); window.addEventListener('focus', back); return () => { document.removeEventListener('visibilitychange', back); window.removeEventListener('focus', back) } }, [])
   const [text, setText] = useState('')
   const [pages, setPages] = useState<Page[]>([])
   // each valid paste is one page of the form; more than one page = paste again
@@ -37,20 +39,21 @@ export default function OrpShare({ country, t }: { country: string; t: (k: strin
   const list = compact(15).length <= 5500 ? compact(15) : compact(0)
   const msg = data ? `FORM SHARE ${countryName(country, 'en')} (${country}) - ${data.site} - scanned ${data.scanned}, sent ${new Date().toISOString().slice(0, 10)}\nReward ${SHARE_CREDIT} code, sent automatically\n\n${list}` : ''
   return (
-    <div className="orp-share" ref={card}>
+    <details className="orp-share orp-share-fold" ref={card} open={expanded} onToggle={e => { const o = e.currentTarget.open; setExpanded(o); if (o) setTimeout(() => card.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60) }}>
       {/* same pink gift as the referral boxes */}
-      <svg className="orp-share-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 9h18v4H3zM5 13h14v8H5zM12 9v12M12 9c-1-3-5-4-5-1.5S10 9 12 9zM12 9c1-3 5-4 5-1.5S14 9 12 9z" /></svg>
+      <summary><GiftIcon className="orp-share-gift" size={44} /><span className="orp-share-h">{t('share.title').replace('{credit}', SHARE_CREDIT)}</span></summary>
       <div className="orp-share-body">
-      <p className="orp-share-h">{t('share.title').replace('{credit}', SHARE_CREDIT)}</p>
       <ul className="jr-assure orp-before-tip">
         <li><b>{t('share.anon')}</b> {t('share.anonText')}</li>
         <li><b>{t('share.shared')}</b> {t('share.sharedText')}</li>
       </ul>
+      {mobile ? <ul className="orp-before-tip"><li>{t('share.phone')}</li></ul> : <>
       <ol className="jts-steps">
         <li><b className="jts-num">1.</b> {t('share.s1')}<BookmarkPic barLabel={t('share.barLabel')} button="Share form" /><a ref={bm} className="jr-bm-link" onClick={ev => { ev.preventDefault(); alert(t('jr.bm.notHere')) }}>JobTrack share form</a></li>
         <li><b className="jts-num">2.</b> {t('share.s2')}</li>
         <li><b className="jts-num">3.</b> {t('share.s3')}</li>
       </ol>
+      </>}
       <textarea ref={pasteBox} rows={3} placeholder={t('share.paste')} value={text} onChange={e => onPaste(e.target.value)} />
       {text && <p className="jr-warn">{t('share.bad')}</p>}
       {data && <>
@@ -61,6 +64,6 @@ export default function OrpShare({ country, t }: { country: string; t: (k: strin
       {data && data.fields.length < 8 && <p className="jr-warn">{t('share.wrong')}</p>}
       {data && data.fields.length >= 8 && <a ref={sendRef} onClick={afterSend} className="orp-share-send" href={`/contact?help=1&focus=contact&msg=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"><svg className="orp-share-env" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></svg>{t('share.how')}</a>}
       </div>
-    </div>
+    </details>
   )
 }

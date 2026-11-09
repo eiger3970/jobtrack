@@ -106,8 +106,12 @@ export function parseAd(text: string): ParsedAd {
     external && source ? `Ad from ${source} - contact, email and apply link are on ${source}` : ''].filter(Boolean).join(' · ')
 
   // a full address anywhere in the ad beats the bare work location ("Bahnhofstr. 1, 3954 Leukerbad")
-  const fullAddr = text.match(/[A-ZÄÖÜ][\wäöüéèà.'-]+(?:[ \t][\wäöüéèà.'-]+)*[ \t]\d+[ \t]?[a-z]?,?[ \t]+\d{4}[ \t]+[A-ZÄÖÜ][\wäöüéèà' -]+/)?.[0] ?? ''
-  const parts = splitAddress(fullAddr || address)
+  const fullAddr = text.replace(/,?[ \t]*(?:CP|Case postale|Postfach|PO Box)[ \t]*\d+/gi, '').match(/[A-ZÄÖÜ][\wäöüéèà.'-]+(?:[ \t][\wäöüéèà.'-]+)*[ \t]\d+[ \t]?[a-z]?,?[ \t]+\d{4}[ \t]+[A-ZÄÖÜ][\wäöüéèà' -]+/)?.[0] ?? ''
+  // 2026-10-26: a short pasted address from a map or phone book ("SICPA SA / Avenue de Florissant 41 / 1008 Prilly",
+  // or with "CP 419") - lines joined, box numbers dropped, then the same shape as above
+  const flat = text.length <= 400 ? ls.join(', ').replace(/,?\s*(?:CP|Case postale|Postfach|PO Box)\s*\d+/gi, '') : ''
+  const flatAddr = flat.match(/[A-ZÄÖÜÉ][^\d,]{2,}?\s\d+\s?[a-z]?,\s*\d{4}\s+[^,()]+/)?.[0] ?? ''
+  const parts = splitAddress(fullAddr || flatAddr || address)
   // 2026-10-15 owner: "Link zum Online-Formular" is the page of THIS job's form. A bare company homepage (no path) is not that link - skip it
   const link = (text.match(/https?:\/\/[^\s<>"]+/g) ?? []).map(u => u.replace(/[.,;)]+$/, '')).find(u => { try { const x = new URL(u); return x.pathname.replace(/\/+$/, '') !== '' || x.search !== '' } catch { return false } }) ?? ''
   return { role, company, address, contact, ...parts, contactPerson: person, email, phone, link,

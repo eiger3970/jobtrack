@@ -25,3 +25,9 @@ body {
 }
 
 a { color: inherit; }
+
+/* Shared feedback incentive treatment, from JobTrack. */
+.incentive-panel { border: 1.5px solid #ff4fa3; border-radius: 8px; background: rgba(255,79,163,.07); padding: .75rem 1rem; }
+.incentive-heading { display: flex; align-items: center; gap: .6rem; color: #ff4fa3; font-weight: 700; }
+.incentive-gift { flex-shrink: 0; color: #ff4fa3; vertical-align: middle; }
+.incentive-callout { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; font-size: .9rem; color: #ff4fa3; }
