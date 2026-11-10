@@ -78,9 +78,9 @@ export default function SyncFlow({ variant, label, lockTip, onLock, lockExpanded
         <g transform="rotate(-28 155 104)">
           <circle cx="140" cy="104" r="8" fill="#0f0d1c" stroke="#00ff41" strokeWidth="3.2" />
           <circle cx="140" cy="104" r="2.6" fill="#00ff41" />
-          <path d="M148 104H174" stroke="#00ff41" strokeWidth="3.4" strokeLinecap="round" />
-          {/* 4 teeth = the 4 blocks of the passphrase symbol */}
-          {[151.5, 157, 162.5, 168].map(x => <rect key={x} x={x} y="105.5" width="3.6" height="6" rx="1.2" fill="#00ff41" />)}
+          <path d="M148 104H175" stroke="#00ff41" strokeWidth="3.4" strokeLinecap="round" />
+          {/* 2026-11-10 owner: copy /admin's key - 5 teeth, heights 2-5-5-1-9 = 25519 (Ed25519, LocalSync's phone key type) */}
+          {[2, 5, 5, 1, 9].map((n, i) => <rect key={i} x={150.5 + i * 5.2} y="105.5" width="3.2" height={n * 0.65 + 0.8} rx="0.9" fill="#00ff41" />)}
         </g>
       </g>
       {/* 2026-10-14 owner: the list itself, locked - lines of mini passphrase blocks instead of text */}

@@ -321,7 +321,7 @@ export default function JobTrack() {
   // 2026-10-14: phone + computer sync - the phone arrives from the QR with #sync=
   // prerender has no navigator - counts as a computer there
   const phoneDevice = isApp() || (typeof navigator !== 'undefined' && /iPhone|iPod|Android/i.test(navigator.userAgent))
-  const [syncOpen, setSyncOpen] = useState(() => linkFromHash() !== null || (import.meta.env.DEV && window.location.hash === '#preview=sync'))
+  const [syncOpen, setSyncOpen] = useState(() => linkFromHash() !== null || (import.meta.env.DEV && /^#preview=sync(phone|lost|scan)?$/.test(window.location.hash)))
   // 2026-11-10 owner: first launch of the installed app = welcome popup, "tap here to import or sync existing data" (QR sync only)
   const WELCOME_STORAGE = 'kworld_jobtrack_welcome_seen'
   const welcomeRef = useRef<HTMLDialogElement>(null)

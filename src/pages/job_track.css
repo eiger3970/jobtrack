@@ -1407,3 +1407,21 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jt-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem; aspect-ratio: 1; padding: .5rem; border-radius: 14px; border: 1px solid #656078; background: #1a1730; color: #f0eeff; font: inherit; font-size: .85rem; font-weight: 600; line-height: 1.2; text-align: center; cursor: pointer; }
 .jt-tile svg { width: 40px; height: 40px; flex-shrink: 0; }
 .jt-tile-main { border-color: #00ff41; box-shadow: 0 0 12px rgba(0,255,65,0.35); }
+.jts-pic { display: flex; align-items: center; justify-content: center; gap: .8rem; margin: .6rem 0 1rem; }
+.jts-pic svg { width: 64px; height: 64px; }
+.jts-pic .jts-pic-arrow { width: 32px; height: 32px; }
+.jts-scan-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: .9rem; }
+.jts-scan-btn { box-shadow: 0 0 16px rgba(0,255,65,0.6); animation: jts-glow 1.8s ease-in-out infinite; }
+@keyframes jts-glow { 0%, 100% { box-shadow: 0 0 10px rgba(0,255,65,0.4); } 50% { box-shadow: 0 0 26px rgba(0,255,65,0.9); } }
+@media (prefers-reduced-motion: reduce) { .jts-scan-btn { animation: none; } }
+.jts-private { display: flex; align-items: center; gap: .5rem; margin: .8rem 0 0; font-weight: 700; color: #f0eeff; }
+.jts-hint { margin: .4rem 0; }
+.jts-hint summary { display: flex; align-items: center; gap: .6rem; cursor: pointer; list-style: none; }
+.jts-hint summary::-webkit-details-marker { display: none; }
+.jts-hint p { margin: .3rem 0 0 2.4rem; font-size: .9rem; }
+.jts-lost-head { margin: 0 0 .4rem; }
+.jts-private { justify-content: center; }
+.jts-lost .btn { display: flex; align-items: center; justify-content: center; margin: .8rem auto 0; }
+.jts-hint { display: flex; align-items: center; gap: .6rem; }
+.jts-hint svg { flex-shrink: 0; }
+.jts-hint p { margin: 0; text-align: left; }

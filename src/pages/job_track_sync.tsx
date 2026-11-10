@@ -3,6 +3,7 @@ import QRCode from 'qrcode'
 import type { ReactNode } from 'react'
 import { type Application } from '../lib/orp'
 import { isApp } from '../lib/platform'
+import { ShieldLink } from '../components/security_shield'
 import SyncFlow from '../components/sync_flow'
 import { merge, baseOf, newRoom, newKey, linkFromHash, linkFromText, openLink, type Base, type MergeResult, type SyncLink } from '../lib/jobtrack_sync'
 
@@ -111,7 +112,7 @@ function Scanner({ L, onLink }: { L: Tx; onLink: (l: { room: string; key: string
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return err
-    ? <p className="jts-lost">{L('No camera. Settings -> JobTrack (or Safari) -> Camera -> Allow, then try again.', 'Keine Kamera. Einstellungen -> JobTrack (oder Safari) -> Kamera -> Erlauben, dann nochmals.', 'Pas de caméra. Réglages -> JobTrack (ou Safari) -> Appareil photo -> Autoriser, puis réessayez.')}</p>
+    ? <p className="jts-lost" style={{ display: 'flex', alignItems: 'center', gap: '.7rem', textAlign: 'left' }}><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#ffb020" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}><path d="M2 2l20 20M9 5h5l1.5 2H19a2 2 0 0 1 2 2v8M5 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14" /><path d="M10 10a3.5 3.5 0 0 0 4.5 4.5" /></svg><span><b>{L('No camera?', 'Keine Kamera?', 'Pas de caméra ?')}</b><br />{L('Settings -> JobTrack (or browser) -> Camera -> Allow -> try again.', 'Einstellungen -> JobTrack (oder Browser) -> Kamera -> Erlauben -> nochmals.', 'Réglages -> JobTrack (ou navigateur) -> Appareil photo -> Autoriser -> réessayer.')}</span></p>
     : <video ref={video} className="jts-cam" playsInline muted />
 }
 
@@ -158,9 +159,9 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
   const L: Tx = (en, de, fr) => (lang === 'de' ? de : lang === 'fr' ? fr : en)
   // the phone arrives with #sync=...&e=... from the QR, or scans it (app)
   const [hashLink] = useState(linkFromHash)
-  const phone = hashLink !== null || onPhone()
+  const phone = hashLink !== null || onPhone() || (import.meta.env.DEV && /^#preview=sync(phone|lost|scan)$/.test(window.location.hash))
   const [link, setLink] = useState<{ room: string; key: string } | null>(() => hashLink ?? (phone ? null : { room: newRoom(), key: newKey() }))
-  const [state, setState] = useState<State>(hashLink ? 'waiting' : 'start')
+  const [state, setState] = useState<State>(import.meta.env.DEV && window.location.hash === '#preview=synclost' ? 'lost' : import.meta.env.DEV && window.location.hash === '#preview=syncscan' ? 'scan' : hashLink ? 'waiting' : 'start')
   const [qr, setQr] = useState('')
   const [result, setResult] = useState<MergeResult | null>(null)
   const [attempt, setAttempt] = useState(0)
@@ -251,12 +252,21 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
         extra={hasCv && <label className="jts-check"><input type="checkbox" checked={withCv} onChange={e => setWithCv(e.target.checked)} />{L('Also my CV from the CV page (not synced - download it first)', 'Auch meinen Lebenslauf von der CV-Seite (nicht synchronisiert - zuerst herunterladen)', 'Aussi mon CV de la page CV (non synchronisé - téléchargez-le avant)')}</label>} />
     </div>}
   </>)
+  else if (state === 'lost' && phone) body = (
+    <div className="jts-lost">
+      <p className="jts-lost-head" role="status" aria-label={L('No link to the other device.', 'Keine Verbindung zum anderen Gerät.', "Pas de lien avec l'autre appareil.")}><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#ffb020" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3l10 18H2L12 3zM12 10v5M12 18h.01" /></svg></p>
+      {/* 2026-11-10 owner: an image before 1. and 2., the text folded up by default */}
+      <div className="jts-hint"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#4da3ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /><rect x="8" y="6" width="3" height="3" /><rect x="13" y="6" width="3" height="3" /><rect x="8" y="11" width="3" height="3" /><path d="M13 11h3v3" /></svg><b className="jts-num">1.</b><p>{L('Computer -> kworld.space/jobtrack -> Sync phone + computer: is the QR still open?', 'Computer -> kworld.space/jobtrack -> Sync Telefon + Computer: ist der QR noch offen?', 'Ordinateur -> kworld.space/jobtrack -> Sync téléphone + ordinateur: le QR est-il encore ouvert?')}</p></div>
+      <div className="jts-hint"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#00ff41" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0" /><circle cx="12" cy="19.5" r="1" /></svg><b className="jts-num">2.</b><p><b>{L('Cable or Wi-Fi', 'Kabel oder WLAN', 'Câble ou Wi-Fi')}</b><br />{L('cable: unplug, plug back in firmly', 'Kabel: ausstecken, fest wieder einstecken', 'câble: débranchez, rebranchez bien')}<br />{L('Wi-Fi: off and on again, on both devices', 'WLAN: aus und wieder ein, auf beiden Geräten', 'Wi-Fi: désactivez puis réactivez, sur les deux appareils')}</p></div>
+      <button className="btn btn-glow" onClick={again} aria-label={L('Try again', 'Nochmals versuchen', 'Réessayer')}><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5" /></svg></button>
+    </div>
+  )
   else if (state === 'lost') body = (
     <div className="jts-lost">
       <p>{L('No link to the other device.', 'Keine Verbindung zum anderen Gerät.', "Pas de lien avec l'autre appareil.")}</p>
       <ol>
         <li>{L('Computer -> kworld.space/jobtrack -> Sync phone + computer: is the QR still open?', 'Computer -> kworld.space/jobtrack -> Sync Telefon + Computer: ist der QR noch offen?', 'Ordinateur -> kworld.space/jobtrack -> Sync téléphone + ordinateur: le QR est-il encore ouvert?')}</li>
-        <li>{L('Both devices online (Wi-Fi or mobile data)?', 'Beide Geräte online (WLAN oder mobile Daten)?', 'Les deux appareils en ligne (Wi-Fi ou données mobiles)?')}</li>
+        <li><b>{L('Cable or Wi-Fi', 'Kabel oder WLAN', 'Câble ou Wi-Fi')}</b><br />{L('cable: unplug, plug back in firmly', 'Kabel: ausstecken, fest wieder einstecken', 'câble: débranchez, rebranchez bien')}<br />{L('Wi-Fi: off and on again, on both devices', 'WLAN: aus und wieder ein, auf beiden Geräten', 'Wi-Fi: désactivez puis réactivez, sur les deux appareils')}</li>
       </ol>
       <button className="btn btn-glow" onClick={again}>{L('Try again', 'Nochmals versuchen', 'Réessayer')}</button>
     </div>
@@ -264,10 +274,17 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
   else if (phone && !link) body = state === 'scan'
     ? <><p className="jts-step">{L("Point at the computer's QR code", 'Auf den QR-Code des Computers richten', "Visez le code QR de l'ordinateur")}</p><Scanner L={L} onLink={l => { setLink(l); setState('waiting') }} /></>
     : <>
-      <p className="jts-step">{L('Computer -> kworld.space/jobtrack -> Sync phone + computer -> a QR code', 'Computer -> kworld.space/jobtrack -> Sync Telefon + Computer -> ein QR-Code', 'Ordinateur -> kworld.space/jobtrack -> Sync téléphone + ordinateur -> un code QR')}</p>
-      <button className="btn btn-glow" onClick={() => setState('scan')}>{L('Scan the QR code', 'QR-Code scannen', 'Scanner le code QR')}</button>
+      {/* 2026-11-10 owner: "way too complicated ... no text, just images" - computer shows a QR, phone scans it */}
+      <div className="jts-pic" role="img" aria-label={L('Computer shows a QR code, phone scans it', 'Computer zeigt einen QR-Code, Telefon scannt ihn', "L'ordinateur affiche un code QR, le téléphone le scanne")}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4da3ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /><rect x="8" y="6" width="3" height="3" /><rect x="13" y="6" width="3" height="3" /><rect x="8" y="11" width="3" height="3" /><path d="M13 11h3v3" /></svg>
+        <svg className="jts-pic-arrow" viewBox="0 0 24 24" fill="none" stroke="#f0eeff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6" /></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00ff41" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" /><path d="M9 8V6h2M15 8V6h-2M9 14v2h2M15 14v2h-2M10 11h4" /></svg>
+      </div>
+      <button className="btn btn-glow jts-scan-btn" aria-label={L('Scan the QR code', 'QR-Code scannen', 'Scanner le code QR')} onClick={() => setState('scan')}>
+        <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16" /></svg>
+      </button>
     </>
-  else if (phone) body = <p className="jts-wait"><span className="jts-spin" />{state === 'syncing' ? L('Syncing...', 'Synchronisiere...', 'Synchronisation...') : L('Linking to the computer...', 'Verbinde mit dem Computer...', "Connexion à l'ordinateur...")}</p>
+  else if (phone) body = <p className="jts-wait" role="status" aria-label={state === 'syncing' ? L('Syncing...', 'Synchronisiere...', 'Synchronisation...') : L('Linking to the computer...', 'Verbinde mit dem Computer...', "Connexion à l'ordinateur...")}><span className="jts-spin" /></p>
   else body = (<>
     {/* 2026-10-14 owner: a clear hint - sync first, then clear the shared computer */}
     <ol className="jts-steps">
@@ -290,19 +307,20 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
 
   return (
     <div className="modal" onClick={close}>
-      <div className="modal-content jts-panel" onClick={e => e.stopPropagation()}>
-        <h2 className="jts-title">{title}</h2>
+      <div className="modal-content jts-panel" aria-label={title} onClick={e => e.stopPropagation()}>
+        {!phone && <h2 className="jts-title">{title}</h2>}
         {body}
-        {link && state !== 'done' && state !== 'lost' && state !== 'cleared' && <p className="jts-match">{L('Same words on both screens = your devices are linked, secure and encrypted', 'Gleiche Wörter auf beiden Bildschirmen = Ihre Geräte sind verbunden, sicher und verschlüsselt', 'Mêmes mots sur les deux écrans = vos appareils sont liés, sécurisés et chiffrés')}:<code className="jts-words">{words(link.room)}</code></p>}
+        {link && state !== 'done' && state !== 'lost' && state !== 'cleared' && <p className="jts-match">{!phone && <>{L('Same words on both screens = your devices are linked, secure and encrypted', 'Gleiche Wörter auf beiden Bildschirmen = Ihre Geräte sind verbunden, sicher und verschlüsselt', 'Mêmes mots sur les deux écrans = vos appareils sont liés, sécurisés et chiffrés')}:</>}<code className="jts-words">{words(link.room)}</code></p>}
         {state !== 'cleared' && <>
           {/* 2026-10-14 owner: same picture as /transfer - shared component, relay variant */}
+          <p className="jts-private"><ShieldLink topic="transfers" iconOnly size={22} />{L('Private and secure', 'Privat und sicher', 'Privé et sécurisé')}</p>
           <SyncFlow variant="relay" className="trx-flow jts-flow"
             label={L('The lock key lives only on your phone and computer. Our server passes the list on, locked, and sees only that two devices linked.', 'Der Schlüssel liegt nur auf Telefon und Computer. Unser Server reicht die Liste verschlossen weiter und sieht nur, dass zwei Geräte verbunden sind.', "La clé n'existe que sur votre téléphone et votre ordinateur. Notre serveur transmet la liste verrouillée et voit seulement que deux appareils sont liés.")}
             lockTip={L('The secret key - tap to learn about passphrases', 'Der geheime Schlüssel - tippen, mehr über Passphrasen', 'La clé secrète - touchez pour en savoir plus')}
             onLock={() => window.open('/passphrase#why', '_blank', 'noopener')} />
-          {state !== 'done' && <Points L={L} />}
+          {state !== 'done' && !phone && <Points L={L} />}
         </>}
-        <div className="modal-buttons"><button className="btn-secondary" onClick={close}>{L('Close', 'Schliessen', 'Fermer')}</button></div>
+        <div className="modal-buttons"><button className="btn-secondary" onClick={close} aria-label={L('Close', 'Schliessen', 'Fermer')}>{phone ? <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg> : L('Close', 'Schliessen', 'Fermer')}</button></div>
       </div>
     </div>
   )
