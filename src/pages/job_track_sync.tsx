@@ -173,6 +173,18 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
   const [qr, setQr] = useState('')
   const [result, setResult] = useState<MergeResult | null>(null)
   const [attempt, setAttempt] = useState(0)
+  // computer: the QR stays open 5 minutes; a small countdown shows the last minute, then the 'no link' help fades in
+  const deskEnd = useRef(Date.now() + 300000)
+  const [deskLeft, setDeskLeft] = useState<number | null>(null)
+  useEffect(() => {
+    if (phone) return
+    const id = setInterval(() => {
+      const secs = Math.ceil((deskEnd.current - Date.now()) / 1000)
+      setDeskLeft(secs <= 60 ? Math.max(secs, 0) : null)
+      if (secs <= 0 && !import.meta.env.DEV) setState(st => (st === 'start' || st === 'waiting' ? 'lost' : st))
+    }, 500)
+    return () => clearInterval(id)
+  }, [phone])
   const [withCv, setWithCv] = useState(false)
   const hasCv = (() => { try { return localStorage.getItem('cvgen-data') !== null } catch { return false } })()
   // fresh values inside the socket callbacks
@@ -189,13 +201,14 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
     if (!link) return
     // localhost preview only: the relay refuses localhost, so a failed connect would hide the QR
     if (import.meta.env.DEV && window.location.hash.startsWith('#preview=sync')) return
-    let l: SyncLink | null = null, sent = false, gone = false
+    let l: SyncLink | null = null, sent = false, gone = false, retry: ReturnType<typeof setTimeout> | undefined
     const role = phone ? 'phone' : 'computer'
     // phone: no answer within 25 s -> say so, offer to try again
     const timer = phone ? setTimeout(() => { if (!gone) setState(s => (s === 'done' ? s : 'lost')) }, 25000) : undefined
     openLink(link.room, link.key, role, {
       open: () => {},
-      lost: () => setState(s => (s === 'done' || s === 'cleared' ? s : 'lost')),
+      // computer: the relay closes idle sockets - reconnect quietly, the QR stays valid; the countdown decides when to give up
+      lost: () => { if (!phone) { if (!gone) retry = setTimeout(() => setAttempt(n => n + 1), 1000) } else setState(s => (s === 'done' || s === 'cleared' ? s : 'lost')) },
       peers: n => {
         if (phone && n >= 2 && !sent && l) {
           sent = true
@@ -226,8 +239,8 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
     }).then(x => {
       if (gone) { x.close(); return }
       l = x
-    }).catch(() => setState('lost'))
-    return () => { gone = true; clearTimeout(timer); l?.close() }
+    }).catch(() => { if (phone) setState('lost'); else if (!gone) retry = setTimeout(() => setAttempt(n => n + 1), 2000) })
+    return () => { gone = true; clearTimeout(timer); clearTimeout(retry); l?.close() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [link, attempt])
 
@@ -241,6 +254,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
     setTimeout(() => { clearComputer(withCv); setState('cleared') }, 0)
   }
   function again() {
+    deskEnd.current = Date.now() + 300000
     setState(phone && !hashLink ? 'scan' : phone ? 'waiting' : 'start')
     if (phone && !hashLink) setLink(null)
     setAttempt(a => a + 1)
@@ -298,7 +312,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
         <svg className="jts-pic-arrow" viewBox="0 0 24 24" fill="none" stroke="#f0eeff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6" /></svg>
         <svg viewBox="0 0 24 24" fill="none" stroke="#4da3ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /><rect x="8" y="6" width="3" height="3" /><rect x="13" y="6" width="3" height="3" /><rect x="8" y="11" width="3" height="3" /><path d="M13 11h3v3" /></svg>
       </div>
-    <div className="jts-qr-wrap">{qr ? <img className="jts-qr" src={qr} alt={L('QR code to sync', 'QR-Code zum Synchronisieren', 'Code QR pour synchroniser')} /> : <div className="jts-qr" />}</div>
+    <div className="jts-qr-wrap">{qr ? <img className="jts-qr" src={qr} alt={L('QR code to sync', 'QR-Code zum Synchronisieren', 'Code QR pour synchroniser')} /> : <div className="jts-qr" />}{deskLeft !== null && state !== 'syncing' && <button type="button" className="jts-cam-timer" onClick={() => { deskEnd.current = Date.now() + 300000; setDeskLeft(null) }} aria-label={L('QR code closes soon. Click for more time.', 'QR-Code schliesst bald. Klicken für mehr Zeit.', "Le code QR se ferme bientôt. Cliquez pour plus de temps.")}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2M9 2h6" /></svg>0:{String(deskLeft).padStart(2, '0')}</button>}</div>
     <p className="jts-qr-line"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#00ff41" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" /><path d="M9 8V6h2M15 8V6h-2M9 14v2h2M15 14v2h-2M10 11h4" /></svg><span><span className="jts-dev-phone">Phone:</span> scan this QR code</span></p>
     {state === 'syncing' && <p className="jts-wait" role="status"><span className="jts-spin" /></p>}
     {/* greyed out on purpose: nothing may be cleared before the list is safe on the phone; it unlocks after the sync */}

@@ -1484,3 +1484,6 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jts-private-link:hover { text-decoration: underline; }
 .jts-private-link svg { color: #00ff41; }
 .jts-cam-timer { position: absolute; right: .5rem; bottom: .5rem; z-index: 3; display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .6rem; border-radius: 999px; border: 1.5px solid #ffbe3c; background: rgba(3,2,10,.85); color: #ffbe3c; font: inherit; font-size: .9rem; font-weight: 800; cursor: pointer; animation: jts-help-in .3s ease-out; }
+.jts-qr-wrap { position: relative; }
+.jts-lost { animation: jts-lost-in .8s ease-out; }
+@keyframes jts-lost-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }

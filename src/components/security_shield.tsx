@@ -124,7 +124,7 @@ const LABEL = { en: 'Website security', de: 'Website-Sicherheit', fr: 'S√©curit√
 export function ShieldLink({ topic = 'about', point, label, iconOnly = false, className = '', size, children }: { topic?: SecurityTopic; point?: string; label?: string; iconOnly?: boolean; className?: string; size?: number; children?: ReactNode }) {
   const { lang } = useLanguage()
   const description = `${LABEL[lang]}: ${SECURITY_TOPICS[topic][lang]}`
-  return <a className={`shield-link ${className}`} href={'https://kworld.space' + securityHref(topic, point)} target="_blank" rel="noopener noreferrer" aria-label={description} title={description} onClick={e => e.stopPropagation()} style={iconOnly && !children ? { display: 'inline-flex', verticalAlign: 'middle', alignItems: 'center', marginLeft: '.35rem', color: 'var(--nebula-teal, #00ff41)' } : undefined}>{children ?? <ShieldIcon size={size} />}{!iconOnly && <> {label ?? LABEL[lang]}</>}</a>
+  return <a className={`shield-link ${className}`} href={'https://kworld.space' + securityHref(topic, point).replace('#', '?open=' + Date.now() + '#')} target="_blank" rel="noopener noreferrer" aria-label={description} title={description} onClick={e => e.stopPropagation()} style={iconOnly && !children ? { display: 'inline-flex', verticalAlign: 'middle', alignItems: 'center', marginLeft: '.35rem', color: 'var(--nebula-teal, #00ff41)' } : undefined}>{children ?? <ShieldIcon size={size} />}{!iconOnly && <> {label ?? LABEL[lang]}</>}</a>
 }
 
 export const DOWNLOAD_TIPS = {
