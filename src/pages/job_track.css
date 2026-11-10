@@ -1399,3 +1399,11 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 @media (max-width: 640px) { .jtb-choices.jtb-simple li { grid-template-columns: 1fr; } }
 .jts-panel .jtb-choices.jtb-simple li { grid-template-columns: 1fr; }
 .jr-rate-label { margin: 0.2rem 0 0.4rem; font-size: 0.9rem; color: #b8b4c8; }
+
+
+.jt-welcome-head { display: flex; align-items: center; gap: .6rem; margin: 0 0 .8rem; }
+.jt-welcome-head img { width: 2.4rem; height: 2.4rem; border-radius: 22%; flex-shrink: 0; }
+.jt-welcome-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+.jt-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem; aspect-ratio: 1; padding: .5rem; border-radius: 14px; border: 1px solid #656078; background: #1a1730; color: #f0eeff; font: inherit; font-size: .85rem; font-weight: 600; line-height: 1.2; text-align: center; cursor: pointer; }
+.jt-tile svg { width: 40px; height: 40px; flex-shrink: 0; }
+.jt-tile-main { border-color: #00ff41; box-shadow: 0 0 12px rgba(0,255,65,0.35); }

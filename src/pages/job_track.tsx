@@ -322,6 +322,14 @@ export default function JobTrack() {
   // prerender has no navigator - counts as a computer there
   const phoneDevice = isApp() || (typeof navigator !== 'undefined' && /iPhone|iPod|Android/i.test(navigator.userAgent))
   const [syncOpen, setSyncOpen] = useState(() => linkFromHash() !== null || (import.meta.env.DEV && window.location.hash === '#preview=sync'))
+  // 2026-11-10 owner: first launch of the installed app = welcome popup, "tap here to import or sync existing data" (QR sync only)
+  const WELCOME_STORAGE = 'kworld_jobtrack_welcome_seen'
+  const welcomeRef = useRef<HTMLDialogElement>(null)
+  useEffect(() => {
+    const force = import.meta.env.DEV && window.location.search.includes('welcome')
+    if (force || (isApp() && apps.length === 0 && readStored(WELCOME_STORAGE) !== '1')) welcomeRef.current?.showModal()
+  }, [])
+  const closeWelcome = (sync: boolean) => { try { localStorage.setItem(WELCOME_STORAGE, '1') } catch { /* blocked */ } welcomeRef.current?.close(); if (sync) setSyncOpen(true) }
   const [showStorageInfo, setShowStorageInfo] = useState(false)
   const infoRef = useRef<HTMLDivElement>(null)
   const [showEmailInfo, setShowEmailInfo] = useState(false)
@@ -1432,6 +1440,14 @@ export default function JobTrack() {
       </div>
 
       {orpPanel && <OrpPanel apps={apps} onSync={() => setSyncOpen(true)} initialCleanup={orpCleanup} t={t} onClose={() => setOrpPanel(false)} onUpdate={(id, patch) => setApps(prev => prev.map(x => x.id === id ? { ...x, ...patch } : x))} />}
+      <dialog ref={welcomeRef} className="jt-notes-dialog jt-welcome" onCancel={() => closeWelcome(false)}>
+        <h2 className="jt-welcome-head"><img src={jobTrackIcon} alt="" />Welcome to JobTrack</h2>
+        <div className="jt-welcome-tiles">
+          <button type="button" className="jt-tile jt-tile-main" onClick={() => closeWelcome(true)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="11" y="2" width="11" height="8" rx="1" stroke="#4da3ff" /><rect x="2" y="12" width="6" height="10" rx="1.5" stroke="#00ff41" /><path d="M10 16l2-2m-1-3 2-2" /></svg><span>Import or sync</span></button>
+          <button type="button" className="jt-tile" onClick={() => { closeWelcome(false); backupInputRef.current?.click() }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5M12 17v-6m-3 3 3-3 3 3" /></svg><span>Open backup file</span></button>
+          <button type="button" className="jt-tile" onClick={() => closeWelcome(false)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" /></svg><span>Start a new list</span></button>
+        </div>
+      </dialog>
       {syncOpen && <JobTrackSync lang={lang} apps={apps} quota={quota} setApps={setApps} setQuota={setQuota} onClose={() => setSyncOpen(false)} />}
 
       {modal && (
