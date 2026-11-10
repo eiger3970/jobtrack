@@ -1504,13 +1504,13 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jts-private + .jts-match { margin: .1rem 0 .8rem; }
 
 /* edge map (components/job_map.tsx): faint at rest, solid while scrolling or dragging */
-.jt-map { position: fixed; right: 3px; top: 96px; bottom: 96px; width: 16px; z-index: 40; opacity: .35; transition: opacity .25s; pointer-events: none; }
+.jt-map { position: fixed; right: 3px; top: 96px; bottom: 96px; width: 22px; z-index: 40; opacity: .35; transition: opacity .25s; pointer-events: none; }
 .jt-map-on { opacity: 1; }
 .jt-map-bar { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 0; border-radius: 8px; background: rgba(20,19,42,.7); overflow: hidden; pointer-events: auto; cursor: pointer; }
 .jt-map-bar i { flex: 1 1 0; min-height: 0; background: #5b5a7a; border-bottom: .5px solid rgba(3,2,10,.5); }
 .jt-map-bar i.jt-map-m { background: #d8d6f0; }
-.jt-map-month { position: absolute; right: 20px; width: 1.9rem; min-height: 1.9rem; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #5b5a7a; border-radius: 4px; background: rgba(20,19,42,.92); font-size: .62rem; line-height: 1.1; font-weight: 700; color: #d8d6f0; white-space: nowrap; pointer-events: none; }
-.jt-map-month small { font-size: .5rem; font-weight: 400; color: #8f8dae; }
+.jt-map-month { position: absolute; right: 0; width: 100%; display: flex; flex-direction: column; align-items: center; font-size: .5rem; line-height: 1; font-weight: 700; color: #f0eeff; text-shadow: 0 0 2px #03020a, 0 0 2px #03020a, 0 0 2px #03020a; white-space: nowrap; pointer-events: none; z-index: 1; }
+.jt-map-month small { font-size: .45rem; font-weight: 400; color: #b8b6d0; }
 .jt-map-bar b { position: absolute; left: -1px; right: -1px; min-height: 8px; border: 2px solid #3ddc84; border-radius: 5px; box-sizing: border-box; pointer-events: none; }
 .jt-map-label { position: absolute; right: 22px; top: 50%; transform: translateY(-50%); padding: .35rem .7rem; border-radius: 999px; background: #3ddc84; color: #03020a; font-weight: 700; font-size: .85rem; white-space: nowrap; opacity: 0; transition: opacity .25s; pointer-events: none; }
 .jt-map-on .jt-map-label { opacity: 1; }
