@@ -79,6 +79,11 @@ function Done({ r, L }: { r: MergeResult; L: Tx }) {
 function Scanner({ L, onLink }: { L: Tx; onLink: (l: { room: string; key: string }) => void }) {
   const video = useRef<HTMLVideoElement>(null)
   const [err, setErr] = useState(false)
+  // localhost preview on a computer without a webcam: keep the camera square and the prompt on screen
+  const keepPreview = import.meta.env.DEV && window.location.hash.startsWith('#preview=sync')
+  // 2026-11-10 owner: the camera needs an automatic prompt saying what to scan; fades after 8 s, ? brings it back
+  const [help, setHelp] = useState(true)
+  useEffect(() => { const a = setTimeout(() => setHelp(false), 10000), b = setTimeout(() => setHelp(true), 25000); return () => { clearTimeout(a); clearTimeout(b) } }, [])
   useEffect(() => {
     let stream: MediaStream | null = null, stop = false
     let jsQR: typeof import('jsqr').default | null = null
@@ -107,13 +112,17 @@ function Scanner({ L, onLink }: { L: Tx; onLink: (l: { room: string; key: string
       stream = s
       if (video.current) { video.current.srcObject = s; void video.current.play() }
       tick()
-    }).catch(() => setErr(true)) ?? setErr(true)
+    }).catch(() => { if (!keepPreview) setErr(true) }) ?? (keepPreview || setErr(true))
     return () => { stop = true; stream?.getTracks().forEach(t => t.stop()) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return err
     ? <p className="jts-lost" style={{ display: 'flex', alignItems: 'center', gap: '.7rem', textAlign: 'left' }}><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#ffb020" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}><path d="M2 2l20 20M9 5h5l1.5 2H19a2 2 0 0 1 2 2v8M5 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14" /><path d="M10 10a3.5 3.5 0 0 0 4.5 4.5" /></svg><span><b>{L('No camera?', 'Keine Kamera?', 'Pas de caméra ?')}</b><br />{L('Settings -⁠> JobTrack (or browser) -⁠> Camera -⁠> Allow -⁠> try again.', 'Einstellungen -⁠> JobTrack (oder Browser) -⁠> Kamera -⁠> Erlauben -⁠> nochmals.', 'Réglages -⁠> JobTrack (ou navigateur) -⁠> Appareil photo -⁠> Autoriser -⁠> réessayer.')}</span></p>
-    : <div className="jts-cam-wrap"><svg className="jts-cam-icon" viewBox="0 0 24 24" fill="none" stroke="#00ff41" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3" /></svg><video ref={video} className="jts-cam" playsInline muted aria-label={L('Camera: point at the QR code on the computer', 'Kamera: auf den QR-Code am Computer richten', "Caméra: visez le code QR de l'ordinateur")} /></div>
+    : <div className="jts-cam-wrap"><video ref={video} className="jts-cam" playsInline muted aria-label={L('Camera: point at the QR code on the computer', 'Kamera: auf den QR-Code am Computer richten', "Caméra: visez le code QR de l'ordinateur")} /><svg className="jts-cam-sight" viewBox="0 0 24 24" fill="none" stroke="#00ff41" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 9V5h4M15 5h4v4M19 15v4h-4M9 19H5v-4M10 12h4" /></svg>{help ? <button type="button" className="jts-cam-help" onClick={() => setHelp(false)} aria-label={L('Where to find the QR code: on your computer open kworld.space/jobtrack, tap the blue computer and green phone icon, then scan the QR code', 'Wo der QR-Code ist: am Computer kworld.space/jobtrack öffnen, das Symbol mit blauem Computer und grünem Telefon tippen, dann den QR-Code scannen', "Où trouver le code QR : sur l'ordinateur ouvrez kworld.space/jobtrack, touchez l'icône ordinateur bleu et téléphone vert, puis scannez le code QR")}>
+          <span className="jts-help-row"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#4da3ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /></svg><b>1.</b><span className="jts-help-txt"><span className="jts-dev-desk">Desktop:</span> <code>kworld.space/jobtrack</code></span></span>
+          <span className="jts-help-row"><span className="jts-help-btn"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="11" y="2" width="11" height="8" rx="1" stroke="#4da3ff" /><path d="M16.5 10v3m-3 0h6" stroke="#4da3ff" /><rect x="2" y="12" width="6" height="10" rx="1.5" stroke="#00ff41" /><path d="M10 16l2-2m-1-3 2-2" stroke="#00ff41" strokeDasharray="1 3" /></svg></span><b>2.</b><span><span className="jts-dev-desk">Desktop:</span> tap this icon</span></span>
+          <span className="jts-help-row"><span className="jts-help-pair"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#00ff41" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" /><path d="M9 8V6h2M15 8V6h-2M9 14v2h2M15 14v2h-2M10 11h4" /></svg></span><b>3.</b><span><span className="jts-dev-phone">Phone:</span> scan the QR code</span></span>
+        </button> : <button type="button" className="jts-cam-q" onClick={() => setHelp(true)} aria-label={L('Help', 'Hilfe', 'Aide')}>?</button>}</div>
 }
 
 type State = 'start' | 'scan' | 'waiting' | 'syncing' | 'done' | 'lost' | 'cleared'
@@ -318,7 +327,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
             onLock={() => window.open('/passphrase#why', '_blank', 'noopener')} />
           {state !== 'done' && !phone && <Points L={L} />}
         </>}
-        <div className="modal-buttons"><button className="btn-secondary" onClick={close} aria-label={L('Close', 'Schliessen', 'Fermer')}>{phone ? <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg> : L('Close', 'Schliessen', 'Fermer')}</button></div>
+        {!phone && <div className="modal-buttons"><button className="btn-secondary" onClick={close} aria-label={L('Close', 'Schliessen', 'Fermer')}>{phone ? <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg> : L('Close', 'Schliessen', 'Fermer')}</button></div>}
       </div>
     </div>
   )

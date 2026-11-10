@@ -1433,3 +1433,39 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 /* 2026-11-10 owner: pictures too big on the no-camera screen */
 .jts-pic svg { width: 40px; height: 40px; }
 .jts-pic .jts-pic-arrow { width: 22px; height: 22px; }
+.jts-cam-help { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .7rem; padding: 1rem; border: 0; border-radius: 12px; background: rgba(3,2,10,.82); color: #f0eeff; font: inherit; font-size: 1rem; font-weight: 700; text-align: center; cursor: pointer; animation: jts-help-in .4s ease-out; }
+@keyframes jts-help-in { from { opacity: 0; } to { opacity: 1; } }
+.jts-cam-q { position: absolute; right: .5rem; bottom: .5rem; z-index: 2; width: 2rem; height: 2rem; border-radius: 50%; border: 1.5px solid #00ff41; background: rgba(3,2,10,.7); color: #00ff41; font: inherit; font-weight: 800; cursor: pointer; }
+.jts-cam-help { align-items: stretch; gap: .9rem; }
+.jts-help-row { display: flex; align-items: center; gap: .6rem; text-align: left; font-size: .95rem; }
+.jts-help-row svg { flex-shrink: 0; }
+.jts-help-row code { font-size: .85rem; color: #4da3ff; }
+.jts-pic-url { font-size: .9rem; font-weight: 700; color: #4da3ff; letter-spacing: .02em; margin-top: .1rem; }
+.jts-help-btn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 10px; border: 1px solid rgba(0,255,65,.6); background: rgba(0,255,65,.08); flex-shrink: 0; }
+.jts-help-pair { display: inline-flex; align-items: center; gap: .15rem; flex-shrink: 0; }
+.jts-help-txt { display: flex; flex-direction: row; align-items: baseline; gap: .3rem; white-space: nowrap; font-size: .85rem; }
+.jts-help-txt code { font-size: .78rem; }
+.jts-dev-desk { color: #4da3ff; font-weight: 800; }
+.jts-dev-phone { color: #00ff41; font-weight: 800; }
+/* one line per step inside the camera square */
+.jts-cam-help { padding: .5rem .6rem; gap: .8rem; }
+.jts-help-row { gap: .4rem; font-size: .8rem; white-space: nowrap; }
+.jts-help-row > svg { width: 24px; height: 24px; }
+.jts-help-row .jts-help-pair svg { width: 22px; height: 22px; }
+.jts-help-btn { width: 32px; height: 32px; }
+.jts-help-btn svg { width: 22px; height: 22px; }
+.jts-help-txt { font-size: .8rem; gap: .25rem; }
+.jts-help-txt code { font-size: .7rem; }
+/* use the free room on the right: bigger again, still one line each */
+.jts-help-row { font-size: .9rem; }
+.jts-help-row > svg { width: 27px; height: 27px; }
+.jts-help-row .jts-help-pair svg { width: 24px; height: 24px; }
+.jts-help-btn { width: 36px; height: 36px; }
+.jts-help-btn svg { width: 25px; height: 25px; }
+.jts-help-txt { font-size: .9rem; }
+.jts-help-txt code { font-size: .8rem; }
+.jts-help-txt code { font-size: .76rem; }
+.jts-cam-sight { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; filter: drop-shadow(0 0 3px rgba(0,255,65,.7)); }
+/* all three steps one size, scaling with the camera square (wider phone = bigger text) */
+.jts-cam-wrap { container-type: inline-size; }
+.jts-help-row, .jts-help-txt, .jts-help-txt code { font-size: min(1.1rem, 4.4cqw); }
