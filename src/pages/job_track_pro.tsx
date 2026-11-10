@@ -84,7 +84,9 @@ export default function JobTrackPro({ apps, lang }: { apps: App[]; lang: string 
           <div key={c.k} className="jt-pro-card"><div className="jt-pro-k">{c.k}</div><div className="jt-pro-v">{pro ? c.v : '00%'}</div><div className="jt-pro-s">{pro ? c.s : '······'}</div></div>
         ))}
       </div>
-      {pro ? (
+      {pro && cal.count === 0 ? (
+        <div className="jt-pro-cal"><p className="jt-pro-hint">{L('No follow-ups to add yet. Give a job a Next date and it appears here.', 'Noch keine Nachfass-Termine. Gib einer Bewerbung ein nächstes Datum, dann erscheint sie hier.', 'Aucune relance à ajouter. Donnez une prochaine date à une candidature et elle apparaît ici.')}</p></div>
+      ) : pro ? (
         <div className="jt-pro-cal">
           <button type="button" className="btn-secondary export-btn" onClick={downloadCalendar} disabled={!cal.count}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /><path d="M12 14v4M10 16h4" /></svg>

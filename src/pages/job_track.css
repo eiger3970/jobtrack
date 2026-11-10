@@ -302,7 +302,7 @@
 .jt-note { display: block; font-size: .72rem; color: var(--text-dim, #a0a0b0); margin-top: 2px; font-weight: 400; }
 .jt-sortable { cursor: pointer; user-select: none; } .jt-sortable:hover { text-decoration: underline; }
 /* 2026-10-06: JobTrack Pro - what's working */
-.jt-pro { margin: -2rem 0 3.5rem; }
+.jt-pro { margin: 1.25rem 0 3.5rem; }  /* 2026-11-10 owner: heading overlapped the pink share box above it */
 .jt-pro-h { display: flex; align-items: center; gap: .6rem; font-size: 1.2rem; color: #f0eeff; margin: 0 0 1rem; }
 .jt-pro-tag { font-size: .72rem; color: #03020a; background: #ffb000; border-radius: 6px; padding: .1rem .45rem; font-weight: 800; }
 .jt-pro-cards { display: flex; gap: 1rem; flex-wrap: wrap; }
@@ -347,6 +347,7 @@
 .howto-go:hover:not(:disabled) { background: rgba(0,255,65,0.14); border-color: #00ff41; }
 .howto-go:disabled { opacity: 0.45; cursor: default; }
 .howto-go svg { width: 20px; height: 20px; color: #00ff41; flex-shrink: 0; }
+.howto-strip .howto-go { width: 16rem; max-width: 100%; justify-content: flex-start; box-sizing: border-box; }  /* 2026-11-10 owner: the three step buttons one width */
 .howto-go-main { border-color: #00ff41; box-shadow: 0 0 12px rgba(0,255,65,0.35); font-weight: 700; }
 .orp-paper { margin-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.6rem; display: grid; gap: 0.5rem; }
 .orp-paper summary { cursor: pointer; color: var(--text-dim); font-size: .85rem; }
