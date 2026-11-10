@@ -1407,11 +1407,10 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jt-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem; aspect-ratio: 1; padding: .5rem; border-radius: 14px; border: 1px solid #656078; background: #1a1730; color: #f0eeff; font: inherit; font-size: .85rem; font-weight: 600; line-height: 1.2; text-align: center; cursor: pointer; }
 .jt-tile svg { width: 40px; height: 40px; flex-shrink: 0; }
 .jt-tile-main { border-color: #00ff41; box-shadow: 0 0 12px rgba(0,255,65,0.35); }
-.jts-pic { display: flex; align-items: center; justify-content: center; gap: .8rem; margin: .6rem 0 1rem; }
-.jts-pic svg { width: 64px; height: 64px; }
-.jts-pic .jts-pic-arrow { width: 32px; height: 32px; }
+.jts-pic { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3rem; margin: .4rem 0 .8rem; }
+.jts-pic svg { width: 52px; height: 52px; }
+.jts-pic .jts-pic-arrow { width: 28px; height: 28px; transform: rotate(-90deg); }
 .jts-scan-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: .9rem; }
-.jts-scan-btn { box-shadow: 0 0 16px rgba(0,255,65,0.6); animation: jts-glow 1.8s ease-in-out infinite; }
 @keyframes jts-glow { 0%, 100% { box-shadow: 0 0 10px rgba(0,255,65,0.4); } 50% { box-shadow: 0 0 26px rgba(0,255,65,0.9); } }
 @media (prefers-reduced-motion: reduce) { .jts-scan-btn { animation: none; } }
 .jts-private { display: flex; align-items: center; gap: .5rem; margin: .8rem 0 0; font-weight: 700; color: #f0eeff; }
@@ -1427,3 +1426,7 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jts-hint p { margin: 0; text-align: left; }
 /* 2026-11-10 owner: "I see no amber button" - waiting state was 25% faint; clearly amber, dashed = not yet tappable */
 .jts-clear-amber.jts-clear-wait:disabled { opacity: 1; border-style: dashed; background: rgba(255,190,60,0.16); font-weight: 600; }
+/* 2026-11-10 owner: the camera view is the big square; it glows. Own class: the site-wide rule at ~line 1062 strips .btn-glow. */
+.jts-cam-wrap { position: relative; width: 100%; max-width: 360px; aspect-ratio: 1; margin: 0 auto .6rem; border-radius: 14px; border: 2px solid #00ff41; background: #03020a; overflow: visible; animation: jts-glow 1.8s ease-in-out infinite; }
+.jts-cam-wrap .jts-cam { position: absolute; inset: 0; width: 100%; max-width: none; height: 100%; margin: 0; border-radius: 12px; background: transparent; }
+.jts-cam-icon { position: absolute; inset: 22%; width: 56%; height: 56%; opacity: .8; }

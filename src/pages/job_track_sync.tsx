@@ -113,7 +113,7 @@ function Scanner({ L, onLink }: { L: Tx; onLink: (l: { room: string; key: string
   }, [])
   return err
     ? <p className="jts-lost" style={{ display: 'flex', alignItems: 'center', gap: '.7rem', textAlign: 'left' }}><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#ffb020" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}><path d="M2 2l20 20M9 5h5l1.5 2H19a2 2 0 0 1 2 2v8M5 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14" /><path d="M10 10a3.5 3.5 0 0 0 4.5 4.5" /></svg><span><b>{L('No camera?', 'Keine Kamera?', 'Pas de caméra ?')}</b><br />{L('Settings -> JobTrack (or browser) -> Camera -> Allow -> try again.', 'Einstellungen -> JobTrack (oder Browser) -> Kamera -> Erlauben -> nochmals.', 'Réglages -> JobTrack (ou navigateur) -> Appareil photo -> Autoriser -> réessayer.')}</span></p>
-    : <video ref={video} className="jts-cam" playsInline muted />
+    : <div className="jts-cam-wrap"><svg className="jts-cam-icon" viewBox="0 0 24 24" fill="none" stroke="#00ff41" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3" /></svg><video ref={video} className="jts-cam" playsInline muted aria-label={L('Camera: point at the QR code on the computer', 'Kamera: auf den QR-Code am Computer richten', "Caméra: visez le code QR de l'ordinateur")} /></div>
 }
 
 type State = 'start' | 'scan' | 'waiting' | 'syncing' | 'done' | 'lost' | 'cleared'
@@ -161,7 +161,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
   const [hashLink] = useState(linkFromHash)
   const phone = hashLink !== null || onPhone() || (import.meta.env.DEV && /^#preview=sync(phone|lost|scan)$/.test(window.location.hash))
   const [link, setLink] = useState<{ room: string; key: string } | null>(() => hashLink ?? (phone ? null : { room: newRoom(), key: newKey() }))
-  const [state, setState] = useState<State>(import.meta.env.DEV && window.location.hash === '#preview=synclost' ? 'lost' : import.meta.env.DEV && window.location.hash === '#preview=syncscan' ? 'scan' : hashLink ? 'waiting' : 'start')
+  const [state, setState] = useState<State>(import.meta.env.DEV && window.location.hash === '#preview=synclost' ? 'lost' : hashLink ? 'waiting' : phone ? 'scan' : 'start')
   const [qr, setQr] = useState('')
   const [result, setResult] = useState<MergeResult | null>(null)
   const [attempt, setAttempt] = useState(0)
@@ -273,18 +273,14 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
       <button className="btn btn-glow" onClick={again}>{L('Try again', 'Nochmals versuchen', 'Réessayer')}</button>
     </div>
   )
-  else if (phone && !link) body = state === 'scan'
-    ? <><p className="jts-step">{L("Point at the computer's QR code", 'Auf den QR-Code des Computers richten', "Visez le code QR de l'ordinateur")}</p><Scanner L={L} onLink={l => { setLink(l); setState('waiting') }} /></>
-    : <>
-      {/* 2026-11-10 owner: "way too complicated ... no text, just images" - computer shows a QR, phone scans it */}
+  else if (phone && !link) body = <>
+      {/* 2026-11-10 owner: no button - the camera opens by itself, in a large square; no text */}
       <div className="jts-pic" role="img" aria-label={L('Computer shows a QR code, phone scans it', 'Computer zeigt einen QR-Code, Telefon scannt ihn', "L'ordinateur affiche un code QR, le téléphone le scanne")}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="#4da3ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /><rect x="8" y="6" width="3" height="3" /><rect x="13" y="6" width="3" height="3" /><rect x="8" y="11" width="3" height="3" /><path d="M13 11h3v3" /></svg>
-        <svg className="jts-pic-arrow" viewBox="0 0 24 24" fill="none" stroke="#f0eeff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6" /></svg>
         <svg viewBox="0 0 24 24" fill="none" stroke="#00ff41" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" /><path d="M9 8V6h2M15 8V6h-2M9 14v2h2M15 14v2h-2M10 11h4" /></svg>
+        <svg className="jts-pic-arrow" viewBox="0 0 24 24" fill="none" stroke="#f0eeff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6" /></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4da3ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /><rect x="8" y="6" width="3" height="3" /><rect x="13" y="6" width="3" height="3" /><rect x="8" y="11" width="3" height="3" /><path d="M13 11h3v3" /></svg>
       </div>
-      <button className="btn btn-glow jts-scan-btn" aria-label={L('Scan the QR code', 'QR-Code scannen', 'Scanner le code QR')} onClick={() => setState('scan')}>
-        <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16" /></svg>
-      </button>
+      <Scanner L={L} onLink={l => { setLink(l); setState('waiting') }} />
     </>
   else if (phone) body = <p className="jts-wait" role="status" aria-label={state === 'syncing' ? L('Syncing...', 'Synchronisiere...', 'Synchronisation...') : L('Linking to the computer...', 'Verbinde mit dem Computer...', "Connexion à l'ordinateur...")}><span className="jts-spin" /></p>
   else body = (<>
