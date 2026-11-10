@@ -179,6 +179,8 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
 
   useEffect(() => {
     if (!link) return
+    // localhost preview only: the relay refuses localhost, so a failed connect would hide the QR
+    if (import.meta.env.DEV && window.location.hash.startsWith('#preview=sync')) return
     let l: SyncLink | null = null, sent = false, gone = false
     const role = phone ? 'phone' : 'computer'
     // phone: no answer within 25 s -> say so, offer to try again

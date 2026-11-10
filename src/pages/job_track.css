@@ -1425,3 +1425,5 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jts-hint { display: flex; align-items: center; gap: .6rem; }
 .jts-hint svg { flex-shrink: 0; }
 .jts-hint p { margin: 0; text-align: left; }
+/* 2026-11-10 owner: "I see no amber button" - waiting state was 25% faint; clearly amber, dashed = not yet tappable */
+.jts-clear-amber.jts-clear-wait:disabled { opacity: 1; border-style: dashed; background: rgba(255,190,60,0.16); font-weight: 600; }
