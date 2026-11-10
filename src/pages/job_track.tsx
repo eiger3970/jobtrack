@@ -20,6 +20,7 @@ import { createUXRecorder, UX_OPT_OUT_STORAGE, type UXReport } from '../lib/jobt
 declare const __BUILD_DATE__: string
 import jobTrackIcon from '../assets/jobtrack_icon.svg'
 import { GiftIcon, ShieldLink } from '../components/security_shield'
+import JobMap from '../components/job_map'
 
 // same lookup pattern as home.tsx's getString - English fallback, then the raw key, never a blank string.
 function getString(key: string, lang: 'en' | 'de' | 'fr'): string {
@@ -147,7 +148,7 @@ function HeaderIcon({ col, filled = false }: { col: HeaderColumn; filled?: boole
     date: <><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></>,
     status: <><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" /></>,
     cv: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></>,
-    cover: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></>,
+    cover: <><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 7h8M8 11h8M8 18c1.5-3 2.5-3 3.5 0s2.5 1.5 4.5-1" /></>,  // 2026-11-10 owner: digital letter (page, lines, signature) - was an envelope
     notes: <path d={filled ? "M14 2H4v20h16V8zM14 2v6h6M8 12h8M8 16h6" : "M14 2H4v20h16V8zM14 2v6h6M12 11v7M8.5 14.5h7"} />,
     next: <><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>,
     actions: <g fill="currentColor" stroke="none"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" /><path transform="translate(24 0)" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" /></g>,
@@ -1334,9 +1335,12 @@ export default function JobTrack() {
         </>}
 
         <div className="jt-table-wrap">
+          <JobMap jobs={filtered} />
           <table className="applications-table" style={{ ['--jt-line' as string]: lineColor, ['--jt-period-date' as string]: quota ? lineColor : '#00ff41' }}>
             {/* One shared record: desktop table and company-first phone card. */}
             <thead><tr>
+              <th data-ux-column="role"><HeaderIcon col="role" />{t('table.role')}</th>
+              <th data-ux-column="company" className={sortCls('company')} aria-sort={sortBy.col === 'company' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('company')} title="Sort A-Z"><HeaderIcon col="company" />{t('table.company')}{sortMark('company')}</th>
               <th data-ux-column="date" className={sortCls('date')} aria-sort={sortBy.col === 'date' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}<InfoTip label={t('stale.legend')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} text={
                 <span className="jt-datekey">
                   <span><b className="jt-dk-white">2026-10-14</b> = {t('dk.white')}</span>
@@ -1346,8 +1350,6 @@ export default function JobTrack() {
               <th data-ux-column="status"><HeaderIcon col="status" />{t('table.status')}{statusCounts.length > 0 && <span className="jt-status-counts">{statusCounts.map(([st, n]) => <span key={st} className={`jt-sc jt-sc-${st}`}>{n} {STATUS_PLAIN[st]}</span>)}</span>}</th>
               <th data-ux-column="cover" title={t('table.cover')}><HeaderIcon col="cover" />{t('document.coverShort')}</th>
               <th data-ux-column="cv" title={t('table.cv')}><HeaderIcon col="cv" />{t('document.cvShort')}</th>
-              <th data-ux-column="company" className={sortCls('company')} aria-sort={sortBy.col === 'company' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('company')} title="Sort A-Z"><HeaderIcon col="company" />{t('table.company')}{sortMark('company')}</th>
-              <th data-ux-column="role"><HeaderIcon col="role" />{t('table.role')}</th>
               <th data-ux-column="actions"><HeaderIcon col="actions" />{t('table.actions')}</th>
             </tr></thead>
             <tbody>
@@ -1355,6 +1357,8 @@ export default function JobTrack() {
               {filtered.map(a => (
                 <Fragment key={a.id}>
                 <tr id={`jobtrack-application-${a.id}`} key={a.id} className={a.id === firstOldId ? 'jt-first-old' : undefined}>
+                  <td data-label={t('table.role')} className="jt-cell-role" title={a.role}><CellLabel col="role">{t('table.role')}</CellLabel><span className="jt-one">{a.role}</span></td>
+                  <td data-label={t('table.company')} className={'jt-cell-company' + (sortBy.col === 'company' ? ' jt-sorted-cell' : '')} title={a.company}><CellLabel col="company">{t('table.company')}</CellLabel><span className="jt-one">{a.company}</span></td>
                   <td data-label={t('table.date')} className={['jt-cell-date', isOld(a) ? 'jt-old-date' : 'jt-current-date', sortBy.col === 'date' ? 'jt-sorted-cell' : ''].filter(Boolean).join(' ')} title={isStale(a) ? t('stale.hint') : undefined}>
                     <CellLabel col="date">{t('table.date')}</CellLabel>
                     <span>{a.date}</span>
@@ -1379,8 +1383,6 @@ export default function JobTrack() {
                       </div>}
                     </div>
                   </td>
-                  <td data-label={t('table.company')} className={'jt-cell-company' + (sortBy.col === 'company' ? ' jt-sorted-cell' : '')} title={a.company}><CellLabel col="company">{t('table.company')}</CellLabel><span className="jt-one">{a.company}</span></td>
-                  <td data-label={t('table.role')} className="jt-cell-role" title={a.role}><CellLabel col="role">{t('table.role')}</CellLabel><span className="jt-one">{a.role}</span></td>
                   <td data-label={t('table.actions')} className="jt-actions">
                     <CellLabel col="actions">{t('table.actions')}</CellLabel>
                     <div className="jt-row-actions">
