@@ -55,14 +55,14 @@ export default function JobMap({ jobs }: { jobs: { id: number; date: string }[] 
   // month starts, only when the list runs in date order (either direction)
   const ym = jobs.map(j => j.date.slice(0, 7))
   const asc = ym.every((v, i) => i === 0 || ym[i - 1] <= v), desc = ym.every((v, i) => i === 0 || ym[i - 1] >= v)
-  const starts: { i: number; label: string }[] = []
+  const starts: { i: number; label: string; year: string }[] = []
   if (asc || desc) {
     let lastI = -99
     ym.forEach((v, i) => {
       if (i === 0 || v !== ym[i - 1]) {
-        if ((i - lastI) / n >= 0.04 || starts.length === 0) {
+        if ((i - lastI) / n >= 0.06 || starts.length === 0) {
           const [y, m] = v.split('-')
-          starts.push({ i, label: MONTHS[Number(m) - 1] + (i === 0 || y !== ym[starts[starts.length - 1]?.i ?? 0].slice(0, 4) ? " '" + y.slice(2) : '') })
+          starts.push({ i, label: MONTHS[Number(m) - 1], year: i === 0 || y !== ym[starts[starts.length - 1]?.i ?? 0].slice(0, 4) ? y.slice(2) : '' })
           lastI = i
         }
       }
@@ -73,7 +73,7 @@ export default function JobMap({ jobs }: { jobs: { id: number; date: string }[] 
   return (
     <div className={'jt-map' + (show || drag ? ' jt-map-on' : '')} aria-hidden="true">
       <div className="jt-map-label">{label}</div>
-      {starts.map(m => <span key={m.i} className="jt-map-month" style={{ top: `${(m.i / n) * 100}%` }}>{m.label}</span>)}
+      {starts.map(m => <span key={m.i} className="jt-map-month" style={{ top: `${(m.i / n) * 100}%` }}>{m.label}{m.year && <small>{m.year}</small>}</span>)}
       <div ref={bar} className="jt-map-bar" style={{ touchAction: 'none' }}
         onPointerDown={e => { (e.target as HTMLElement).setPointerCapture?.(e.pointerId); setDrag(true); jump(e.clientY) }}
         onPointerMove={e => { if (drag) jump(e.clientY) }}

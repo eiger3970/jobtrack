@@ -78,8 +78,8 @@
 			<string>jobroom</string>
 			<key>UIApplicationShortcutItemTitle</key>
 			<string>Job-Room entries</string>
-			<key>UIApplicationShortcutItemIconSymbolName</key>
-			<string>building.2</string>
+			<key>UIApplicationShortcutItemIconFile</key>
+			<string>JobRoomIcon</string>
 		</dict>
 	</array>
 </dict>

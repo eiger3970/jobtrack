@@ -1509,7 +1509,8 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jt-map-bar { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 0; border-radius: 8px; background: rgba(20,19,42,.7); overflow: hidden; pointer-events: auto; cursor: pointer; }
 .jt-map-bar i { flex: 1 1 0; min-height: 0; background: #5b5a7a; border-bottom: .5px solid rgba(3,2,10,.5); }
 .jt-map-bar i.jt-map-m { background: #d8d6f0; }
-.jt-map-month { position: absolute; right: 20px; transform: translateY(-1px); font-size: .62rem; line-height: 1; color: #b8b6d0; white-space: nowrap; pointer-events: none; text-shadow: 0 0 3px #03020a, 0 0 3px #03020a; }
+.jt-map-month { position: absolute; right: 20px; width: 1.9rem; min-height: 1.9rem; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #5b5a7a; border-radius: 4px; background: rgba(20,19,42,.92); font-size: .62rem; line-height: 1.1; font-weight: 700; color: #d8d6f0; white-space: nowrap; pointer-events: none; }
+.jt-map-month small { font-size: .5rem; font-weight: 400; color: #8f8dae; }
 .jt-map-bar b { position: absolute; left: -1px; right: -1px; min-height: 8px; border: 2px solid #3ddc84; border-radius: 5px; box-sizing: border-box; pointer-events: none; }
 .jt-map-label { position: absolute; right: 22px; top: 50%; transform: translateY(-50%); padding: .35rem .7rem; border-radius: 999px; background: #3ddc84; color: #03020a; font-weight: 700; font-size: .85rem; white-space: nowrap; opacity: 0; transition: opacity .25s; pointer-events: none; }
 .jt-map-on .jt-map-label { opacity: 1; }
