@@ -195,7 +195,7 @@
       "fr": "Aucune sauvegarde exportée pour l'instant."
     },
     "backup.import": {
-      "en": "Open backup file",
+      "en": "Import backup file",
       "de": "Sicherungsdatei öffnen",
       "fr": "Ouvrir une sauvegarde"
     },

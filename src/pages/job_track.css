@@ -1487,3 +1487,10 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jts-qr-wrap { position: relative; }
 .jts-lost { animation: jts-lost-in .8s ease-out; }
 @keyframes jts-lost-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.jts-xfer { display: flex; align-items: center; justify-content: center; gap: .9rem; margin: .6rem 0 .8rem; }
+.jts-xfer-pc { color: #4da3ff; } .jts-xfer-phone { color: #00ff41; }
+.jts-xfer-arrows { display: flex; flex-direction: column; gap: .5rem; }
+.jts-xfer-row { display: flex; align-items: center; justify-content: center; gap: .5rem; color: #f0eeff; }
+.jts-xfer-row b { font-size: 1.3rem; min-width: 1.6rem; text-align: center; }
+.jts-xfer-zero { opacity: .35; }

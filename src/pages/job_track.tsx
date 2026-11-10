@@ -292,7 +292,7 @@ export default function JobTrack() {
     const pill = (m: 'bookmark' | 'paste' | 'type' | 'multiple', taps: number, keys: number) => <button key={m} type="button" role="tab" aria-selected={active === m} className={'fill-pill' + (active === m ? ' on' : '')} onClick={() => pick(m)}><TapCount n={taps} maxCount={8} big label={t('fd.tapsAria')} />{keys > 0 && <KeyCount n={keys} label={t('fd.keysAria')} />}{t('fill.' + m)}</button>
     return <div className="fill-pills" role="tablist" aria-label={t('modal.addTitle')}>{pill('bookmark', 1, 0)}{pill('paste', 7, 0)}{pill('type', 8, phoneDevice ? 80 : 60)}{pill('multiple', 5, phoneDevice ? 120 : 90)}</div>
   }
-  // how many duplicates the last Open backup file joined (shown on the button)
+  // how many duplicates the last Import backup file joined (shown on the button)
   const [importJoined, setImportJoined] = useState(0)
   // 2026-10-25 owner: the page finds and joins doubled jobs itself, and says so - with Undo. Undo is remembered,
   // so the next visit does not join them again.
@@ -321,7 +321,7 @@ export default function JobTrack() {
   // 2026-10-14: phone + computer sync - the phone arrives from the QR with #sync=
   // prerender has no navigator - counts as a computer there
   const phoneDevice = isApp() || (typeof navigator !== 'undefined' && /iPhone|iPod|Android/i.test(navigator.userAgent))
-  const [syncOpen, setSyncOpen] = useState(() => linkFromHash() !== null || (import.meta.env.DEV && /^#preview=sync(phone|lost|scan)?$/.test(window.location.hash)))
+  const [syncOpen, setSyncOpen] = useState(() => linkFromHash() !== null || (import.meta.env.DEV && /^#preview=sync(phone|lost|scan|done)?$/.test(window.location.hash)))
   // 2026-11-10 owner: first launch of the installed app = welcome popup, "tap here to import or sync existing data" (QR sync only)
   const WELCOME_STORAGE = 'kworld_jobtrack_welcome_seen'
   const welcomeRef = useRef<HTMLDialogElement>(null)
@@ -1173,7 +1173,7 @@ export default function JobTrack() {
             )}
           </div><input type="file" accept="application/json" ref={backupInputRef} style={{ display: 'none' }} onChange={importBackup} /><div className="howto-step howto-step-info import-btn-wrap" ref={importInfoRef}>
             <button type="button" className="howto-go" onClick={() => backupInputRef.current?.click()} title={t('backup.hint')}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2" /></svg>
               <span>{backupImported ? (importJoined ? `${t('backup.imported')} - ${importJoined} ${t('backup.joined')}` : t('backup.imported')) : t('backup.import')}</span>
             </button>
             <button type="button" className="info-btn" aria-label={t('backup.importInfo.title')} onClick={() => setShowImportInfo(v => !v)}>i</button>
@@ -1444,7 +1444,7 @@ export default function JobTrack() {
         <h2 className="jt-welcome-head"><img src={jobTrackIcon} alt="" />Welcome to JobTrack</h2>
         <div className="jt-welcome-tiles">
           <button type="button" className="jt-tile jt-tile-main" onClick={() => closeWelcome(true)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="11" y="2" width="11" height="8" rx="1" stroke="#4da3ff" /><rect x="2" y="12" width="6" height="10" rx="1.5" stroke="#00ff41" /><path d="M10 16l2-2m-1-3 2-2" /></svg><span>Import or sync</span></button>
-          <button type="button" className="jt-tile" onClick={() => { closeWelcome(false); backupInputRef.current?.click() }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5M12 17v-6m-3 3 3-3 3 3" /></svg><span>Open backup file</span></button>
+          <button type="button" className="jt-tile" onClick={() => { closeWelcome(false); backupInputRef.current?.click() }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2" /></svg><span>Import backup file</span></button>
           <button type="button" className="jt-tile" onClick={() => closeWelcome(false)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" /></svg><span>Start a new list</span></button>
         </div>
       </dialog>
