@@ -1499,3 +1499,5 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jts-match + .jts-private { margin-top: .5rem; }
 .jts-match .jts-words-link { display: block; text-decoration: none; }
 .jts-match .jts-words-link:hover .jts-words { text-decoration: underline; }
+/* 2026-11-10 owner: passphrase under the Private and secure text */
+.jts-private + .jts-match { margin: .1rem 0 .8rem; }

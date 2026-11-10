@@ -53,12 +53,12 @@ function Done({ r, L }: { r: MergeResult; L: Tx }) {
       <p className="jts-done-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg> {L('Synced', 'Synchronisiert', 'Synchronisé')} · {r.apps.length}</p>
       {/* 2026-11-10 owner: show the result with images - computer (blue) and phone (green), one arrow each way with its count */}
       <div className="jts-xfer" role="img" aria-label={`${L('Sent from the computer to the phone', 'Vom Computer an das Telefon gesendet', "Envoyé de l'ordinateur au téléphone")}: ${r.fromComputer}. ${L('Sent from the phone to the computer', 'Vom Telefon an den Computer gesendet', "Envoyé du téléphone à l'ordinateur")}: ${r.fromPhone}`}>
-        <span className="jts-xfer-dev jts-xfer-pc"><svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /></svg></span>
-        <span className="jts-xfer-arrows">
-          <span className={`jts-xfer-row${r.fromComputer ? '' : ' jts-xfer-zero'}`}><b>{r.fromComputer}</b><svg viewBox="0 0 48 12" width="64" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 6h42M38 1l6 5-6 5" /></svg></span>
-          <span className={`jts-xfer-row${r.fromPhone ? '' : ' jts-xfer-zero'}`}><svg viewBox="0 0 48 12" width="64" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M46 6H4M10 1L4 6l6 5" /></svg><b>{r.fromPhone}</b></span>
-        </span>
         <span className="jts-xfer-dev jts-xfer-phone"><svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2" /><path d="M11 18h2" /></svg></span>
+        <span className="jts-xfer-arrows">
+          <span className={`jts-xfer-row${r.fromPhone ? '' : ' jts-xfer-zero'}`}><b>{r.fromPhone}</b><svg viewBox="0 0 48 12" width="64" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 6h42M38 1l6 5-6 5" /></svg></span>
+          <span className={`jts-xfer-row${r.fromComputer ? '' : ' jts-xfer-zero'}`}><svg viewBox="0 0 48 12" width="64" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M46 6H4M10 1L4 6l6 5" /></svg><b>{r.fromComputer}</b></span>
+        </span>
+        <span className="jts-xfer-dev jts-xfer-pc"><svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /></svg></span>
       </div>
       <div className="jts-chips">
         {(r.joined ?? 0) > 0 && chip(ICON_JOIN, r.joined ?? 0, L('Duplicates joined (same job, date and company)', 'Doppelte zusammengelegt (gleiche Stelle, Datum, Firma)', 'Doublons réunis (même poste, date, entreprise)'))}
@@ -320,10 +320,10 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
     <div className="modal" onClick={close}>
       <div className="modal-content jts-panel" aria-label={title} onClick={e => e.stopPropagation()}>
                 {body}
-        {link && state !== 'done' && state !== 'lost' && state !== 'cleared' && <p className="jts-match"><ShieldLink topic="transfers" point="words" iconOnly className="jts-words-link"><code className="jts-words">{words(link.room)}</code></ShieldLink></p>}
         {state !== 'cleared' && <>
           {/* 2026-10-14 owner: same picture as /transfer - shared component, relay variant */}
           <p className="jts-private"><ShieldLink topic="transfers" iconOnly className="jts-private-link"><ShieldIcon size={22} />{L('Private and secure', 'Privat und sicher', 'Privé et sécurisé')}</ShieldLink></p>
+          {link && state !== 'lost' && <p className="jts-match"><ShieldLink topic="transfers" point="words" iconOnly className="jts-words-link"><code className="jts-words">{words(link.room)}</code></ShieldLink></p>}
           <SyncFlow variant="relay" className="trx-flow jts-flow"
             label={L('The lock key lives only on your phone and computer. Our server passes the list on, locked, and sees only that two devices linked.', 'Der Schlüssel liegt nur auf Telefon und Computer. Unser Server reicht die Liste verschlossen weiter und sieht nur, dass zwei Geräte verbunden sind.', "La clé n'existe que sur votre téléphone et votre ordinateur. Notre serveur transmet la liste verrouillée et voit seulement que deux appareils sont liés.")}
             lockTip={L('The secret key - tap to learn about passphrases', 'Der geheime Schlüssel - tippen, mehr über Passphrasen', 'La clé secrète - touchez pour en savoir plus')}
