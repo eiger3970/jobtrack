@@ -330,6 +330,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
     <div className="modal" onClick={close}>
       <div className="modal-content jts-panel" aria-label={title} onClick={e => e.stopPropagation()}>
                 {body}
+        {link && state !== 'done' && state !== 'lost' && state !== 'cleared' && <p className="jts-match"><code className="jts-words">{words(link.room)}</code></p>}
         {state !== 'cleared' && <>
           {/* 2026-10-14 owner: same picture as /transfer - shared component, relay variant */}
           <p className="jts-private"><ShieldLink topic="transfers" iconOnly className="jts-private-link"><ShieldIcon size={22} />{L('Private and secure', 'Privat und sicher', 'Privé et sécurisé')}</ShieldLink></p>
@@ -337,7 +338,6 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
             label={L('The lock key lives only on your phone and computer. Our server passes the list on, locked, and sees only that two devices linked.', 'Der Schlüssel liegt nur auf Telefon und Computer. Unser Server reicht die Liste verschlossen weiter und sieht nur, dass zwei Geräte verbunden sind.', "La clé n'existe que sur votre téléphone et votre ordinateur. Notre serveur transmet la liste verrouillée et voit seulement que deux appareils sont liés.")}
             lockTip={L('The secret key - tap to learn about passphrases', 'Der geheime Schlüssel - tippen, mehr über Passphrasen', 'La clé secrète - touchez pour en savoir plus')}
             onLock={() => window.open('/passphrase#why', '_blank', 'noopener')} />
-          {link && state !== 'done' && state !== 'lost' && <p className="jts-match"><code className="jts-words">{words(link.room)}</code></p>}
                   </>}
         
       </div>

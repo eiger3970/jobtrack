@@ -1494,3 +1494,6 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jts-xfer-row { display: flex; align-items: center; justify-content: center; gap: .5rem; color: #f0eeff; }
 .jts-xfer-row b { font-size: 1.3rem; min-width: 1.6rem; text-align: center; }
 .jts-xfer-zero { opacity: .35; }
+/* 2026-11-10 owner: more space above the passphrase, so it sits close above "Private and secure" */
+.jts-match { margin: 1.8rem 0 0; }
+.jts-match + .jts-private { margin-top: .5rem; }
