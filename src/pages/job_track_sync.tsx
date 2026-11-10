@@ -248,6 +248,8 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
         }
         if (phone && kind === 'result') {
           const r: MergeResult = body.r
+          // 2026-11-10 owner: a first scan showed "Synced" with 0 jobs and the next scans found them - an empty answer to an empty phone is not a success, offer the retry instead
+          if (r.apps.length === 0 && appsRef.current.length === 0) { setState('lost'); return }
           setApps(r.apps); keepBase(r.apps)
           if (!quotaRef.current && body.quota) setQuota(body.quota)
           adoptProfile(body.profile)
