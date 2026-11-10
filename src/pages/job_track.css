@@ -1529,3 +1529,7 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
   .jobtrack-page.jt-min .applications-table .jt-actions { position: absolute; top: .45rem; right: .5rem; flex: none; width: auto; border: 0; padding: 0; }
   .jobtrack-page.jt-min .applications-table .jt-cell-status .status-badge { min-height: 0; }
 }
+/* 2026-11-10 owner: minimal view = short icon buttons, all on one row (the 16rem step width is for the full view only) */
+.jobtrack-page.jt-min .howto-strip { flex-direction: row; flex-wrap: wrap; align-items: center; }
+.jobtrack-page.jt-min .howto-strip .howto-go { width: auto; min-width: 44px; justify-content: center; }
+.jobtrack-page.jt-min .howto-strip .howto-step { flex: 0 0 auto; margin-right: 0; }

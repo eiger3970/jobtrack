@@ -978,6 +978,16 @@ export default function JobTrack() {
     e.target.value = ''
   }
 
+  // 2026-11-10 owner: app-icon quick actions (ios/App/App/AppDelegate.swift) arrive as the 'jt-quick' event, or as window.__jtQuick when the page loaded after the tap.
+  const quickRun = useRef<(a: string) => void>(() => {})
+  quickRun.current = (a: string) => { if (a === 'add') openAdd(); else if (a === 'email') openEmailUpdate(); else if (a === 'sync') setSyncOpen(true); else if (a === 'jobroom') openOrp() }
+  useEffect(() => {
+    const w = window as unknown as { __jtQuick?: string }
+    const take = () => { const a = w.__jtQuick; w.__jtQuick = ''; if (a) quickRun.current(a) }
+    take()
+    window.addEventListener('jt-quick', take)
+    return () => window.removeEventListener('jt-quick', take)
+  }, [])
   return (
     <div className={'jobtrack-page' + (minimal ? ' jt-min' : '')}>
 

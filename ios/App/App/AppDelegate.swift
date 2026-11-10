@@ -6,8 +6,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
+    // 2026-11-10 owner: long-press the app icon for quick actions (add, email, sync, Job-Room entries). The tap is passed to
+    // the web app, retrying until the page has finished loading (a cold start has no page yet).
+    func deliverShortcut(_ action: String, attempt: Int = 0) {
+        guard attempt < 40 else { return }
+        let js = "(function(){var r=document.getElementById('root');if(document.readyState==='complete'&&r&&r.children.length>0){window.__jtQuick='\(action)';window.dispatchEvent(new Event('jt-quick'));return 1;}return 0;})()"
+        let vc = window?.rootViewController as? CAPBridgeViewController
+        vc?.webView?.evaluateJavaScript(js) { result, _ in
+            if let n = result as? NSNumber, n.intValue == 1 { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { self.deliverShortcut(action, attempt: attempt + 1) }
+        }
+        if vc == nil {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { self.deliverShortcut(action, attempt: attempt + 1) }
+        }
+    }
+
+    func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
+        deliverShortcut(shortcutItem.type)
+        completionHandler(true)
+    }
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        if let item = launchOptions?[UIApplication.LaunchOptionsKey.shortcutItem] as? UIApplicationShortcutItem {
+            deliverShortcut(item.type)
+            return false
+        }
         return true
     }
 

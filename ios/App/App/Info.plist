@@ -47,5 +47,40 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>add</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Add application</string>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>plus.circle</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>email</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Update from email</string>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>envelope</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>sync</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Sync phone and computer</string>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>arrow.triangle.2.circlepath</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>jobroom</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Job-Room entries</string>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>building.2</string>
+		</dict>
+	</array>
 </dict>
 </plist>
