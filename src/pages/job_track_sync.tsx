@@ -283,23 +283,13 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
         extra={hasCv && <label className="jts-check"><input type="checkbox" checked={withCv} onChange={e => setWithCv(e.target.checked)} />{L('Also my CV from the CV page (not synced - download it first)', 'Auch meinen Lebenslauf von der CV-Seite (nicht synchronisiert - zuerst herunterladen)', 'Aussi mon CV de la page CV (non synchronisé - téléchargez-le avant)')}</label>} />
     </div>}
   </>)
-  else if (state === 'lost' && phone) body = (
+  else if (state === 'lost') body = (
     <div className="jts-lost">
       <p className="jts-lost-head" role="status" aria-label={L('No link to the other device.', 'Keine Verbindung zum anderen Gerät.', "Pas de lien avec l'autre appareil.")}><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#ffb020" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3l10 18H2L12 3zM12 10v5M12 18h.01" /></svg></p>
       {/* 2026-11-10 owner: an image before 1. and 2., the text folded up by default */}
       <div className="jts-hint"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#4da3ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /><rect x="8" y="6" width="3" height="3" /><rect x="13" y="6" width="3" height="3" /><rect x="8" y="11" width="3" height="3" /><path d="M13 11h3v3" /></svg><b className="jts-num">1.</b><p>{L('Computer -> kworld.space/jobtrack -> Sync phone + computer: is the QR still open?', 'Computer -> kworld.space/jobtrack -> Sync Telefon + Computer: ist der QR noch offen?', 'Ordinateur -> kworld.space/jobtrack -> Sync téléphone + ordinateur: le QR est-il encore ouvert?')}</p></div>
       <div className="jts-hint"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#00ff41" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0" /><circle cx="12" cy="19.5" r="1" /></svg><b className="jts-num">2.</b><p><b>{L('Cable or Wi-Fi', 'Kabel oder WLAN', 'Câble ou Wi-Fi')}</b><br />{L('cable: unplug, plug back in firmly', 'Kabel: ausstecken, fest wieder einstecken', 'câble: débranchez, rebranchez bien')}<br />{L('Wi-Fi: off and on again, on both devices', 'WLAN: aus und wieder ein, auf beiden Geräten', 'Wi-Fi: désactivez puis réactivez, sur les deux appareils')}</p></div>
       <button className="btn btn-glow" onClick={again} aria-label={L('Try again', 'Nochmals versuchen', 'Réessayer')}><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5" /></svg></button>
-    </div>
-  )
-  else if (state === 'lost') body = (
-    <div className="jts-lost">
-      <p>{L('No link to the other device.', 'Keine Verbindung zum anderen Gerät.', "Pas de lien avec l'autre appareil.")}</p>
-      <ol>
-        <li>{L('Computer -> kworld.space/jobtrack -> Sync phone + computer: is the QR still open?', 'Computer -> kworld.space/jobtrack -> Sync Telefon + Computer: ist der QR noch offen?', 'Ordinateur -> kworld.space/jobtrack -> Sync téléphone + ordinateur: le QR est-il encore ouvert?')}</li>
-        <li><b>{L('Cable or Wi-Fi', 'Kabel oder WLAN', 'Câble ou Wi-Fi')}</b><br />{L('cable: unplug, plug back in firmly', 'Kabel: ausstecken, fest wieder einstecken', 'câble: débranchez, rebranchez bien')}<br />{L('Wi-Fi: off and on again, on both devices', 'WLAN: aus und wieder ein, auf beiden Geräten', 'Wi-Fi: désactivez puis réactivez, sur les deux appareils')}</li>
-      </ol>
-      <button className="btn btn-glow" onClick={again}>{L('Try again', 'Nochmals versuchen', 'Réessayer')}</button>
     </div>
   )
   else if (phone && !link) body = <>
