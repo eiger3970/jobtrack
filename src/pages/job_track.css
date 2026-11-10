@@ -1430,3 +1430,6 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jts-cam-wrap { position: relative; width: 100%; max-width: 360px; aspect-ratio: 1; margin: 0 auto .6rem; border-radius: 14px; border: 2px solid #00ff41; background: #03020a; overflow: visible; animation: jts-glow 1.8s ease-in-out infinite; }
 .jts-cam-wrap .jts-cam { position: absolute; inset: 0; width: 100%; max-width: none; height: 100%; margin: 0; border-radius: 12px; background: transparent; }
 .jts-cam-icon { position: absolute; inset: 22%; width: 56%; height: 56%; opacity: .8; }
+/* 2026-11-10 owner: pictures too big on the no-camera screen */
+.jts-pic svg { width: 40px; height: 40px; }
+.jts-pic .jts-pic-arrow { width: 22px; height: 22px; }
