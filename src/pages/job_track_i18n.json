@@ -196,8 +196,8 @@
     },
     "backup.import": {
       "en": "Import backup file",
-      "de": "Sicherungsdatei öffnen",
-      "fr": "Ouvrir une sauvegarde"
+      "de": "Sicherungsdatei importieren",
+      "fr": "Importer une sauvegarde"
     },
     "backup.hint": {
       "en": "Full backup of everything - for moving to another device via USB or cloud storage, or helping someone without their own reliable device set this up once and hand it over.",
