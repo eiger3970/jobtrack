@@ -1469,3 +1469,18 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 /* all three steps one size, scaling with the camera square (wider phone = bigger text) */
 .jts-cam-wrap { container-type: inline-size; }
 .jts-help-row, .jts-help-txt, .jts-help-txt code { font-size: min(1.1rem, 4.4cqw); }
+/* numbers 1. 2. 3. line up: every icon sits in the same fixed-width cell; step 2's box is smaller */
+.jts-help-row > :first-child { flex: 0 0 32px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+.jts-help-row > svg:first-child { width: 28px; height: 28px; }
+.jts-help-btn { width: 32px; height: 32px; }
+.jts-help-btn svg { width: 20px; height: 20px; }
+.jts-help-pair svg { width: 26px; height: 26px; }
+.jts-qr-wrap { width: 100%; max-width: 360px; aspect-ratio: 1; margin: 0 auto .6rem; border-radius: 14px; border: 2px solid #00ff41; overflow: hidden; background: #fff; animation: jts-glow 1.8s ease-in-out infinite; }
+.jts-qr-wrap .jts-qr { width: 100%; height: 100%; margin: 0; border-radius: 0; }
+.jts-qr-line { display: flex; align-items: center; justify-content: center; gap: .5rem; margin: 0 0 .6rem; font-size: min(1.1rem, 4.4cqw); font-weight: 700; }
+.jts-clear-wait svg { vertical-align: -0.2em; margin-right: .4rem; }
+.jts-private { margin-top: 1.8rem; }
+.jts-private-link { display: inline-flex; align-items: center; gap: .5rem; color: #f0eeff; text-decoration: none; }
+.jts-private-link:hover { text-decoration: underline; }
+.jts-private-link svg { color: #00ff41; }
+.jts-cam-timer { position: absolute; right: .5rem; bottom: .5rem; z-index: 3; display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .6rem; border-radius: 999px; border: 1.5px solid #ffbe3c; background: rgba(3,2,10,.85); color: #ffbe3c; font: inherit; font-size: .9rem; font-weight: 800; cursor: pointer; animation: jts-help-in .3s ease-out; }
