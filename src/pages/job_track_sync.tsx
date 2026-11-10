@@ -299,7 +299,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
       </div>
       <Scanner L={L} onLink={l => { setLink(l); setState('waiting') }} onTimeout={close} />
     </>
-  else if (phone) body = <p className="jts-wait" role="status" aria-label={state === 'syncing' ? L('Syncing...', 'Synchronisiere...', 'Synchronisation...') : L('Linking to the computer...', 'Verbinde mit dem Computer...', "Connexion à l'ordinateur...")}><span className="jts-spin" /></p>
+  else if (phone) body = <p className="jts-wait" role="status" ><span className="jts-spin" /><span style={{ display: 'block', marginTop: '.6rem', fontWeight: 700 }}>{L('Code scanned. Syncing...', 'Code gescannt. Synchronisiere...', 'Code scanné. Synchronisation...')}</span><span style={{ display: 'block', opacity: .75, fontSize: '.85rem' }}>{L('You can lower the phone now.', 'Sie können das Telefon jetzt senken.', 'Vous pouvez baisser le téléphone.')}</span></p>
   else body = (<>
     {/* 2026-11-10 owner: the computer window follows the phone app: pictures, the QR in the big square, almost no words */}
 <div className="jts-pic" role="img" aria-label={L('Computer shows a QR code, phone scans it', 'Computer zeigt einen QR-Code, Telefon scannt ihn', "L'ordinateur affiche un code QR, le téléphone le scanne")}>
