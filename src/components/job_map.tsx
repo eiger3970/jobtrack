@@ -73,12 +73,12 @@ export default function JobMap({ jobs }: { jobs: { id: number; date: string }[] 
   return (
     <div className={'jt-map' + (show || drag ? ' jt-map-on' : '')} aria-hidden="true">
       <div className="jt-map-label">{label}</div>
-      {starts.map((m, k) => <span key={m.i} className="jt-map-month" style={{ top: `${(((m.i + (starts[k + 1]?.i ?? n)) / 2) / n) * 100}%` }}>{m.label}{m.year && <small>{m.year}</small>}</span>)}
+      {starts.map((m, k) => <span key={m.i} className="jt-map-month" style={{ top: `${(((m.i + (starts[k + 1]?.i ?? n)) / 2) / n) * 100}%` }}>{m.label}</span>)}
       <div ref={bar} className="jt-map-bar" style={{ touchAction: 'none' }}
         onPointerDown={e => { (e.target as HTMLElement).setPointerCapture?.(e.pointerId); setDrag(true); jump(e.clientY) }}
         onPointerMove={e => { if (drag) jump(e.clientY) }}
         onPointerUp={() => setDrag(false)} onPointerCancel={() => setDrag(false)}>
-        {jobs.map((j, i) => <i key={j.id} className={isStart.has(i) && (asc || desc) ? 'jt-map-m' : undefined} />)}
+        {jobs.map((j, i) => <i key={j.id}  />)}
         <b style={{ top: `${(a / n) * 100}%`, height: `${((z - a + 1) / n) * 100}%` }} />
       </div>
     </div>
