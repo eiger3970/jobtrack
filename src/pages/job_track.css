@@ -1497,3 +1497,5 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 /* 2026-11-10 owner: more space above the passphrase, so it sits close above "Private and secure" */
 .jts-match { margin: 1.8rem 0 0; }
 .jts-match + .jts-private { margin-top: .5rem; }
+.jts-match .jts-words-link { display: block; text-decoration: none; }
+.jts-match .jts-words-link:hover .jts-words { text-decoration: underline; }

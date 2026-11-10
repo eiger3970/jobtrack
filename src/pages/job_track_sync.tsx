@@ -180,8 +180,8 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
   const [qr, setQr] = useState('')
   const [result, setResult] = useState<MergeResult | null>(() => (import.meta.env.DEV && window.location.hash === '#preview=syncdone' ? ({ apps: new Array(35).fill(null), fromPhone: 0, fromComputer: 35, both: 0, removed: 0, joined: 0, merged: 0 } as unknown as MergeResult) : null))
   const [attempt, setAttempt] = useState(0)
-  // computer: the QR stays open 5 minutes; a small countdown shows the last minute, then the 'no link' help fades in
-  const deskEnd = useRef(Date.now() + 300000)
+  // computer: the QR stays open 30 seconds; a small countdown shows the last minute, then the 'no link' help fades in
+  const deskEnd = useRef(Date.now() + 30000)
   const [deskLeft, setDeskLeft] = useState<number | null>(null)
   useEffect(() => {
     if (phone) return
@@ -261,7 +261,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
     setTimeout(() => { clearComputer(withCv); setState('cleared') }, 0)
   }
   function again() {
-    deskEnd.current = Date.now() + 300000
+    deskEnd.current = Date.now() + 30000
     setState(phone && !hashLink ? 'scan' : phone ? 'waiting' : 'start')
     if (phone && !hashLink) setLink(null)
     setAttempt(a => a + 1)
@@ -319,7 +319,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
         <svg className="jts-pic-arrow" viewBox="0 0 24 24" fill="none" stroke="#f0eeff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6" /></svg>
         <svg viewBox="0 0 24 24" fill="none" stroke="#4da3ff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /><rect x="8" y="6" width="3" height="3" /><rect x="13" y="6" width="3" height="3" /><rect x="8" y="11" width="3" height="3" /><path d="M13 11h3v3" /></svg>
       </div>
-    <div className="jts-qr-wrap">{qr ? <img className="jts-qr" src={qr} alt={L('QR code to sync', 'QR-Code zum Synchronisieren', 'Code QR pour synchroniser')} /> : <div className="jts-qr" />}{deskLeft !== null && state !== 'syncing' && <button type="button" className="jts-cam-timer" onClick={() => { deskEnd.current = Date.now() + 300000; setDeskLeft(null) }} aria-label={L('QR code closes soon. Click for more time.', 'QR-Code schliesst bald. Klicken für mehr Zeit.', "Le code QR se ferme bientôt. Cliquez pour plus de temps.")}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2M9 2h6" /></svg>0:{String(deskLeft).padStart(2, '0')}</button>}</div>
+    <div className="jts-qr-wrap">{qr ? <img className="jts-qr" src={qr} alt={L('QR code to sync', 'QR-Code zum Synchronisieren', 'Code QR pour synchroniser')} /> : <div className="jts-qr" />}{deskLeft !== null && state !== 'syncing' && <button type="button" className="jts-cam-timer" onClick={() => { deskEnd.current = Date.now() + 30000; setDeskLeft(null) }} aria-label={L('QR code closes soon. Click for more time.', 'QR-Code schliesst bald. Klicken für mehr Zeit.', "Le code QR se ferme bientôt. Cliquez pour plus de temps.")}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2M9 2h6" /></svg>0:{String(deskLeft).padStart(2, '0')}</button>}</div>
     <p className="jts-qr-line"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#00ff41" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" /><path d="M9 8V6h2M15 8V6h-2M9 14v2h2M15 14v2h-2M10 11h4" /></svg><span><span className="jts-dev-phone">Phone:</span> scan this QR code</span></p>
     {state === 'syncing' && <p className="jts-wait" role="status"><span className="jts-spin" /></p>}
     {/* greyed out on purpose: nothing may be cleared before the list is safe on the phone; it unlocks after the sync */}
@@ -330,7 +330,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
     <div className="modal" onClick={close}>
       <div className="modal-content jts-panel" aria-label={title} onClick={e => e.stopPropagation()}>
                 {body}
-        {link && state !== 'done' && state !== 'lost' && state !== 'cleared' && <p className="jts-match"><code className="jts-words">{words(link.room)}</code></p>}
+        {link && state !== 'done' && state !== 'lost' && state !== 'cleared' && <p className="jts-match"><ShieldLink topic="transfers" point="words" iconOnly className="jts-words-link"><code className="jts-words">{words(link.room)}</code></ShieldLink></p>}
         {state !== 'cleared' && <>
           {/* 2026-10-14 owner: same picture as /transfer - shared component, relay variant */}
           <p className="jts-private"><ShieldLink topic="transfers" iconOnly className="jts-private-link"><ShieldIcon size={22} />{L('Private and secure', 'Privat und sicher', 'Privé et sécurisé')}</ShieldLink></p>
