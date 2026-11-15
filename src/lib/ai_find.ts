@@ -1,14 +1,30 @@
 // 2026-10-19: the JobTrack AI find, shared by one card (find_details.tsx) and the all-jobs run (job_room_helper.tsx).
 // Nobody waits on a busy AI: best engine first, the next one at once. Only engines that search the web are used -
 // one without would guess an address. Results are suggestions: nothing fills a job until the person taps "Use".
-// 2026-11-04 owner: the Buy credits buttons stay hidden until there is money to top up the AI accounts (likely after 2027-01-06) - then set this to true
-export const BUY_CREDITS_LIVE = false
+// 2026-11-13 owner: the Buy credits buttons are switched on and off in /admin (AI payments card), no code change or deploy.
+// Off until the owner turns it on (likely after 2027-01-06, when there is money to top up the AI accounts). Any error reads as off.
+let buyLive = false, buyLoaded = 0
+const buyWatchers = new Set<(v: boolean) => void>()
+export function useBuyCreditsLive(): boolean {
+  const [v, setV] = useState(buyLive)
+  useEffect(() => {
+    buyWatchers.add(setV)
+    if (Date.now() - buyLoaded > 60000) {
+      buyLoaded = Date.now()
+      fetch(SITE_BASE + '/api/ai-payments').then(r => r.json()).then(j => { buyLive = j?.live === true; buyWatchers.forEach(f => f(buyLive)) }).catch(() => { /* stays off */ })
+    }
+    return () => { buyWatchers.delete(setV) }
+  }, [])
+  return v
+}
+import { useEffect, useState } from 'react'
 export type Loc = Record<string, any>  // an office: strings plus likelyForJob / headOffice flags
 export type Rec = Record<string, string>
 export interface AiSource { title: string; uri: string }
 export interface AiSuggestion { runs: Loc[][]; contact: Rec; sources: AiSource[]; at: string; trace?: string }
 
 // the iPhone app has no same-origin site, it calls the worker directly (phones reach workers.dev fine)
+const SITE_BASE = typeof window !== 'undefined' && /^https?:/.test(window.location.origin) && window.location.hostname.endsWith('kworld.space') ? '' : 'https://kworld.space'   // the app has no same-origin site
 const APP_FIND_URL = 'https://cvgen-writer.kinhswch-cloudflare.workers.dev/find-details'
 const STORE = 'kworld_jobtrack_ai'
 

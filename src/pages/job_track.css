@@ -348,6 +348,7 @@
 .howto-go:disabled { opacity: 0.45; cursor: default; }
 .howto-go svg { width: 20px; height: 20px; color: #00ff41; flex-shrink: 0; }
 .howto-strip .howto-go { width: 16rem; max-width: 100%; justify-content: flex-start; box-sizing: border-box; }  /* 2026-11-10 owner: the three step buttons one width */
+.jt-min .howto-strip .howto-go { width: auto; }  /* 2026-11-13 owner: minimal showed the three step buttons full width again; icons only there */
 .howto-go-main { border-color: #00ff41; box-shadow: 0 0 12px rgba(0,255,65,0.35); font-weight: 700; }
 .orp-paper { margin-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.6rem; display: grid; gap: 0.5rem; }
 .orp-paper summary { cursor: pointer; color: var(--text-dim); font-size: .85rem; }
