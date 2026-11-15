@@ -460,7 +460,17 @@
         "Nice beginning",
         "On the board",
         "Ticking along",
-        "Underway now"
+        "Underway now",
+        "Off the mark",
+        "Up and running",
+        "The ball is rolling",
+        "First ones in",
+        "The hardest part is done",
+        "Into the swing of it",
+        "Early wins",
+        "Good first moves",
+        "One step at a time",
+        "Started well"
       ],
       "de": [
         "Guter Start",
@@ -498,7 +508,17 @@
         "Solid momentum",
         "You're on track",
         "Building a real list",
-        "Nice and steady"
+        "Nice and steady",
+        "Real headway",
+        "The list is growing",
+        "Good rhythm",
+        "Each one adds up",
+        "More doors open",
+        "Consistency pays",
+        "Good work so far",
+        "Keeping the pace",
+        "Halfway habits forming",
+        "Moving forward"
       ],
       "de": [
         "Es geht voran",
@@ -536,7 +556,17 @@
         "You've got this",
         "Nearly at goal",
         "Not far to go",
-        "Closing in on it"
+        "Closing in on it",
+        "Within reach",
+        "Finish line ahead",
+        "One more push",
+        "The end is in sight",
+        "Down to the last few",
+        "So nearly done",
+        "Nearly there, keep going",
+        "Last stretch now",
+        "Close to the line",
+        "Nearly wrapped up"
       ],
       "de": [
         "Fast geschafft!",
@@ -571,7 +601,12 @@
         "That's your quota - great work.",
         "Target hit - nicely done.",
         "Quota complete.",
-        "You made it - nice work."
+        "You made it - nice work.",
+        "Target reached.",
+        "Quota ticked off.",
+        "All done for now.",
+        "Mission complete.",
+        "Every one counted - done."
       ],
       "de": [
         "Quote erreicht - gut gemacht.",
@@ -599,7 +634,12 @@
         "Nothing more needed this period. Take some time for yourself.",
         "That's the quota met. Step away and recharge.",
         "You're covered for this period. Go do something else for a while.",
-        "That's everything required. Enjoy the rest of your day."
+        "That's everything required. Enjoy the rest of your day.",
+        "Time off is part of the job hunt too.",
+        "Recharge now - interviews need energy.",
+        "Nothing else is due this period. Enjoy it.",
+        "Step back for a while. You've covered it.",
+        "That's the work done. The rest of the day is yours."
       ],
       "de": [
         "Das war's für diesen Zeitraum. Gönn dir eine Pause - du hast sie dir verdient.",
@@ -1322,6 +1362,12 @@
       "en": "older - not in this quota",
       "de": "älter - nicht in dieser Quote",
       "fr": "plus ancien - hors de ce quota"
+    },
+    "period.tag": {
+      "en": "↑ {n} this month"
+    },
+    "period.tagQuota": {
+      "en": "↑ {n} of {target} this period"
     },
     "dk.line": {
       "en": "where this period begins",

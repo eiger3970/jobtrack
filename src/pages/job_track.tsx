@@ -10,6 +10,7 @@ import JobSaveBookmark from './job_save_bookmark'
 import { TapCount, KeyCount } from './find_details'
 import JobTrackSync, { clearComputer } from './job_track_sync'
 import { FILL_KEY } from '../lib/jobroom_fill'
+import { nextQuote } from '../lib/job_quotes'
 import BackupBar, { notBackedUp } from './job_track_backup'
 import { linkFromHash, merge, dedupe } from '../lib/jobtrack_sync'
 import { parseAd } from '../lib/ad_parse'
@@ -32,6 +33,12 @@ function getString(key: string, lang: 'en' | 'de' | 'fr'): string {
 // Same idea, but for a pool of variants (encouragement text shouldn't repeat
 // the same 3 phrases forever). `seed` picks deterministically so the message
 // doesn't flicker on every re-render, but does change as progress changes.
+// 2026-11-15 owner: a quote left of the Job-Room entries button, new on every visit (src/lib/job_quotes.ts)
+function JobQuote() {
+  const [q] = useState(nextQuote)
+  return <figure className="jt-quote" title={`${q[0]} - ${q[1]}`}><blockquote>{q[0]} <cite>- {q[1]}</cite></blockquote></figure>
+}
+
 function getStringVariant(key: string, lang: 'en' | 'de' | 'fr', seed: number): string {
   const entry = (jobTrackI18n as any).strings[key]
   if (!entry) return key
@@ -64,7 +71,7 @@ function loadApps(): App[] {
     { id: 13, company: 'Bergbahnen Rinerhorn AG', role: 'Ski Lift Operator', date: '2026-10-13', status: 'applied', cv: '', cover: '', nextDate: '', notes: '', address: '7277 Davos Glaris (GR)', jobroomDone: '2026-10-14' },
   ] as App[]
   // DEV preview of the not-backed-up bar
-  if (import.meta.env.DEV && typeof window !== 'undefined' && window.location.hash === '#preview=backup') return [{ id: 1, company: 'Bergbahnen Rinerhorn AG', role: 'Ski lift operator', date: '2026-09-12', status: 'applied', cv: '', cover: '', nextDate: '', notes: 'Staff housing offered\nStart By agreement Permanent' }, { id: 2, company: 'Example Semiconductor GmbH', role: 'Shift Equipment Maintenance Engineer - Etching 80 - 100% (f/m/d) - R0129808', date: '2026-10-14', status: 'applied', cv: '', cover: '', nextDate: '', notes: '' }]
+  if (import.meta.env.DEV && typeof window !== 'undefined' && window.location.hash === '#preview=backup') return [{ id: 1, company: 'Bergbahnen Rinerhorn AG', role: 'Ski lift operator', date: '2026-09-12', status: 'applied', cv: '', cover: '', nextDate: '', notes: 'Staff housing offered\nStart By agreement Permanent' }, { id: 2, company: 'Example Semiconductor GmbH', role: 'Shift Equipment Maintenance Engineer - Etching 80 - 100% (f/m/d) - R0129808', date: '2026-10-14', status: 'applied', cv: '', cover: '', nextDate: '', notes: '' }, { id: 3, company: 'Example Hotel SA', role: 'Night receptionist', date: new Date().toISOString().slice(0, 10), status: 'applied', cv: 'cv.pdf', cover: '', nextDate: '', notes: '' }]
   try { return JSON.parse(localStorage.getItem(STORAGE) || '[]') } catch { return [] }
 }
 
@@ -1077,7 +1084,10 @@ export default function JobTrack() {
             // hunt shouldn't greet you with red every time you open it.
             const color = lineColor
             const zone = pct >= 75 ? 'quota.pool.almost' : pct >= 30 ? 'quota.pool.progress' : 'quota.pool.start'
-            const milestone = pct === 0 ? null : getStringVariant(zone, lang, count)
+            // 2026-11-15 owner: "must not repeat, new inspiration on each opportunity ... so the user isn't bored each
+            // month" - the pick moves with the count AND the period, so each new period starts somewhere else in the pool
+            const periodSeed = Math.floor(periodStart(quota.period).getTime() / 86400000) * 7
+            const milestone = pct === 0 ? null : getStringVariant(zone, lang, count + periodSeed)
 
             if (met) {
               return (
@@ -1090,8 +1100,8 @@ export default function JobTrack() {
                   </div>
                   <svg className="quota-relax-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
                   <div className="stat-number" style={{ color }}>{count} / {quota.target}</div>
-                  <p className="quota-celebrate-title">{getStringVariant('quota.pool.celebrateTitle', lang, count)}</p>
-                  <p className="quota-celebrate-body">{getStringVariant('quota.pool.celebrateBody', lang, count)}</p>
+                  <p className="quota-celebrate-title">{getStringVariant('quota.pool.celebrateTitle', lang, count + periodSeed)}</p>
+                  <p className="quota-celebrate-body">{getStringVariant('quota.pool.celebrateBody', lang, count + periodSeed)}</p>
                 </div>
               )
             }
@@ -1256,6 +1266,7 @@ export default function JobTrack() {
 
 
         <div className="toolbar jt-secondary-actions">
+          {lang === 'en' && <JobQuote />}
           <div className="toolbar-primary">
             {/* 2026-10-13 owner: ORP proofs (716.007 PDF + Job-Room) in one tap */}
             <button className="btn-secondary export-btn orp-btn" title={orpButtonLabel()} onClick={() => openOrp()}>
@@ -1366,7 +1377,9 @@ export default function JobTrack() {
               {filtered.length === 0 && <tr><td colSpan={7} style={{ textAlign: 'center', color: '#a0a0b0', padding: '2rem' }}>{t(searchText.trim() ? 'find.empty' : 'table.empty')}</td></tr>}
               {filtered.map(a => (
                 <Fragment key={a.id}>
-                <tr id={`jobtrack-application-${a.id}`} key={a.id} className={a.id === firstOldId ? 'jt-first-old' : undefined}>
+                {/* 2026-11-15 owner: a tab on the period line says what it means - the jobs above it count for this period */}
+                {a.id === firstOldId && <tr className="jt-period-row" aria-hidden="true"><td colSpan={7}><span className="jt-period-tag">{(() => { const n = quota ? countInPeriod(apps, quota.period) : apps.filter(x => !isOld(x)).length; const s = (quota ? t('period.tagQuota').replace('{target}', String(quota.target)) : t('period.tag')).replace('{n}', String(n)); return n ? s : s.replace(/^↑\s*/, '') })()}</span></td></tr>}
+                <tr id={`jobtrack-application-${a.id}`} key={a.id} className={[a.id === firstOldId ? 'jt-first-old' : '', firstOldId !== undefined ? (isOld(a) ? 'jt-old-row' : 'jt-current-row') : ''].filter(Boolean).join(' ') || undefined}>
                   <td data-label={t('table.role')} className="jt-cell-role" title={a.role}><CellLabel col="role">{t('table.role')}</CellLabel><span className="jt-one">{a.role}</span>{a.notes?.trim() && <div className="jt-application-note jt-note-desk"><button type="button" className="jt-note-edit" aria-label={t('note.edit')} onClick={() => openNote(a)}><span className="jt-note-text">{a.notes}</span></button></div>}</td>
                   <td data-label={t('table.company')} className={'jt-cell-company' + (sortBy.col === 'company' ? ' jt-sorted-cell' : '')} title={a.company}><CellLabel col="company">{t('table.company')}</CellLabel><span className="jt-one">{a.company}</span></td>
                   <td data-label={t('table.date')} className={['jt-cell-date', isOld(a) ? 'jt-old-date' : 'jt-current-date', sortBy.col === 'date' ? 'jt-sorted-cell' : ''].filter(Boolean).join(' ')} title={isStale(a) ? t('stale.hint') : undefined}>

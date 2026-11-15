@@ -559,6 +559,24 @@
 .applications-table td.jt-old-date { color: #a0a0b0; }
 .applications-table td.jt-current-date { color: var(--jt-period-date, #00ff41); }
 .applications-table tr.jt-first-old td { border-top: 3px solid var(--jt-line, #ffb000); }
+.applications-table tr.jt-period-row td { padding: 0; height: 0; border: 0; position: relative; background: none; }
+/* 2026-11-15 owner: curved corners where the tab meets the line (outward flares, like a browser tab) */
+.jt-period-tag::before, .jt-period-tag::after { content: ''; position: absolute; bottom: 0; width: 7px; height: 7px; }
+.jt-period-tag::before { left: -7px; background: radial-gradient(circle at 0 0, transparent 7px, var(--jt-line, #ffb000) 7.5px); }
+.jt-period-tag::after { right: -7px; background: radial-gradient(circle at 100% 0, transparent 7px, var(--jt-line, #ffb000) 7.5px); }
+.jt-period-tag { position: absolute; left: .6rem; bottom: 0; padding: .12rem .55rem; border-radius: 6px 6px 0 0; background: var(--jt-line, #ffb000); color: #03020a; font-size: .72rem; font-weight: 700; line-height: 1.3; white-space: nowrap; }
+/* 2026-11-15 owner: the line and tab looked like they belonged to the jobs below - a bar down the left of the jobs
+   above joins the line (a bracket around this period), and older jobs are dimmed */
+@media (min-width: 761px) {
+  .applications-table tr.jt-current-row td:first-child { box-shadow: inset 3px 0 0 var(--jt-line, #ffb000); }
+  .applications-table tr.jt-old-row td { opacity: .55; transition: opacity .15s; }
+  .applications-table tr.jt-old-row:hover td, .applications-table tr.jt-old-row:focus-within td { opacity: 1; }
+  .applications-table tr.jt-first-old td { border-top: 0; }
+  .applications-table tr.jt-period-row td { border-bottom: 3px solid var(--jt-line, #ffb000); }
+  .jt-period-tag { left: 0; border-top-left-radius: 0; }
+  .jt-period-tag::before { display: none; }
+}
+@media (max-width: 760px) { .applications-table tr.jt-period-row { display: none; } }
 .jt-datekey { display: flex; flex-direction: column; gap: 0.35rem; }
 .jt-dk-white { color: var(--jt-period-date, #00ff41); } .jt-dk-amber { color: #a0a0b0; }
 .jt-dk-line { display: inline-block; width: 1.6rem; height: 3px; background: #ffb000; vertical-align: middle; }
@@ -1548,3 +1566,14 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jobtrack-page.jt-min .howto-strip { flex-direction: row; flex-wrap: wrap; align-items: center; }
 .jobtrack-page.jt-min .howto-strip .howto-go { width: auto; min-width: 44px; justify-content: center; }
 .jobtrack-page.jt-min .howto-strip .howto-step { flex: 0 0 auto; margin-right: 0; }
+
+/* 2026-11-15 owner: quote left of the Job-Room entries button - quiet grey italics, small, up to 3 rows so the toolbar
+   stays one row; the author follows the quote on the same line */
+@media (min-width: 761px) {
+  .jt-secondary-actions { flex: 1 1 0; min-width: 0; justify-content: flex-end; flex-wrap: nowrap; }
+  .jt-secondary-actions .toolbar-primary { flex: 0 0 auto; flex-wrap: nowrap; }
+}
+.jt-quote { flex: 1 1 auto; min-width: 0; margin: 0 .75rem 0 1rem; text-align: right; color: #a0a0b0; font-size: .78rem; line-height: 1.3; }
+.jt-quote blockquote { margin: 0; font-style: italic; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.jt-quote cite { font-style: normal; color: #656078; white-space: nowrap; }
+@media (max-width: 760px) { .jt-secondary-actions { flex-wrap: wrap; } .jt-quote { flex-basis: 100%; order: 2; margin: .4rem 0 0; text-align: left; } }
