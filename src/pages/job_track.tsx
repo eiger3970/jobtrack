@@ -1367,7 +1367,7 @@ export default function JobTrack() {
               {filtered.map(a => (
                 <Fragment key={a.id}>
                 <tr id={`jobtrack-application-${a.id}`} key={a.id} className={a.id === firstOldId ? 'jt-first-old' : undefined}>
-                  <td data-label={t('table.role')} className="jt-cell-role" title={a.role}><CellLabel col="role">{t('table.role')}</CellLabel><span className="jt-one">{a.role}</span></td>
+                  <td data-label={t('table.role')} className="jt-cell-role" title={a.role}><CellLabel col="role">{t('table.role')}</CellLabel><span className="jt-one">{a.role}</span>{a.notes?.trim() && <div className="jt-application-note jt-note-desk"><button type="button" className="jt-note-edit" aria-label={t('note.edit')} onClick={() => openNote(a)}><span className="jt-note-text">{a.notes}</span></button></div>}</td>
                   <td data-label={t('table.company')} className={'jt-cell-company' + (sortBy.col === 'company' ? ' jt-sorted-cell' : '')} title={a.company}><CellLabel col="company">{t('table.company')}</CellLabel><span className="jt-one">{a.company}</span></td>
                   <td data-label={t('table.date')} className={['jt-cell-date', isOld(a) ? 'jt-old-date' : 'jt-current-date', sortBy.col === 'date' ? 'jt-sorted-cell' : ''].filter(Boolean).join(' ')} title={isStale(a) ? t('stale.hint') : undefined}>
                     <CellLabel col="date">{t('table.date')}</CellLabel>

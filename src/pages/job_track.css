@@ -479,10 +479,21 @@
 .jtb-synced .jts-clear-amber, .jtb-synced .jts-confirm { max-width: 32rem; }
 /* 2026-10-14 owner: all 8 columns fit the screen - no sideways scroll, nothing hidden */
 .applications-table { table-layout: fixed; }
-.applications-table th:nth-child(1) { width: 7.4rem; }
-.applications-table th:nth-child(2) { width: 8rem; }
 .applications-table th:nth-child(3), .applications-table th:nth-child(4) { width: 6rem; }
 .applications-table th:nth-child(7) { width: 10.5rem; }
+/* 2026-11-15 owner: CL and CV took all the spare width though most cells are a tick or a cross - now as wide as their
+   headers, and Role and Company share the spare width */
+.applications-table th:nth-child(5), .applications-table th:nth-child(6) { width: 4.6rem; }
+/* notes moved under the role on desktop (they sat in the CL/CV cell and needed its width); phone cards keep them there.
+   Date and Status no longer break mid-word ("2026-10-1 / 4", "Ap / plie / d") */
+.jt-note-desk { display: none; }
+@media (min-width: 761px) {
+  .jt-note-desk { display: block; margin-top: .35rem; font-size: .85rem; }
+  .jt-cell-documents .jt-application-note { display: none; }
+  .applications-table th:nth-child(3) { width: 7.2rem; }
+  .applications-table th:nth-child(4) { width: 8rem; }
+  .jt-cell-date > span:not(.jt-next-date), .jt-cell-status .status-badge { white-space: nowrap; overflow-wrap: normal; }
+}
 .applications-table td { overflow-wrap: anywhere; }
 .jt-small { font-size: .72rem; color: #a0a0b0; }
 .jt-clip { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
