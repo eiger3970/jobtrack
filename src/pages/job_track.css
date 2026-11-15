@@ -1581,3 +1581,4 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jt-quote cite { font-style: normal; color: #656078; white-space: nowrap; }
 @media (max-width: 760px) { .jt-secondary-actions { flex-wrap: wrap; } .jt-quote { flex-basis: 100%; order: 2; margin: .4rem 0 0; text-align: left; } }
 .jt-sponsor { margin: .8rem 0 .4rem; }
+.jt-biz-link { margin: 0 0 .6rem; font-size: .8rem; text-align: right; }
