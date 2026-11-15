@@ -491,7 +491,7 @@
 @media (min-width: 761px) {
   .jt-note-desk { display: block; margin-top: .35rem; font-size: .85rem; }
   .jt-cell-documents .jt-application-note { display: none; }
-  .applications-table th:nth-child(3) { width: 7.2rem; }
+  .applications-table th:nth-child(3) { width: 8.6rem; white-space: nowrap; }
   .applications-table th:nth-child(4) { width: 8rem; }
   .jt-cell-date > span:not(.jt-next-date), .jt-cell-status .status-badge { white-space: nowrap; overflow-wrap: normal; }
 }
@@ -580,7 +580,8 @@
 .jt-datekey { display: flex; flex-direction: column; gap: 0.35rem; }
 .jt-dk-white { color: var(--jt-period-date, #00ff41); } .jt-dk-amber { color: #a0a0b0; }
 .jt-dk-line { display: inline-block; width: 1.6rem; height: 3px; background: #ffb000; vertical-align: middle; }
-.jt-status-counts { display: flex; flex-wrap: wrap; gap: 0.15rem 0.4rem; font-weight: 400; font-size: .72rem; margin-top: 0.2rem; }
+/* 2026-11-15 owner: status counts smaller and tighter so the header row stays low */
+.jt-status-counts { display: flex; flex-wrap: wrap; gap: 0 0.3rem; font-weight: 400; font-size: .62rem; line-height: 1.15; margin-top: 0.1rem; }
 .jt-sc { color: #a0a0b0; } .jt-sc-rejected { color: #ff6b6b; } .jt-sc-applied { color: #4d9dff; } .jt-sc-interview, .jt-sc-offer, .jt-sc-accepted { color: #00ff41; }
 .orp-before-tip { border-left: 3px solid #ffb000; padding: 0.4rem 0.6rem; background: rgba(255,176,0,0.08); color: #ffcf70; font-size: .85rem; margin: 0.5rem 0; }
 .orp-warn ul { margin: 0.2rem 0 0; padding-left: 1.2rem; }
