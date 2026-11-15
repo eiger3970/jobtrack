@@ -1588,3 +1588,11 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 @media (max-width: 760px) { .jt-secondary-actions { flex-wrap: wrap; } .jt-quote { flex-basis: 100%; order: 2; margin: .4rem 0 0; text-align: left; } }
 .jt-sponsor { margin: .8rem 0 .4rem; }
 .jt-biz-link { margin: 0 0 .6rem; font-size: .8rem; text-align: right; }
+/* 2026-11-15 owner: phone - Job-Room entries and Report stay on the first row beside the add/email/sync buttons;
+   the quote takes its own row underneath (it made the button group wrap as a whole) */
+@media (max-width: 760px) {
+  .jobtrack-page .howto-strip { flex-wrap: wrap; }
+  .howto-strip > .jt-secondary-actions { display: contents; }
+  .howto-strip > .jt-secondary-actions > .toolbar-primary { margin-left: auto; flex-wrap: nowrap; }
+  .howto-strip > .jt-secondary-actions > .jt-quote { order: 99; flex: 1 1 100%; margin: .4rem 0 0; text-align: left; }
+}
