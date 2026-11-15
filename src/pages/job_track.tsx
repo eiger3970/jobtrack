@@ -324,6 +324,7 @@ export default function JobTrack() {
   }
   function openOrp(cleanup = false) { setOrpCleanup(cleanup); setOrpPanel(true) }
   const settingsDialogRef = useRef<HTMLDialogElement>(null)
+  const [whereOpen, setWhereOpen] = useState(false)
   const [minimal, setMinimal] = useState(() => readStored(MIN_STORAGE) !== '0' || (import.meta.env.DEV && typeof window !== 'undefined' && window.location.search.includes('min')))
   useEffect(() => { try { localStorage.setItem(MIN_STORAGE, minimal ? '1' : '0') } catch { /* private mode */ } }, [minimal])
   // 2026-10-14: phone + computer sync - the phone arrives from the QR with #sync=
@@ -930,11 +931,11 @@ export default function JobTrack() {
   function copyAsList() {
     uxRecorder.mark('copy_email')
     const lines = apps.map(a => {
-      let line = `- ${a.date} — ${a.company} — ${a.role} (${STATUS_PLAIN[a.status] || a.status})`
-      if (a.cover?.trim()) line += ` — ${t('table.cover')}: ${a.cover}`
-      if (a.cv?.trim()) line += ` — ${t('table.cv')}: ${a.cv}`
-      if (a.nextDate) line += ` — ${t('copyList.next')}: ${a.nextDate}`
-      if (a.notes?.trim()) line += ` — ${t('table.notes')}: ${a.notes}`
+      let line = `- ${a.date} - ${a.company} - ${a.role} (${STATUS_PLAIN[a.status] || a.status})`
+      if (a.cover?.trim()) line += ` - ${t('table.cover')}: ${a.cover}`
+      if (a.cv?.trim()) line += ` - ${t('table.cv')}: ${a.cv}`
+      if (a.nextDate) line += ` - ${t('copyList.next')}: ${a.nextDate}`
+      if (a.notes?.trim()) line += ` - ${t('table.notes')}: ${a.notes}`
       return line
     })
     navigator.clipboard?.writeText(lines.join('\n')).then(() => {
@@ -1057,6 +1058,8 @@ export default function JobTrack() {
           {/* 2026-10-14 owner: the app icon (clipboard + check + confetti) everywhere */}
           <img src={jobTrackIcon} alt="" style={{ width: '2.4rem', height: '2.4rem', borderRadius: '22%', flexShrink: 0 }} />
           <span>{t('title')}</span>
+          {/* 2026-11-15 owner: "Website or app?" took a row of its own - now beside the title; the three lines open below only when tapped */}
+          {!isApp() && <button type="button" className="jt-where-btn" aria-expanded={whereOpen} onClick={() => setWhereOpen(v => !v)}>{t('where.title')}</button>}
           {/* 2026-10-14 owner: "lots of controls... a minimal version with only images" -
               icons only; mouse over a row (or tap this again on a phone) for the full view */}
           <span className="jt-header-controls">
@@ -1066,15 +1069,12 @@ export default function JobTrack() {
           </button>
           <button type="button" className="jt-settings-toggle" aria-label={t('settings.title')} title={t('settings.title')} onClick={() => settingsDialogRef.current?.showModal()}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="#0f0d1a"/><circle cx="15" cy="17" r="3" fill="#0f0d1a"/></svg></button></span>
         </h1>
-        {/* 2026-11-09 owner: website or app, one fold, three lines with icons (website only; the app itself needs no pitch) */}
-        {!isApp() && <details className="jt-where">
-          <summary>{t('where.title')}</summary>
-          <ul>
+        {/* 2026-11-09 owner: website or app, three lines with icons (website only; the app itself needs no pitch) */}
+        {!isApp() && whereOpen && <div className="jt-where"><ul>
             <li><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v10z" /></svg><span>{t('where.web')}</span></li>
             <li><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" /></svg><span>{t('where.backup')}</span></li>
             <li><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z" /></svg><span>{t('where.app')}</span></li>
-          </ul>
-        </details>}
+          </ul></div>}
         <div className="stats">
           {quota && !editingQuota && (() => {
             const count = countInPeriod(apps, quota.period)
