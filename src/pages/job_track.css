@@ -1421,8 +1421,8 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 /* 2026-11-09 website-or-app fold: one quiet line closed, three icon lines open */
 .jt-where { margin: 0 0 12px; font-size: .9rem; }
 .jt-where-btn { background: none; border: 0; padding: 0 .25rem; min-height: 44px; color: var(--nebula-teal); font: inherit; font-size: .9rem; font-weight: 400; cursor: pointer; -webkit-text-fill-color: currentColor; }
-.jt-where-btn::after { content: ' \25BE'; font-size: .75em; }
-.jt-where-btn[aria-expanded="true"]::after { content: ' \25B4'; }
+.jt-where-btn::after { content: ' \25B8'; font-size: .75em; }  /* closed: points right, like a fold */
+.jt-where-btn[aria-expanded="true"]::after { content: ' \25BE'; }  /* open: points down */
 .jt-where summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--nebula-teal); }
 .jt-where ul { list-style: none; margin: 0; padding: 0; }
 .jt-where li { display: flex; gap: 12px; align-items: flex-start; padding: 6px 0; color: var(--text-mid); }
