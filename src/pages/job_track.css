@@ -1602,3 +1602,8 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jt-settings-lang .jt-lang-pills { display: flex; gap: .5rem; flex-wrap: wrap; }
 .jt-lang-pills button { min-height: 44px; padding: 0 1rem; border-radius: 999px; border: 1px solid #3a3a4a; background: #0f0d1a; color: #f0eeff; font: inherit; }
 .jt-lang-pills button.on { border-color: #00ff41; color: #00ff41; }
+/* 2026-11-15 owner: "Accepted" ran out of its card on the phone - less side padding, the name may wrap under its icon */
+@media (max-width: 760px) {
+  .stat-card { padding: .9rem .35rem; min-width: 0; }
+  .stat-label { flex-wrap: wrap; max-width: 100%; }
+}
