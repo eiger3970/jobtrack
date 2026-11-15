@@ -1539,8 +1539,13 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jts-private + .jts-match { margin: .1rem 0 .8rem; }
 
 /* edge map (components/job_map.tsx): faint at rest, solid while scrolling or dragging */
-.jt-map { position: fixed; right: 3px; top: 96px; bottom: 96px; width: 22px; z-index: 40; opacity: .6; transition: opacity .25s; pointer-events: none; }
+.jt-map { position: fixed; right: 3px; top: 96px; bottom: 96px; width: 22px; z-index: 40; opacity: .6; transition: opacity .25s, transform .25s; pointer-events: none; }
 .jt-map-on { opacity: 1; }
+/* 2026-11-15 owner: the buttons win when the list is still - the map slides to a thin edge strip and lets taps through;
+   it comes back while scrolling or dragging */
+.jt-map:not(.jt-map-on) { transform: translateX(17px); opacity: .45; }
+.jt-map:not(.jt-map-on) .jt-map-bar { pointer-events: none; }
+.jt-map:not(.jt-map-on) .jt-map-month { opacity: 0; }
 /* 2026-11-14 owner: grey map was boring -> green-teal-violet gradient, jobs as thin dark lines, months as bright tags */
 .jt-map-bar { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 0; border-radius: 8px; background: linear-gradient(180deg, #00e676 0%, #00bcd4 50%, #8b6cff 100%); box-shadow: 0 0 10px rgba(0,188,212,.35); overflow: hidden; pointer-events: auto; cursor: pointer; }
 .jt-map-bar i { flex: 1 1 0; min-height: 0; background: transparent; border-bottom: 1px solid rgba(3,2,10,.35); }
