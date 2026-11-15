@@ -47,6 +47,13 @@ export function aiTrialUsed(): boolean {
     return localStorage.getItem('kworld_jobtrack_ai_trial_used') === '1' || Object.values(readAll()).some(s => !!s.trace)
   } catch { return false }
 }
+// 2026-11-15 owner: free finds are unlimited; after 5 a short note says Pro finds keep working on busy days
+export function freeFindsCount(): number {
+  try { return parseInt(localStorage.getItem('kworld_jobtrack_free_finds') || '0', 10) || 0 } catch { return 0 }
+}
+function countFreeFind() {
+  try { localStorage.setItem('kworld_jobtrack_free_finds', String(freeFindsCount() + 1)) } catch { /* unavailable storage */ }
+}
 function markTrialUsed() {
   try { localStorage.setItem('kworld_jobtrack_ai_trial_used', '1') } catch { /* unavailable storage */ }
 }
@@ -103,7 +110,7 @@ export async function aiFind(o: { want?: 'joblink'; date?: string; company: stri
       if (d.status === 'trial_used') { markTrialUsed(); return { kind: 'used' } }
       if (d.status === 'cap') return { kind: 'cap' }
       if (d.status === 'paused') return { kind: 'paused' }
-      if (d.status === 'ok' && d.found && d.pro === false) markTrialUsed()
+      if (d.status === 'ok' && d.found && d.pro === false) { markTrialUsed(); if (d.via !== 'search') countFreeFind() }
       if (o.want === 'joblink' && d.status === 'ok') return { kind: 'jobs', jobs: Array.isArray(d.jobs) ? d.jobs : [], email: typeof d.email === 'string' ? d.email : '', via: typeof d.via === 'string' ? d.via : '' }
       if (d.status === 'ok') return d.found ? { kind: 'ok', free: d.pro === false, locs: rankLocations(d.locations ?? [], o.jobLocation ?? '', o.hint), contact: d.contact ?? {}, sources: d.sources ?? [], trace: d.trace } : { kind: 'none' }
       if (d.status === 'error') return { kind: 'err', detail: d.detail || '', trail: tr() }

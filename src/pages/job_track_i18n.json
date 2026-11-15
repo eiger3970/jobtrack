@@ -2170,8 +2170,8 @@
     "fd.histMore": {"en": "Other pages found", "de": "Weitere gefundene Seiten", "fr": "Autres pages trouvées"},
     "fd.histBusy": {"en": "AI paid package working for you", "de": "Bezahltes KI-Paket arbeitet für Sie", "fr": "Le forfait IA payant travaille pour vous"},
     "fd.histPerm": {"en": "Allow history search in the tab that just opened, then tap again.", "de": "Verlaufssuche im neu geöffneten Tab erlauben, dann nochmals tippen.", "fr": "Autorisez la recherche dans l'onglet qui vient de s'ouvrir, puis touchez à nouveau."},
-    "fd.histCap": {"en": "Free AI limit reached. Use the steps below.", "de": "Gratis-KI-Limit erreicht. KI bezahlen oder die Schritte unten nutzen.", "fr": "Limite de l'IA gratuite atteinte. Payer l'IA, ou suivre les étapes ci-dessous."},
-    "fd.histCapPay": {"en": "Free AI limit reached. Pay for more AI, or use the steps below.", "de": "Gratis-KI-Limit erreicht. KI bezahlen oder die Schritte unten nutzen.", "fr": "Limite de l'IA gratuite atteinte. Payer l'IA, ou suivre les étapes ci-dessous."},
+    "fd.histCap": {"en": "Free AI is paused for today (busy day). Use the steps below.", "de": "Die Gratis-KI ist für heute pausiert (viel los). Die Schritte unten nutzen.", "fr": "L'IA gratuite est en pause pour aujourd'hui (journée chargée). Suivez les étapes ci-dessous."},
+    "fd.histCapPay": {"en": "Free AI is paused for today (busy day). Pro keeps working, or use the steps below.", "de": "Die Gratis-KI ist für heute pausiert (viel los). Pro läuft weiter, oder die Schritte unten nutzen.", "fr": "L'IA gratuite est en pause pour aujourd'hui (journée chargée). Pro continue, ou suivez les étapes ci-dessous."},
     "fd.histErr": {"en": "AI search failed. Try again later or use the steps below.", "de": "KI-Suche fehlgeschlagen. Später erneut versuchen oder die Schritte unten nutzen.", "fr": "Recherche IA échouée. Réessayez plus tard ou suivez les étapes ci-dessous."},
     "fd.histProCap": {"en": "All 20 AI finds used. Try the steps below.", "de": "Alle 20 KI-Suchen verbraucht. Die Schritte unten versuchen.", "fr": "Les 20 recherches IA sont utilisées. Essayez les étapes ci-dessous."},
     "fd.histBuy": {"en": "Free AI search is unavailable. Get Pro (US$5 = 20 AI finds), or use the steps below.", "de": "Die Gratis-KI-Suche ist nicht verfügbar. Pro holen (US$5 = 20 KI-Suchen) oder die Schritte unten nutzen.", "fr": "La recherche IA gratuite est indisponible. Prendre Pro (US$5 = 20 recherches IA), ou suivre les étapes ci-dessous."},
@@ -2232,24 +2232,25 @@
     "ai.f.addr": {"en": "Finding address", "de": "Suche nach Adresse", "fr": "Recherche de l’adresse"},
     "ai.f.contact": {"en": "Finding contact", "de": "Suche nach Kontakt", "fr": "Recherche du contact"},
     "ai.f.email": {"en": "Finding email", "de": "Suche nach E-Mail", "fr": "Recherche de l’e-mail"},
-    "ai.f.free": {"en": "(1 free)", "de": "(1 gratis)", "fr": "(1 gratuit)"},
+    "ai.f.free": {"en": "(free)", "de": "(gratis)", "fr": "(gratuit)"},
     "ai.btn": {
       "en": "Find address and contact",
       "de": "Adresse und Kontakt finden",
       "fr": "Trouver adresse et contact"
     },
     "ai.btnFree": {
-      "en": "Find address and contact (1 free)",
-      "de": "Adresse und Kontakt finden (1 gratis)",
-      "fr": "Trouver adresse et contact (1 gratuit)"
+      "en": "Find address and contact (free)",
+      "de": "Adresse und Kontakt finden (gratis)",
+      "fr": "Trouver adresse et contact (gratuit)"
     },
-    "ai.buyResult": {"en": "Get Pro - $5 (20 AI finds, 1 free AI result done)", "de": "Pro holen - $5 (20 KI-Suchen, 1 kostenloses KI-Ergebnis fertig)", "fr": "Obtenir Pro - 5 $ (20 recherches IA, 1 résultat IA gratuit terminé)"},
+    "ai.buyResult": {"en": "Get Pro - $5 (20 AI finds that keep working on busy days)", "de": "Pro holen - $5 (20 KI-Suchen, die auch an vollen Tagen laufen)", "fr": "Obtenir Pro - 5 $ (20 recherches IA qui marchent aussi les jours chargés)"},
+    "ai.freeNote": {"en": "Free AI finds pause on busy days. Pro finds keep working.", "de": "Gratis-KI-Suchen pausieren an vollen Tagen. Pro-Suchen laufen weiter.", "fr": "Les recherches IA gratuites s’arrêtent les jours chargés. Celles de Pro continuent."},
     "ai.buyRunning": {"en": "Get Pro - $5 (20 AI finds, analysing selected application now)", "de": "Pro holen - $5 (20 KI-Suchen, ausgewählte Bewerbung wird analysiert)", "fr": "Obtenir Pro - 5 $ (20 recherches IA, analyse de la candidature sélectionnée en cours)"},
     "ai.busyPaid": {"en": "AI search running...", "de": "KI-Suche läuft...", "fr": "Recherche IA en cours..."},
     "ai.busy": {
-      "en": "AI search 1 free running...",
-      "de": "1 kostenlose KI-Suche läuft...",
-      "fr": "1 recherche IA gratuite en cours..."
+      "en": "Free AI search running...",
+      "de": "Kostenlose KI-Suche läuft...",
+      "fr": "Recherche IA gratuite en cours..."
     },
     "ai.none": {
       "en": "Nothing reliable found. Use the steps below.",

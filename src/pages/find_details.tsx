@@ -6,7 +6,7 @@ import { useProKey } from '../lib/pro'
 import { PackList, openPacks, readPackToken } from '../lib/credit_packs'
 import { isApp } from '../lib/platform'
 import { PRO_KEY } from './job_track_pro'
-import { aiFind, aiTrialUsed, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
+import { aiFind, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
 
 type AiState = 'idle' | 'busy' | 'result' | 'used' | 'cap' | 'none' | 'err'
 
@@ -624,6 +624,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
             </div>
           </>}
           </div>}
+          {buyLive && !pro && ai === 'result' && freeResult && freeFindsCount() >= 5 && <span className="fd-t">{t('ai.freeNote')}</span>}
           {buyLive && !pro && ai !== 'idle' && ai !== 'busy' && !(ai === 'err' && aiErr) && <div className="fd-ai-buy"><button type="button" className="btn fd-btn" onClick={() => openPacks()}>{t(ai === 'result' && freeResult ? 'ai.buyResult' : 'bulk.buy')}</button></div>}
         </li>
 

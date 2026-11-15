@@ -1,5 +1,6 @@
 import { Fragment, useState, useEffect, useRef, type ReactNode } from 'react'
 import { countAdClick, useAdView } from '../lib/ad_count'
+import { SPONSORS } from '../lib/jobtrack_sponsors'
 import { useLanguage } from '../context/language'
 import jobTrackI18n from './job_track_i18n.json'
 import './job_track.css'
@@ -237,6 +238,7 @@ export default function JobTrack() {
   const adCl = useRef<HTMLAnchorElement>(null)
   useAdView(adCv, 'jobtrack:cv', !isApp())
   useAdView(adCl, 'jobtrack:cl', !isApp())
+  const adSponsor = useRef<HTMLAnchorElement>(null)
   // phone: lock page zoom on this page only (iOS Firefox restores a zoomed view after refresh); restored on leave
   useEffect(() => {
     const m = document.querySelector('meta[name="viewport"]'); if (!m) return
@@ -322,6 +324,10 @@ export default function JobTrack() {
     c = c || btnCountry
     return t(c === 'CH' ? 'orp.button.ch' : c === 'AU' ? 'orp.button.au' : c ? 'orp.button.other' : 'orp.button')
   }
+  // 2026-11-15 owner: the sponsor line follows the same country as the Job-Room button
+  const sponsorCountry = (() => { let c = ''; try { c = (localStorage.getItem('kworld_jobtrack_country') || '').toUpperCase() } catch { /* private mode */ } return c || btnCountry })()
+  const sponsor = SPONSORS[sponsorCountry]
+  useAdView(adSponsor, 'jobtrack:sponsor:' + (sponsor ? sponsorCountry : 'yours'), !!sponsor || !isApp())
   function openOrp(cleanup = false) { setOrpCleanup(cleanup); setOrpPanel(true) }
   const settingsDialogRef = useRef<HTMLDialogElement>(null)
   const [whereOpen, setWhereOpen] = useState(false)
@@ -1428,6 +1434,12 @@ export default function JobTrack() {
             </tbody>
           </table>
         </div>
+
+        {/* 2026-11-15 owner: one sponsor line under the jobs table (no new row at the top); empty slot = "Your ad here" on the website only */}
+        {(sponsor || !isApp()) && <a className={'orp-ad jt-sponsor' + (sponsor ? '' : ' orp-ad-you')} ref={adSponsor} onClick={() => countAdClick('jobtrack:sponsor:' + (sponsor ? sponsorCountry : 'yours'))}
+          href={sponsor ? sponsor.url : '/contact?help=1&focus=contact&msg=' + encodeURIComponent('I would like to sponsor JobTrack' + (sponsorCountry ? ' in ' + sponsorCountry : '') + '.')} target="_blank" rel={sponsor ? 'sponsored noopener noreferrer' : 'noopener noreferrer'}>
+          <span>{sponsor ? <><b>{sponsor.name}</b> {sponsor.text}</> : <><b>{t('ad.yoursH')}</b> {t('ad.yours')}</>}</span>
+        </a>}
 
         <p className="jt-sponsor-privacy">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
