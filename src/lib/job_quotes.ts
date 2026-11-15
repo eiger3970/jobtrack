@@ -54,6 +54,20 @@ export const JOB_QUOTES: [string, string][] = [
   ['They tramp in mateship side by side.', 'Henry Lawson'],
   ['And he sees the vision splendid of the sunlit plains extended, and at night the wondrous glory of the everlasting stars.', 'Banjo Paterson'],
   ['Be micro-ambitious. Put your head down and work with pride on whatever is in front of you.', 'Tim Minchin'],
+  // 2026-11-15 owner: funny but positive, to help over the hill of pain
+  ['Don\u2019t worry about the world coming to an end today. It\u2019s already tomorrow in Australia.', 'Charles Schulz'],
+  ['Learn from yesterday, live for today, look to tomorrow, rest this afternoon.', 'Charles Schulz'],
+  ['There\u2019s no such thing as bad weather, just the wrong clothes, so get yourself a sexy raincoat and live a little.', 'Billy Connolly'],
+  ['If life is a bowl of cherries, what am I doing in the pits?', 'Erma Bombeck'],
+  ['I love deadlines. I love the whooshing noise they make as they go by.', 'Douglas Adams'],
+  ['Don\u2019t Panic.', 'Douglas Adams'],
+  ['I refuse to join any club that would have me as a member.', 'Groucho Marx'],
+  ['Experience is the name everyone gives to their mistakes.', 'Oscar Wilde'],
+  ['We are all in the gutter, but some of us are looking at the stars.', 'Oscar Wilde'],
+  ['Laughter and tears are both responses to frustration and exhaustion. I myself prefer to laugh, since there is less cleaning up to do afterward.', 'Kurt Vonnegut'],
+  ['You can\u2019t be that kid standing at the top of the waterslide, overthinking it. You have to go down the chute.', 'Tina Fey'],
+  ['Money can\u2019t buy you happiness, but it does bring you a more pleasant form of misery.', 'Spike Milligan'],
+  ['It\u2019s not much of a tail, but I\u2019m sort of attached to it.', 'Eeyore, A.A. Milne'],
   ['Fall seven times, stand up eight.', 'Japanese proverb'],
   ['The bamboo that bends is stronger than the oak that resists.', 'Japanese proverb'],
   ['The one who moves a mountain begins by carrying away small stones.', 'Chinese proverb'],
@@ -62,14 +76,32 @@ export const JOB_QUOTES: [string, string][] = [
   ['Rest if you must, but don\u2019t you quit.', 'From the poem Don\u2019t Quit'],
 ]
 
-const LAST_KEY = 'jobtrack_quote_last'
+const BAG_KEY = 'jobtrack_quote_bag'
 
-/** A different quote on every visit: random, never the one shown last time on this device. */
+/** 2026-11-15 owner: "numerous so jobseekers long term see no repeats" - each device works through every quote in a
+ *  shuffled order before any comes back (a new shuffle each round, never starting with the last one shown). New quotes
+ *  added later join the current round. */
 export function nextQuote(): [string, string] {
-  let last = -1
-  try { last = Number(localStorage.getItem(LAST_KEY) ?? -1) } catch { /* private mode */ }
-  let i = Math.floor(Math.random() * JOB_QUOTES.length)
-  if (i === last) i = (i + 1) % JOB_QUOTES.length
-  try { localStorage.setItem(LAST_KEY, String(i)) } catch { /* private mode */ }
+  const n = JOB_QUOTES.length
+  let bag: { order: number[]; pos: number; last: number } = { order: [], pos: 0, last: -1 }
+  try { bag = { ...bag, ...JSON.parse(localStorage.getItem(BAG_KEY) || '{}') } } catch { /* private mode or bad data */ }
+  const known = new Set(bag.order)
+  const fresh = Array.from({ length: n }, (_, i) => i).filter(i => !known.has(i))
+  bag.order = bag.order.filter(i => i < n)
+  if (fresh.length) bag.order.splice(bag.pos + 1, 0, ...shuffle(fresh))
+  if (bag.pos >= bag.order.length) {
+    bag.order = shuffle(Array.from({ length: n }, (_, i) => i))
+    if (bag.order[0] === bag.last && n > 1) bag.order.push(bag.order.shift()!)
+    bag.pos = 0
+  }
+  const i = bag.order[bag.pos]
+  bag.pos += 1
+  bag.last = i
+  try { localStorage.setItem(BAG_KEY, JSON.stringify(bag)) } catch { /* private mode */ }
   return JOB_QUOTES[i]
+}
+
+function shuffle(a: number[]): number[] {
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]] }
+  return a
 }
