@@ -246,7 +246,7 @@ export default function JobTrack() {
     m.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0')
     return () => { m.setAttribute('content', old) }
   }, [])
-  const { lang } = useLanguage()
+  const { lang, setLang } = useLanguage()
   const t = (key: string) => getString(key, lang)
   const STATUS_PLAIN: Record<string, string> = {
     applied: t('status.plain.applied'), screening: t('status.plain.screening'), interview: t('status.plain.interview'),
@@ -1117,7 +1117,7 @@ export default function JobTrack() {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z" /></svg>
                 </button>
                 <div className="stat-number" style={{ color }}>{count} / {quota.target}</div>
-                <div className="stat-label">{quota.period === 'month' ? t('quota.thisMonth') : quota.period === 'fortnight' ? t('quota.thisFortnight') : t('quota.thisWeek')}</div>
+                <div className="stat-label"><HeaderIcon col="date" />{quota.period === 'month' ? t('quota.thisMonth') : quota.period === 'fortnight' ? t('quota.thisFortnight') : t('quota.thisWeek')}</div>
                 <div className="quota-bar"><div className="quota-bar-fill" style={{ width: `${pct}%`, background: color }} /></div>
                 {milestone && <div className="quota-milestone" style={{ color }}>{milestone}</div>}
               </div>
@@ -1146,11 +1146,13 @@ export default function JobTrack() {
               </div>
             </div>
           )}
-          <div className="stat-card"><div className="stat-number">{apps.length}</div><div className="stat-label">{t('stat.total')}</div></div>
-          {Object.entries(counts).map(([s, n]) => <div key={s} className="stat-card"><div className="stat-number">{n}</div><div className="stat-label">{STATUS_PLAIN[s] || s}</div></div>)}
+          <div className="stat-card"><div className="stat-number">{apps.length}</div><div className="stat-label"><HeaderIcon col="list" />{t('stat.total')}</div></div>
+          {Object.entries(counts).map(([s, n]) => <div key={s} className="stat-card"><div className="stat-number">{n}</div><div className={`stat-label jt-sc-${s}`}><StatusIcon status={s} />{STATUS_PLAIN[s] || s}</div></div>)}
         </div>
         <dialog ref={settingsDialogRef} className="jt-notes-dialog jt-settings-dialog" onClick={e => { const r = e.currentTarget.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.currentTarget.close() }}>
           <h2>{t('settings.title')}</h2>
+          {/* 2026-11-15 owner: app language - follows the phone until picked here (the website has the flag in the menu) */}
+          {isApp() && <section className="jt-settings-lang"><h3>Language · Sprache · Langue</h3><div className="jt-lang-pills">{([['en', 'English'], ['de', 'Deutsch'], ['fr', 'Français']] as const).map(([l, name]) => <button key={l} type="button" className={lang === l ? 'on' : ''} aria-pressed={lang === l} onClick={() => setLang(l)}>{name}</button>)}</div></section>}
           <section className="jt-settings-backups"><h3>{t('settings.backupFiles')}</h3><div className="howto-step howto-step-info" ref={infoRef}>
             <button type="button" className="howto-go" onClick={exportBackup} disabled={apps.length === 0}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg>

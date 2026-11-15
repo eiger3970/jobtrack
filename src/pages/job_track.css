@@ -1596,3 +1596,9 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
   .howto-strip > .jt-secondary-actions > .toolbar-primary { margin-left: auto; flex-wrap: nowrap; }
   .howto-strip > .jt-secondary-actions > .jt-quote { order: 99; flex: 1 1 100%; margin: .4rem 0 0; text-align: left; }
 }
+/* 2026-11-15 owner: an icon left of each stat card name */
+.stat-label { display: inline-flex; align-items: center; justify-content: center; gap: .3rem; }
+.stat-label svg { width: 14px; height: 14px; flex: none; }
+.jt-settings-lang .jt-lang-pills { display: flex; gap: .5rem; flex-wrap: wrap; }
+.jt-lang-pills button { min-height: 44px; padding: 0 1rem; border-radius: 999px; border: 1px solid #3a3a4a; background: #0f0d1a; color: #f0eeff; font: inherit; }
+.jt-lang-pills button.on { border-color: #00ff41; color: #00ff41; }
