@@ -9,7 +9,7 @@ import JobTrackPro from './job_track_pro'
 import { type Application, type OrpMethod, ORP_DEFAULTS, jobRoomEntry, jobRoomMissing } from '../lib/orp'
 import OrpPanel from './orp_panel'
 import JobSaveBookmark from './job_save_bookmark'
-import { TapCount, KeyCount } from './find_details'
+import { TapCount, KeyCount, SegSteps } from './find_details'
 import JobTrackSync, { clearComputer } from './job_track_sync'
 import { FILL_KEY } from '../lib/jobroom_fill'
 import { nextQuote } from '../lib/job_quotes'
@@ -797,12 +797,14 @@ export default function JobTrack() {
   // in one i. Export file = no judgement (subject + sender come along); Select all = fewer steps, can catch other
   // emails from the inbox list; Copy parts = today's way, the person guesses how much to copy.
   type EmailWay = 'file' | 'all' | 'parts'
-  const [emailWay, setEmailWay] = useState<EmailWay>(() => { try { const w = localStorage.getItem('kworld_jobtrack_emailway'); if (w === 'file' || w === 'all' || w === 'parts') return w } catch { /* private mode */ } return window.matchMedia('(max-width: 760px)').matches ? 'parts' : 'file' })
+  const [emailWay, setEmailWay] = useState<EmailWay>(() => { try { const w = localStorage.getItem('kworld_jobtrack_emailway'); if (w === 'file' || w === 'all' || w === 'parts') return w } catch { /* private mode */ } return (isApp() || /iPhone|iPod|Android/i.test(navigator.userAgent)) ? 'parts' : 'file' })
+  // 2026-11-16 owner: say which way is best on this device - computer: Export file; phone and app: Copy parts (phone email apps mostly cannot export an email file)
+  const bestEmailWay: EmailWay = phoneDevice ? 'parts' : 'file'
   const pickEmailWay = (w: EmailWay) => { setEmailWay(w); try { localStorage.setItem('kworld_jobtrack_emailway', w) } catch { /* private mode */ } }
   const EMAIL_WAYS: Record<EmailWay, { taps: number; name: string; steps: string }> = {
-    file: { taps: 10, name: 'Export file', steps: 'Email: open it → ⋯ More → Export / Download → here: Open email file → pick it → Update status' },
-    all: { taps: 8, name: 'Select all', steps: 'Email: open it → Ctrl+A (select all) → Ctrl+C → here: paste in the box → Update status' },
-    parts: { taps: 14, name: 'Copy parts', steps: 'Email: select the text → copy → paste here → then the subject the same way → Update status' },
+    file: { taps: 10, name: 'Export file', steps: 'Email app -> open the email -> ⋯ More -> Export / Download -> JobTrack -> Open email file -> pick the email file -> Update status' },
+    all: { taps: 8, name: 'Select all', steps: 'Email app -> open the email -> Ctrl+A (select all) -> Ctrl+C (copy) -> JobTrack -> paste into the email box -> Update status' },
+    parts: { taps: 14, name: 'Copy parts', steps: 'Email app -> open the email -> select the email text -> copy -> JobTrack -> paste into the email box -> Email app -> select the subject -> copy -> JobTrack -> paste into the subject box -> Update status' },
   }
   const emailFileRef = useRef<HTMLInputElement>(null)
   const [emailFileNote, setEmailFileNote] = useState('')
@@ -820,7 +822,9 @@ export default function JobTrack() {
         : 'This file could not be read as an email (.eml).')
     }
   }
+  const [emailTickRound, setEmailTickRound] = useState(0)
   function openEmailUpdate() {
+    setEmailTickRound(r => r + 1)   // every email starts with all steps not done
     setEmailFileNote('')
     focusProxyRef.current?.focus({ preventScroll: true })
     setEmailText('')
@@ -1677,15 +1681,18 @@ export default function JobTrack() {
               <button className="btn email-update-action" onClick={applyEmailUpdate} disabled={!emailCompany.trim()}>Update status</button>
             </div>}
             <div className="fill-pills" role="tablist" aria-label="How to bring the email in">
-              {(['file', 'all', 'parts'] as EmailWay[]).map(w => <button key={w} type="button" role="tab" aria-selected={emailWay === w} className={'fill-pill' + (emailWay === w ? ' on' : '')} onClick={() => pickEmailWay(w)}><TapCount n={EMAIL_WAYS[w].taps} maxCount={14} big label={t('fd.tapsAria')} />{EMAIL_WAYS[w].name}</button>)}
+              {(['all', 'file', 'parts'] as EmailWay[]).map(w =>   // 2026-11-16 owner: fewest taps first
+                <button key={w} type="button" role="tab" aria-selected={emailWay === w} className={'fill-pill' + (emailWay === w ? ' on' : '')} onClick={() => pickEmailWay(w)}><TapCount n={EMAIL_WAYS[w].taps} maxCount={14} big label={t('fd.tapsAria')} /><span className="eml-pill-name">{EMAIL_WAYS[w].name}{w === bestEmailWay && <small className="eml-pill-best">{phoneDevice ? (isApp() ? 'Best in the app' : 'Best on phone') : 'Best on computer'}</small>}</span></button>)}
               <InfoTip label="The 3 ways, step by step" icon={<><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></>} text={<span className="eml-ways-info">
-                <b>Export file, 10 taps</b>: nothing to guess, subject and sender come along.<br />{EMAIL_WAYS.file.steps}<br />
-                Gmail: ⋮ More → Download message. Outlook (web): ⋯ More → Save as / Download. Proton: ⋯ More → Export. Thunderbird: File → Save As → File. Apple Mail: File → Save As.<br /><br />
-                <b>Select all, 8 taps</b>: fastest, but some mail sites copy the inbox list too, so check the match.<br />{EMAIL_WAYS.all.steps}<br /><br />
-                <b>Copy parts, 14 taps</b>: works everywhere, also on the phone.<br />{EMAIL_WAYS.parts.steps}
+                {/* 2026-11-16 owner: the steps are under the pills already - the i only says how the 3 ways differ and where Export is */}
+                <b>Select all, 8 taps</b>: fastest, but some email clients copy the inbox list too, so the match needs to be checked.<br />
+                <b>Export file, 10 taps</b>: nothing to guess, the subject and sender come with the email file.<br />
+                <b>Copy parts, 14 taps</b>: works everywhere, also on a phone.<br /><br />
+                Best on computer: Export file. Best on phone and in the app: Copy parts.<br /><br />
+                Export email location:<br />Apple Mail: File -&gt; Save As<br />Gmail: ⋮ More -&gt; Download message<br />Outlook (web): ⋯ More -&gt; Save as / Download<br />Proton: ⋯ (More) -&gt; Export<br />Thunderbird: File -&gt; Save As -&gt; File
               </span>} />
             </div>
-            <p className="eml-way-steps">{EMAIL_WAYS[emailWay].steps}</p>
+            <p className="eml-way-steps"><SegSteps key={emailWay + emailTickRound} id={'jt_email_' + emailWay} text={EMAIL_WAYS[emailWay].steps} /></p>
             {emailWay === 'file' && <div className="eml-open-row">
               <button type="button" className="btn-secondary" onClick={() => emailFileRef.current?.click()}>
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3" /></svg>

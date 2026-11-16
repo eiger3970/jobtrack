@@ -1616,3 +1616,8 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .email-modal .fill-pills { align-items: center; }
 .eml-way-steps { margin: 0 0 .75rem; font-size: .9rem; color: #f0eeff; line-height: 1.45; }
 .eml-ways-info { display: block; text-align: left; line-height: 1.45; }
+/* 2026-11-16 owner: the email ways info was cut off on the right - it opens leftwards from the i */
+.email-modal .fill-pills .info-tip-popover { left: auto; right: 0; width: min(420px, 80vw); }
+.eml-pill-name { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.eml-pill-best { font-size: .7rem; font-weight: 600; color: #f5a524; }
+.fd-guide .fd-seg:focus-visible { outline: 2px solid #00ff41; outline-offset: 2px; border-radius: 4px; }

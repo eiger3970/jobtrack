@@ -82,8 +82,30 @@ function Segs({ id, text, map, versionBtn }: { id: string; text: string; map?: R
     const linkDone = isLink && dimmed(i)
     const sep = i > 0 ? <span className={dimmed(i - 1) ? 'fd-done' : undefined}>{' -> '}</span> : null
     if (isLink) return <span key={i}>{sep}<span className={linkDone ? 'fd-done' : undefined}>{versionBtn!(seg)}</span></span>
-    return <span key={i}>{sep}<span className={'fd-seg' + (done.includes(sid) ? ' fd-done' : '')} data-sid={sid}>{map ? flow(seg, map) : seg}</span></span>
+    return <span key={i}>{sep}<span className={'fd-seg' + (done.includes(sid) ? ' fd-done' : '')} data-sid={sid} role="button" tabIndex={0} aria-pressed={done.includes(sid)}>{map ? flow(seg, map) : seg}</span></span>
   })}</>
+}
+
+// tap one part: it and the parts before it in the same step dim; tap a dimmed part: it and every later part come back ("done up to here")
+function segTap(done: string[], all: string[], i: number): string[] {
+  const sid = all[i]
+  const step = sid.split(':')[0]
+  if (!done.includes(sid)) return Array.from(new Set([...done, ...all.slice(0, i + 1).filter(x => x.split(':')[0] === step)]))
+  const after = all.slice(i).filter(x => x.split(':')[0] === step)
+  return done.filter(x => !after.includes(x))
+}
+// 2026-11-16 owner: the same tappable "a -> b -> c" step line outside the guide window (JobTrack Update from email)
+export function SegSteps({ id, text }: { id: string; text: string }) {
+  const [done, setDone] = useState<string[]>([])
+  const box = useRef<HTMLSpanElement>(null)
+  const tap = (target: EventTarget) => {
+    const p = (target as Element).closest('[data-sid]') as HTMLElement | null; if (!p) return false
+    const all = Array.from(box.current?.querySelectorAll<HTMLElement>('[data-sid]') ?? []).map(el => el.dataset.sid as string)
+    setDone(segTap(done, all, all.indexOf(p.dataset.sid as string))); return true
+  }
+  // 2026-11-16 owner: "Can the step guide be navigated via Tab?" - Tab moves step to step, Enter or Space = tap
+  return <DoneCtx.Provider value={{ done }}><span ref={box} className="fd-guide fd-segbox fd-segline" onClick={e => { tap(e.target) }}
+    onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && tap(e.target)) e.preventDefault() }}><Segs id={id} text={text} /></span></DoneCtx.Provider>
 }
 
 // 2026-11-07 owner: a Video button that only says "Coming soon" wastes the user's time - the button shows only once the clip is confirmed to exist (a missing file may answer 200 with the page itself, so the type must be video)
@@ -121,14 +143,7 @@ function GuideRow({ t, title, group, vars, children }: { t: (k: string) => strin
   }
   // tap one part to dim it and the parts before it in the same step; tapping a dimmed part undims it and every part after it in the same step ("done up to here")
   const parts = () => Array.from(box.current?.querySelectorAll<HTMLElement>('[data-sid]') ?? [])
-  const tapPart = (i: number) => {
-    const all = parts().map(el => el.dataset.sid as string)
-    const sid = all[i]
-    const step = sid.split(':')[0]
-    if (!done.includes(sid)) { setDone(Array.from(new Set([...done, ...all.slice(0, i + 1).filter(x => x.split(':')[0] === step)]))); return }   // dims this part and every part before it in the step
-    const after = all.slice(i).filter(x => x.split(':')[0] === sid.split(':')[0])
-    setDone(done.filter(x => !after.includes(x)))
-  }
+  const tapPart = (i: number) => setDone(segTap(done, parts().map(el => el.dataset.sid as string), i))
   const partAt = (el: Element | null) => { const p = el?.closest('[data-sid]') as HTMLElement | null; return p ? parts().indexOf(p) : -1 }
   return <div className="fd-guide">
     <div className="fd-guide-btns">{kinds.map(k => <button key={k} type="button" className="fd-guide-btn" onClick={() => setOpen(k)}>{t('fd.g.' + k)}</button>)}</div>
@@ -137,7 +152,8 @@ function GuideRow({ t, title, group, vars, children }: { t: (k: string) => strin
         <div className="fd-ghead"><h3>{title}: {t('fd.g.' + open)}</h3><button type="button" className="btn-secondary fd-gclose" onClick={closeWin}>{t('fd.g.close')}</button></div>
         {open === 'text'
           ? <><DoneCtx.Provider value={{ done }}><div ref={box} className="fd-segbox"
-            onClick={e => { if ((e.target as HTMLElement).closest('button, a')) return; const i = partAt(e.target as Element); if (i >= 0) tapPart(i) }}>{children}</div></DoneCtx.Provider></>
+            onClick={e => { if ((e.target as HTMLElement).closest('button, a')) return; const i = partAt(e.target as Element); if (i >= 0) tapPart(i) }}
+            onKeyDown={e => { if (e.key !== 'Enter' && e.key !== ' ') return; const i = partAt(e.target as Element); if (i >= 0) { e.preventDefault(); tapPart(i) } }}>{children}</div></DoneCtx.Provider></>
           : open === 'images' ? <GuideImages t={t} group={group} vars={vars} /> : <GuideVideo t={t} group={group} />}
       </div>
     </div>, (document.querySelector('.jobtrack-page') as HTMLElement | null) ?? document.body)}
