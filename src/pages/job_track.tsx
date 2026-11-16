@@ -236,6 +236,16 @@ function senderDomains(text: string): string[] {
   return found
 }
 
+// 2026-11-16 owner: TéléCharmey rejection "Conducteur-trice d'engins de damage" was not matched to the saved
+// "Dameur / Snowcat Operator" - same job, no shared word. Job-title words that mean the same job map to one word.
+const ROLE_SYNONYMS: [string, string[]][] = [
+  ['grooming', ['dameur', 'dameuse', 'damage', 'damer', 'snowcat', 'ratrac', 'pistenbully', 'pistenfahrzeug', 'pistenfahrzeugfahrer', 'pistenmaschinenfahrer', 'groomer', 'grooming']],
+  ['patrol', ['patrouilleur', 'patrouilleuse', 'patrouille', 'pisteur', 'pisteuse', 'pistenpatrouille', 'pistenpatrouilleur', 'pistenretter', 'patrol', 'patroller']],
+  ['lift', ['remontees', 'telesiege', 'telecabine', 'sesselbahn', 'skilift', 'bergbahn', 'seilbahn', 'chairlift', 'liftman', 'lifty']],
+]
+const ROLE_SYNONYM_OF = new Map(ROLE_SYNONYMS.flatMap(([key, words]) => words.map(w => [w, key] as [string, string])))
+const roleWord = (w: string) => ROLE_SYNONYM_OF.get(w) ?? w
+
 export default function JobTrack() {
   const adCv = useRef<HTMLAnchorElement>(null)
   const adCl = useRef<HTMLAnchorElement>(null)
@@ -697,8 +707,8 @@ export default function JobTrack() {
     }
     if (candidates.length < 2) return candidates
     const filler = new Set(['saison', 'hiver', 'winter', 'season', 'summer', 'saisonniere', 'poste', 'operator'])
-    const tokens = candidates.map(a => [...new Set(normalizeName(a.role).split(' ').filter(w => w.length >= 4 && !filler.has(w) && !/^\d+$/.test(w)))])
-    const hayWords = new Set(hay.split(' '))
+    const tokens = candidates.map(a => [...new Set(normalizeName(a.role).split(' ').filter(w => w.length >= 4 && !filler.has(w) && !/^\d+$/.test(w)).map(roleWord))])
+    const hayWords = new Set(hay.split(' ').map(roleWord))
     const scores = candidates.map((a, i) => {
       const role = normalizeName(a.role)
       const exact = role.length >= 4 && hay.includes(role) ? 2 : 0
