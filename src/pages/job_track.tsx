@@ -786,7 +786,14 @@ export default function JobTrack() {
   function looksLikeAcknowledgement(text: string): boolean {
     return /entre de bonnes mains|nous (?:allons|avons bien) (?:reçu|l.étudier|étudier)|bien reçu|accusé de réception|avons reçu (?:ta|votre) candidature|received your application|we have received|confirm (?:the )?receipt|currently reviewing|will review your application|eingang (?:ihrer|deiner) bewerbung|(?:ihre|deine) bewerbung (?:ist )?(?:bei uns )?eingegangen|haben (?:ihre|deine) (?:bewerbung|unterlagen) erhalten|werden (?:ihre|deine) (?:bewerbung|unterlagen) (?:sorgfältig )?prüfen/i.test(text)
   }
+  // 2026-11-16 owner: "no cursor in Paste the email text here... the user has to tap again". The box gets the cursor
+  // on open. iPhones only show the keyboard for a focus made inside the tap itself, so the tap focuses a hidden
+  // stand-in field first and the box takes the focus (and keyboard) over once it is on screen.
+  const emailBodyRef = useRef<HTMLTextAreaElement>(null)
+  const focusProxyRef = useRef<HTMLInputElement>(null)
+  useEffect(() => { if (emailModal) emailBodyRef.current?.focus({ preventScroll: true }) }, [emailModal])
   function openEmailUpdate() {
+    focusProxyRef.current?.focus({ preventScroll: true })
     setEmailText('')
     setEmailSender('')
     setEmailSubject('')
@@ -1630,6 +1637,7 @@ export default function JobTrack() {
         </div>
       )}
 
+      <input ref={focusProxyRef} aria-hidden="true" tabIndex={-1} style={{ position: 'fixed', top: 0, left: 0, width: 1, height: 1, opacity: 0, fontSize: 16, border: 0, padding: 0, pointerEvents: 'none' }} />
       {emailModal && (
         <div className="modal email-modal" onClick={() => setEmailModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -1640,7 +1648,7 @@ export default function JobTrack() {
               <button className="btn email-update-action" onClick={applyEmailUpdate} disabled={!emailCompany.trim()}>Update status</button>
             </div>}
             <label className="modal-label">Email body text</label>
-            <textarea rows={8} placeholder="Paste the email text here…" value={emailText} onChange={e => checkEmailMatch(e.target.value, emailSender)} className="bulk-textarea" />
+            <textarea ref={emailBodyRef} rows={8} placeholder="Paste the email text here…" value={emailText} onChange={e => checkEmailMatch(e.target.value, emailSender)} className="bulk-textarea" />
             {emailAmbiguous && !emailMatch && <div className="email-results">
               <p role="alert">Which position is this reply about? Tap the matching job:</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
