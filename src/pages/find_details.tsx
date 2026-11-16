@@ -96,7 +96,7 @@ function segTap(done: string[], all: string[], i: number): string[] {
   return done.filter(x => !after.includes(x))
 }
 // 2026-11-16 owner: the same tappable "a -> b -> c" step line outside the guide window (JobTrack Update from email)
-export function SegSteps({ id, text }: { id: string; text: string }) {
+export function SegSteps({ id, text, map }: { id: string; text: string; map?: Record<string, ReactNode> }) {
   const [done, setDone] = useState<string[]>([])
   const box = useRef<HTMLSpanElement>(null)
   const tap = (target: EventTarget) => {
@@ -106,7 +106,7 @@ export function SegSteps({ id, text }: { id: string; text: string }) {
   }
   // 2026-11-16 owner: "Can the step guide be navigated via Tab?" - Tab moves step to step, Enter or Space = tap
   return <DoneCtx.Provider value={{ done }}><span ref={box} className="fd-guide fd-segbox fd-segline" onClick={e => { tap(e.target) }}
-    onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && tap(e.target)) e.preventDefault() }}><Segs id={id} text={text} /></span></DoneCtx.Provider>
+    onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && tap(e.target)) e.preventDefault() }}><Segs id={id} text={text} map={map} /></span></DoneCtx.Provider>
 }
 
 // 2026-11-07 owner: a Video button that only says "Coming soon" wastes the user's time - the button shows only once the clip is confirmed to exist (a missing file may answer 200 with the page itself, so the type must be video)

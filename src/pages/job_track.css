@@ -1661,3 +1661,14 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .eml-find-note { font-size: .78rem; color: #a0a0b0; }
 .eml-find-ok { flex-basis: 100%; color: #00ff41; font-weight: 600; }
 .eml-find-no { flex-basis: 100%; color: #f5a524; }
+.eml-seg-tip { position: relative; }
+.eml-seg-tip-box { display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 25; width: min(340px, 70vw); padding: .7rem .85rem; border: 1px solid var(--nebula-teal, #00ff41); border-radius: 10px; background: #03020a; color: #f0eeff; font-size: .85rem; line-height: 1.5; text-decoration: none; opacity: 1; white-space: normal; pointer-events: none; }
+@media (hover: hover) and (pointer: fine) {
+  .eml-seg-tip { text-decoration: underline dotted rgba(240,238,255,.55); text-underline-offset: 4px; }
+  .eml-seg-tip:hover .eml-seg-tip-box { display: block; }
+}
+/* 2026-11-16 owner: an export picture beside "Export email location" so the eye stops there - same icon as Open email file */
+.eml-export-head { display: flex; align-items: center; gap: .45rem; margin: 0 0 .25rem; color: #00ff41; font-weight: 700; }
+.eml-export-ico { flex: none; }
+/* 2026-11-16 owner: a colour badge per email app so the eye finds its own app (no trademark logos) */
+.eml-badge { display: inline-flex; align-items: center; justify-content: center; width: 1.2rem; height: 1.2rem; margin: .12rem .4rem .12rem 0; border-radius: 50%; color: #fff; font-size: .7rem; font-weight: 800; font-style: normal; vertical-align: middle; }
