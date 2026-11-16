@@ -1629,3 +1629,35 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
   .email-modal .fill-pill:hover .eml-pill-tip, .email-modal .fill-pill:focus-visible .eml-pill-tip { display: block; }
   .eml-ways-i { display: none; }
 }
+/* 2026-11-16 owner: email file import summary - dim label, bright value, one line each */
+.eml-card { display: grid; gap: .35rem; margin: 0 0 .9rem; padding: .8rem .95rem; border: 1px solid rgba(0,255,65,.35); border-radius: 10px; background: rgba(0,255,65,.05); }
+.eml-card > div { display: grid; grid-template-columns: 6.5rem 1fr; gap: .6rem; align-items: baseline; }
+.eml-card span { font-size: .8rem; color: #a0a0b0; }
+.eml-card b { color: #f0eeff; font-weight: 600; overflow-wrap: anywhere; }
+.eml-card .eml-card-ok { color: #00ff41; }
+.eml-card .eml-card-warn { color: #f5a524; }
+.eml-card-toggle { justify-self: start; margin-top: .3rem; background: none; border: 1px solid rgba(240,238,255,.25); border-radius: 8px; color: #c8c8d8; font-size: .8rem; padding: .3rem .7rem; cursor: pointer; }
+.eml-card-toggle:hover, .eml-card-toggle:focus-visible { color: #00ff41; border-color: #00ff41; }
+/* 2026-11-16 owner: all info found = the Update status button pulses (the next step) */
+.jobtrack-page .email-update-action.jt-guidance-glow:not(:disabled) { animation: email-update-pulse 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .jobtrack-page .email-update-action.jt-guidance-glow:not(:disabled) { animation: none; box-shadow: 0 0 8px rgba(0,255,65,.4); } }
+.eml-card-done { display: flex; align-items: center; gap: .4rem; margin: .4rem 0 0; color: #00ff41; font-weight: 600; }
+.eml-card-todo { margin: .4rem 0 0; color: #f5a524; font-weight: 600; }
+.eml-card .eml-card-go { justify-self: start; margin-top: .2rem; }
+.eml-card > .eml-card-actions { display: flex; align-items: center; gap: .75rem; }
+.eml-card-actions .eml-card-toggle { margin: 0 0 0 auto; }
+.eml-card-todo p { margin: 0 0 .3rem; }
+.eml-card-todo ol { margin: 0; padding-left: 1.3rem; font-weight: 400; color: #f0eeff; line-height: 1.6; }
+.eml-card-link { background: none; border: 0; padding: 0; color: #f5a524; font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.eml-card-link:hover, .eml-card-link:focus-visible { color: #00ff41; }
+.jobtrack-page .eml-pick-glow { animation: jr-glow-pulse 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .jobtrack-page .eml-pick-glow { animation: none; } }
+.eml-card > div.eml-card-todo { display: block; }
+/* 2026-11-16 owner: job not found - the same amber search as Find details */
+.eml-find { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .7rem; margin: .2rem 0 .6rem; font-weight: 400; }
+.eml-find-btn { display: inline-flex; align-items: center; gap: .45rem; padding: .45rem .9rem; border: 1px solid #f5a524; border-radius: 8px; background: rgba(245,165,36,.1); color: #f5a524; font: inherit; font-weight: 700; cursor: pointer; }
+.eml-find-btn:disabled { opacity: .6; cursor: progress; }
+.eml-find-dot { display: inline-block; width: .8rem; height: .8rem; border-radius: 3px; background: #f5a524; }
+.eml-find-note { font-size: .78rem; color: #a0a0b0; }
+.eml-find-ok { flex-basis: 100%; color: #00ff41; font-weight: 600; }
+.eml-find-no { flex-basis: 100%; color: #f5a524; }

@@ -25,6 +25,8 @@ import jobTrackIcon from '../assets/jobtrack_icon.svg'
 import { GiftIcon, ShieldLink } from '../components/security_shield'
 import JobMap from '../components/job_map'
 import { useHoverInfo } from '../lib/hover_info'
+import { aiFind } from '../lib/ai_find'
+import { readPackToken } from '../lib/credit_packs'
 
 // same lookup pattern as home.tsx's getString - English fallback, then the raw key, never a blank string.
 function getString(key: string, lang: 'en' | 'de' | 'fr'): string {
@@ -826,6 +828,7 @@ export default function JobTrack() {
       const e = await parseEmailFile(file)
       setEmailFileNote(e.body || e.subject ? '' : 'No text found in this file.')
       checkEmailMatch(e.body, e.from, e.subject)
+      setEmailFromFile(true); setEmailBodyShown(false); setSenderFind({ state: 'idle' })
     } catch (err) {
       setEmailFileNote(err instanceof OutlookMsgError
         ? 'Outlook .msg files can\'t be read. In Outlook: File > Save As > "Outlook Message Format - Unicode" is .msg; instead drag the email to the desktop from Outlook on the web (Download), or forward it to yourself and save it as .eml.'
@@ -833,7 +836,27 @@ export default function JobTrack() {
     }
   }
   const [emailTickRound, setEmailTickRound] = useState(0)
+  // 2026-11-16 owner: after an email file import "I just see a sea of white text" - a short summary card instead,
+  // the email text folded away, the Unsure? boxes only when there is no match
+  const [emailFromFile, setEmailFromFile] = useState(false)
+  const [emailBodyShown, setEmailBodyShown] = useState(false)
+  const emailPickRef = useRef<HTMLSelectElement>(null), emailCompanyRef = useRef<HTMLInputElement>(null)
+  // 2026-11-16 owner: job not found - the Find details search (amber) works out the company from the sender's web address.
+  // Sent: only the sender's web address and the subject, never the email text.
+  const [senderFind, setSenderFind] = useState<{ state: 'idle' | 'busy' | 'done' | 'none' | 'err'; company?: string; role?: string; website?: string }>({ state: 'idle' })
+  const senderDomain = (emailSender.match(/@([a-z0-9.-]+\.[a-z]{2,})/i)?.[1] || '').toLowerCase()
+  async function findSender() {
+    if (!senderDomain) return
+    setSenderFind({ state: 'busy' })
+    const out = await aiFind({ want: 'sender', company: senderDomain, role: emailSubject.slice(0, 120), hint: '', tok: readPackToken(), app: isApp() })
+    if (out.kind === 'sender') {
+      setSenderFind({ state: 'done', company: out.company, role: out.role, website: out.website })
+      recheckCompany(out.company)   // matches an existing job when the company is in the list
+      if (out.role && !emailRole.trim()) setEmailRole(out.role)
+    } else setSenderFind({ state: out.kind === 'none' ? 'none' : 'err' })
+  }
   function openEmailUpdate() {
+    setEmailFromFile(false); setEmailBodyShown(false); setSenderFind({ state: 'idle' })
     setEmailTickRound(r => r + 1)   // every email starts with all steps not done
     setEmailFileNote('')
     focusProxyRef.current?.focus({ preventScroll: true })
@@ -1687,9 +1710,12 @@ export default function JobTrack() {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h3>{t('email.button')}</h3>
             <p className="bulk-instructions"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" aria-hidden="true" style={{ verticalAlign: 'middle', marginRight: '.35rem' }}><path d="M6 8V4a1 1 0 0 1 1-1h15a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-4M6 5l8.5 5L23 5" /><rect x="1" y="8" width="17" height="13" rx="1" /><path d="m1 10 8.5 5 8.5-5" /></svg>Matched against your existing applications.<br />Nothing is sent anywhere, it all happens in your browser.<ShieldLink topic="privacy" point="jobtrack-email" iconOnly /></p>
-            {emailMatch && <div className="email-results" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', position: 'sticky', top: '-1.5rem', zIndex: 1, background: '#0f0d1a', padding: '.75rem 0' }}>
-              <span role="status" style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', color: 'var(--nebula-teal, #00ff41)' }}><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m7 12 3 3 7-7" /></svg>Matched</span>
-              <button className="btn email-update-action" onClick={applyEmailUpdate} disabled={!emailCompany.trim()}>Update status</button>
+            {/* 2026-11-16 owner: hint the next step - all info found = Update status glows; more info needed = Update status inactive */}
+            {!emailFromFile && (emailMatch || emailText.trim() || emailSubject.trim()) && <div className="email-results" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', position: 'sticky', top: '-1.5rem', zIndex: 1, background: '#0f0d1a', padding: '.75rem 0' }}>
+              {emailMatch
+                ? <span role="status" style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', color: 'var(--nebula-teal, #00ff41)' }}><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m7 12 3 3 7-7" /></svg>All info found - tap Update status</span>
+                : <span role="status" style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', color: '#f5a524' }}><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 7v6M12 16.5h.01" /></svg>More info needed - pick the job below</span>}
+              <button className={'btn email-update-action' + (emailMatch ? ' jt-guidance-glow' : '')} onClick={applyEmailUpdate} disabled={!emailMatch || !emailCompany.trim()}>Update status</button>
             </div>}
             <div className="fill-pills" role="tablist" aria-label="How to bring the email in">
               {(['all', 'file', 'parts'] as EmailWay[]).map(w =>   // 2026-11-16 owner: fewest taps first
@@ -1715,15 +1741,44 @@ export default function JobTrack() {
               <input ref={emailFileRef} type="file" accept=".eml,message/rfc822,.mbox,.txt" hidden onChange={e => { loadEmailFile(e.target.files?.[0]); e.target.value = '' }} />
             </div>}
             {emailFileNote && <p className="eml-open-note" role="alert">{emailFileNote}</p>}
-            <label className="modal-label">Email body text</label>
-            <textarea ref={emailBodyRef} onDragOver={e => e.preventDefault()} onDrop={e => { if (e.dataTransfer.files.length) { e.preventDefault(); loadEmailFile(e.dataTransfer.files[0]) } }} rows={8} placeholder="Paste the email text here…" value={emailText} onChange={e => checkEmailMatch(e.target.value, emailSender)} className="bulk-textarea" />
+            {emailFromFile && <div className="eml-card">
+              <div><span>From</span><b>{emailSender || '-'}</b></div>
+              <div><span>Subject</span><b>{emailSubject || '-'}</b></div>
+              <div><span>Job</span><b className={emailMatch ? 'eml-card-ok' : 'eml-card-warn'}>{emailMatch ? `${emailMatch.role || 'Position not recorded'} - ${emailMatch.company}` : 'No match yet - pick the job below'}</b></div>
+              <div><span>New status</span><b>{STATUS_PLAIN[emailStatus] || emailStatus}</b></div>
+              {/* 2026-11-16 owner: a 2nd confirmation right under the data, so the data and the next step are read together */}
+              {emailMatch && emailSender && emailSubject
+                ? <p className="eml-card-done" role="status"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m7 12 3 3 7-7" /></svg>All 4 found: From, Subject, Job, New status</p>
+                : !emailMatch
+                  // 2026-11-16 owner: "Job not found ... I'm left wondering what to do next" - the next steps, each one a tap
+                  ? <div className="eml-card-todo" role="status"><p>Job not found. Next:</p>
+                    {senderDomain && <div className="eml-find">
+                      <button type="button" className="eml-find-btn" disabled={senderFind.state === 'busy'} onClick={findSender}><span className="jr-dot eml-find-dot" aria-hidden="true" />{senderFind.state === 'busy' ? 'Searching…' : 'Find with AI'}</button>
+                      <span className="eml-find-note">Sends only {senderDomain}{emailSubject ? ' and the subject' : ''}, never the email text.</span>
+                      {senderFind.state === 'done' && <span className="eml-find-ok">Found: {senderFind.company}{senderFind.role ? ` - ${senderFind.role}` : ''}. Filled in below, check it.</span>}
+                      {senderFind.state === 'none' && <span className="eml-find-no">Nothing reliable found for {senderDomain}. Use the steps below.</span>}
+                      {senderFind.state === 'err' && <span className="eml-find-no">The search is busy. Try again in a minute, or use the steps below.</span>}
+                    </div>}
+                    <ol>
+                      <li><button type="button" className="eml-card-link" onClick={() => setEmailBodyShown(true)}>Show email text</button>: look for the company name and the job title.</li>
+                      <li>Applied already? <button type="button" className="eml-card-link" onClick={() => { emailPickRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' }); emailPickRef.current?.focus({ preventScroll: true }) }}>Pick the job from your list</button>.</li>
+                      <li>Not in your list? <button type="button" className="eml-card-link" onClick={() => { emailCompanyRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' }); emailCompanyRef.current?.focus({ preventScroll: true }) }}>Type the company and the role</button>, then tap Add as new application.</li>
+                    </ol></div>
+                  : <p className="eml-card-todo" role="status">Found: Job and New status. Check the job before updating.</p>}
+              <div className="eml-card-actions">
+                {emailMatch && <button type="button" className="btn email-update-action jt-guidance-glow eml-card-go" onClick={applyEmailUpdate} disabled={!emailCompany.trim()}>Update status</button>}
+                <button type="button" className="eml-card-toggle" aria-expanded={emailBodyShown} onClick={() => setEmailBodyShown(v => !v)}>{emailBodyShown ? 'Hide email text' : 'Show email text'}</button>
+              </div>
+            </div>}
+            {(!emailFromFile || emailBodyShown) && <><label className="modal-label">Email body text</label>
+            <textarea ref={emailBodyRef} onDragOver={e => e.preventDefault()} onDrop={e => { if (e.dataTransfer.files.length) { e.preventDefault(); loadEmailFile(e.dataTransfer.files[0]) } }} rows={8} placeholder="Paste the email text here…" value={emailText} onChange={e => checkEmailMatch(e.target.value, emailSender)} className="bulk-textarea" /></>}
             {emailAmbiguous && !emailMatch && <div className="email-results">
               <p role="alert">Which position is this reply about? Tap the matching job:</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                {emailCandidates.map(a => <button type="button" className="btn-secondary" key={a.id} onClick={() => pickEmailApplication(a)}>{a.company} - {a.role || 'Position not recorded'} ({a.date})</button>)}
+                {emailCandidates.map(a => <button type="button" className="btn-secondary" key={a.id} onClick={() => pickEmailApplication(a)}>{a.role || 'Position not recorded'} - {a.company} ({a.date})</button>)}
               </div>
             </div>}
-            {((emailText.trim() && !emailMatch) || emailSender.trim() || emailSubject.trim()) && <div className="email-results">
+            {!(emailFromFile && emailMatch) && ((emailText.trim() && !emailMatch) || emailSender.trim() || emailSubject.trim()) && <div className="email-results">
               <p>Unsure?</p>
               <input type="text" aria-label="Email subject" placeholder="Paste the email subject here" value={emailSubject} onChange={e => checkEmailMatch(emailText, emailSender, e.target.value)} />
               {((emailSubject.trim() && !emailMatch) || emailSender.trim()) && <>
@@ -1735,7 +1790,7 @@ export default function JobTrack() {
             {(emailText.trim() || emailSender.trim() || emailSubject.trim()) && (
               <div className="email-results" style={{ marginTop: '.75rem' }}>
                 <label className="modal-label">Company {!emailMatch && !emailAmbiguous && emailCompany && <span style={{ fontWeight: 400 }}>(not in your list yet - check the spelling matches, or this'll be added as new)</span>}</label>
-                <input type="text" placeholder="Company name" value={emailCompany} onChange={e => recheckCompany(e.target.value)} />
+                <input ref={emailCompanyRef} type="text" placeholder="Company name" value={emailCompany} onChange={e => recheckCompany(e.target.value)} />
                 {!emailCompany.trim() && <p style={{ fontSize: '.75rem', color: 'var(--text-dim, #a0a0b0)' }}>Couldn't guess the company from this email - type it in above.</p>}
                 {/* 2026-09-25: real gap, live - a BOBST rejection wasn't matched
                     and the only buttons were Cancel / Add as new. Now any
@@ -1744,14 +1799,15 @@ export default function JobTrack() {
                 {apps.length > 0 && (!emailAmbiguous || emailMatch) && (
                   <>
                     <label className="modal-label">{emailMatch ? 'Wrong one? Pick the application' : 'Or pick the existing application'}</label>
-                    <select value={emailMatch ? String(emailMatch.id) : ''} onChange={e => {
+                    <select ref={emailPickRef} className={!emailMatch && emailFromFile ? 'jt-guidance-glow eml-pick-glow' : undefined} value={emailMatch ? String(emailMatch.id) : ''} onChange={e => {
                       const picked = apps.find(a => String(a.id) === e.target.value) || null
                       if (picked) pickEmailApplication(picked)
                       else setEmailMatch(null)
                     }}>
                       <option value="">{emailAmbiguous ? 'Choose the application' : emailMatch ? '-' : 'Not in my list - add as new'}</option>
-                      {[...apps].sort((a, b) => a.company.localeCompare(b.company)).map(a => (
-                        <option key={a.id} value={String(a.id)}>{a.company}{a.role ? ` - ${a.role}` : ''} ({a.date})</option>
+                      {/* 2026-11-16 owner: same order as the jobs table columns - Role, Company, Date - A-Z by role */}
+                      {[...apps].sort((a, b) => (a.role || '').localeCompare(b.role || '') || a.company.localeCompare(b.company)).map(a => (
+                        <option key={a.id} value={String(a.id)}>{a.role || 'Position not recorded'} - {a.company} ({a.date})</option>
                       ))}
                     </select>
                   </>

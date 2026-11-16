@@ -67,6 +67,7 @@ export type AiOutcome =
   | { kind: 'none' } | { kind: 'webnone'; detail: string } | { kind: 'used' } | { kind: 'cap' } | { kind: 'paused' }
   | { kind: 'err'; detail: string; trail?: string }
   | { kind: 'jobs'; jobs: { url: string; title: string; source: string }[]; email?: string; via?: string }
+  | { kind: 'sender'; company: string; website: string; role: string }
 
 // Job-Room asks for the address of the office the application was sent to, so ranking looks for that office. Each office scores from
 // every clue at once: the card/ad address (strongest), the AI's application match (an office directly linked to this application),
@@ -89,7 +90,7 @@ export function rankLocations(locs: Loc[], jobLocation: string, hint: string): L
   return scored.map(({ l }, i) => ({ ...l, ...(top > 0 ? { likelyForJob: clear && i === 0 } : {}) }))
 }
 
-export async function aiFind(o: { want?: 'joblink'; date?: string; company: string; role: string; hint: string; jobLocation?: string; applicationLink?: string; tok: string; app: boolean; retry?: boolean; avoid?: string; webOnly?: boolean; skipWeb?: boolean }, onSwitch?: () => void): Promise<AiOutcome> {
+export async function aiFind(o: { want?: 'joblink' | 'sender'; date?: string; company: string; role: string; hint: string; jobLocation?: string; applicationLink?: string; tok: string; app: boolean; retry?: boolean; avoid?: string; webOnly?: boolean; skipWeb?: boolean }, onSwitch?: () => void): Promise<AiOutcome> {
   const device = deviceId()
   const trail: [string, string][] = []   // [engine, exact error] per engine, so a failure can be diagnosed from a phone screenshot
   // same error from several engines is shown once: "claude, claude2: 400 credit balance too low | gemini: 429 quota"
@@ -111,6 +112,7 @@ export async function aiFind(o: { want?: 'joblink'; date?: string; company: stri
       if (d.status === 'cap') return { kind: 'cap' }
       if (d.status === 'paused') return { kind: 'paused' }
       if (d.status === 'ok' && d.found && d.pro === false) { markTrialUsed(); if (d.via !== 'search') countFreeFind() }
+      if (o.want === 'sender' && d.status === 'ok') return d.found && d.sender?.company ? { kind: 'sender', company: String(d.sender.company), website: String(d.sender.website || ''), role: String(d.sender.role || '') } : { kind: 'none' }
       if (o.want === 'joblink' && d.status === 'ok') return { kind: 'jobs', jobs: Array.isArray(d.jobs) ? d.jobs : [], email: typeof d.email === 'string' ? d.email : '', via: typeof d.via === 'string' ? d.via : '' }
       if (d.status === 'ok') return d.found ? { kind: 'ok', free: d.pro === false, locs: rankLocations(d.locations ?? [], o.jobLocation ?? '', o.hint), contact: d.contact ?? {}, sources: d.sources ?? [], trace: d.trace } : { kind: 'none' }
       if (d.status === 'error') return { kind: 'err', detail: d.detail || '', trail: tr() }
