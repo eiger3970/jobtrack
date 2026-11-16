@@ -62,7 +62,10 @@ const STATUSES = ['applied','screening','interview','technical','offer','accepte
 const STATUS_MENU = ['accepted','offer','technical','interview','screening','applied','rejected']
 const JOBROOM_PREVIEW = import.meta.env.DEV && typeof window !== 'undefined' && window.location.hash === '#preview=jobroom'
 const LIST_PREVIEW = JOBROOM_PREVIEW && new URLSearchParams(window.location.search).get('preview') === 'list'
-const STORAGE = JOBROOM_PREVIEW ? 'kworld_jobtrack_preview' : 'kworld_jobtrack'
+// 2026-11-16 owner: 3 preview sample jobs (#preview=backup) were saved into a real list and synced to the app -
+// any developer preview keeps its list under its own key, never the real one
+const PREVIEW = import.meta.env.DEV && typeof window !== 'undefined' && window.location.hash.startsWith('#preview=')
+const STORAGE = PREVIEW ? 'kworld_jobtrack_preview' : 'kworld_jobtrack'
 
 function loadApps(): App[] {
   // DEV preview of the Job-Room helper

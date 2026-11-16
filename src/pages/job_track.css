@@ -1514,6 +1514,7 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jts-qr-wrap { width: 100%; max-width: 360px; aspect-ratio: 1; margin: 0 auto .6rem; border-radius: 14px; border: 2px solid #00ff41; overflow: hidden; background: #fff; animation: jts-glow 1.8s ease-in-out infinite; }
 .jts-qr-wrap .jts-qr { width: 100%; height: 100%; margin: 0; border-radius: 0; }
 .jts-qr-line { display: flex; align-items: center; justify-content: center; gap: .5rem; margin: 0 0 .6rem; font-size: min(1.1rem, 4.4cqw); font-weight: 700; }
+.jts-app-line { margin: 0 0 .6rem; text-align: center; font-size: .9rem; color: #f5a524; }
 .jts-clear-wait svg { vertical-align: -0.2em; margin-right: .4rem; }
 .jts-private { margin-top: 1.8rem; }
 .jts-private-link { display: inline-flex; align-items: center; gap: .5rem; color: #f0eeff; text-decoration: none; }

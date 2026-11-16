@@ -219,7 +219,8 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
   useEffect(() => {
     if (!link) return
     // localhost preview only: the relay refuses localhost, so a failed connect would hide the QR
-    if (import.meta.env.DEV && window.location.hash.startsWith('#preview=sync')) return
+    // 2026-11-16: no developer preview ever joins a real sync (its sample jobs would spread to the other device)
+    if (import.meta.env.DEV && window.location.hash.startsWith('#preview=')) return
     let l: SyncLink | null = null, sent = false, gone = false, retry: ReturnType<typeof setTimeout> | undefined
     const role = phone ? 'phone' : 'computer'
     // phone: no answer within 25 s -> say so, offer to try again
@@ -291,6 +292,7 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
   )
   else if (state === 'done' && result) body = (<>
     <Done r={result} L={L} />
+    {phone && hashLink && !isApp() && <p className="jts-app-line">{L('This synced the browser. Using the JobTrack app? Sync from inside the app.', 'Synchronisiert wurde der Browser. JobTrack-App? In der App synchronisieren.', "Le navigateur est synchronisé. Vous utilisez l'app JobTrack\u202f? Synchronisez depuis l'app.")}</p>}
     {!phone && <div className="jts-shared">
       <p className="jts-step">{L('Shared or library computer? Clear it now:', 'Fremder oder Bibliotheks-Computer? Jetzt leeren:', 'Ordinateur partagé ou de bibliothèque? Videz-le maintenant:')}</p>
       <ClearBox L={L} n={result.apps.length} at={Date.now()} onClear={clearHere}
@@ -325,6 +327,8 @@ export default function JobTrackSync({ lang, apps, quota, setApps, setQuota, onC
       </div>
     <div className="jts-qr-wrap">{qr ? <img className="jts-qr" src={qr} alt={L('QR code to sync', 'QR-Code zum Synchronisieren', 'Code QR pour synchroniser')} /> : <div className="jts-qr" />}{deskLeft !== null && state !== 'syncing' && <button type="button" className="jts-cam-timer" onClick={() => { deskEnd.current = Date.now() + 30000; setDeskLeft(null) }} aria-label={L('QR code closes soon. Click for more time.', 'QR-Code schliesst bald. Klicken für mehr Zeit.', "Le code QR se ferme bientôt. Cliquez pour plus de temps.")}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2M9 2h6" /></svg>0:{String(deskLeft).padStart(2, '0')}</button>}</div>
     <p className="jts-qr-line"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#00ff41" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" /><path d="M9 8V6h2M15 8V6h-2M9 14v2h2M15 14v2h-2M10 11h4" /></svg><span><span className="jts-dev-phone">{L('Phone:', 'Telefon:', 'Téléphone\u202f:')}</span> {L('scan this QR code', 'diesen QR-Code scannen', 'scannez ce code QR')}</span></p>
+    {/* 2026-11-16 owner: the iPhone Camera opens Safari, so the app was never synced - app users scan from inside the app */}
+    <p className="jts-app-line">{L('JobTrack app: scan from inside the app, not with the phone camera', 'JobTrack-App: in der App scannen, nicht mit der Telefonkamera', "App JobTrack\u202f: scannez depuis l'app, pas avec l'appareil photo du téléphone")}</p>
     {state === 'syncing' && <p className="jts-wait" role="status"><span className="jts-spin" /></p>}
     {/* greyed out on purpose: nothing may be cleared before the list is safe on the phone; it unlocks after the sync */}
     <button className="jts-clear-amber jts-clear-wait" disabled title={L('Unlocks after the sync', 'Wird nach dem Sync freigeschaltet', 'Se débloque après la synchro')}><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>{L('Clear this computer', 'Computer leeren', 'Vider cet ordinateur')}</button>
