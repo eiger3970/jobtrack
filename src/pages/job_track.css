@@ -1608,3 +1608,11 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
   .stat-card { padding: .9rem .35rem; min-width: 0; }
   .stat-label { flex-wrap: wrap; max-width: 100%; }
 }
+/* 2026-11-16 Update from email: open a saved email file */
+.eml-open-row { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem .75rem; margin: 0 0 .75rem; }
+.eml-open-row .btn-secondary { display: inline-flex; align-items: center; gap: .4rem; }
+.eml-open-hint { font-size: .85rem; color: var(--text-dim, #9a96b0); }
+.eml-open-note { margin: 0 0 .75rem; font-size: .9rem; color: #f5a524; }
+.email-modal .fill-pills { align-items: center; }
+.eml-way-steps { margin: 0 0 .75rem; font-size: .9rem; color: #f0eeff; line-height: 1.45; }
+.eml-ways-info { display: block; text-align: left; line-height: 1.45; }

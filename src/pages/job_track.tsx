@@ -1,4 +1,5 @@
 import { Fragment, useState, useEffect, useRef, type ReactNode } from 'react'
+import { parseEmailFile, OutlookMsgError } from '../lib/eml_parse'
 import { countAdClick, useAdView } from '../lib/ad_count'
 import { SPONSORS } from '../lib/jobtrack_sponsors'
 import { useLanguage } from '../context/language'
@@ -792,7 +793,35 @@ export default function JobTrack() {
   const emailBodyRef = useRef<HTMLTextAreaElement>(null)
   const focusProxyRef = useRef<HTMLInputElement>(null)
   useEffect(() => { if (emailModal) emailBodyRef.current?.focus({ preventScroll: true }) }, [emailModal])
+  // 2026-11-16 owner: 3 ways to bring an email in, picked like the Add-job pills (hand + number of taps), all explained
+  // in one i. Export file = no judgement (subject + sender come along); Select all = fewer steps, can catch other
+  // emails from the inbox list; Copy parts = today's way, the person guesses how much to copy.
+  type EmailWay = 'file' | 'all' | 'parts'
+  const [emailWay, setEmailWay] = useState<EmailWay>(() => { try { const w = localStorage.getItem('kworld_jobtrack_emailway'); if (w === 'file' || w === 'all' || w === 'parts') return w } catch { /* private mode */ } return window.matchMedia('(max-width: 760px)').matches ? 'parts' : 'file' })
+  const pickEmailWay = (w: EmailWay) => { setEmailWay(w); try { localStorage.setItem('kworld_jobtrack_emailway', w) } catch { /* private mode */ } }
+  const EMAIL_WAYS: Record<EmailWay, { taps: number; name: string; steps: string }> = {
+    file: { taps: 10, name: 'Export file', steps: 'Email: open it → ⋯ More → Export / Download → here: Open email file → pick it → Update status' },
+    all: { taps: 8, name: 'Select all', steps: 'Email: open it → Ctrl+A (select all) → Ctrl+C → here: paste in the box → Update status' },
+    parts: { taps: 14, name: 'Copy parts', steps: 'Email: select the text → copy → paste here → then the subject the same way → Update status' },
+  }
+  const emailFileRef = useRef<HTMLInputElement>(null)
+  const [emailFileNote, setEmailFileNote] = useState('')
+  // 2026-11-16 owner: a saved email file (.eml from Gmail, Thunderbird, Apple Mail, Proton, Outlook web) fills
+  // body, subject and sender at once - no guessing how much to copy. Read on the device, never uploaded.
+  async function loadEmailFile(file: File | undefined) {
+    if (!file) return
+    try {
+      const e = await parseEmailFile(file)
+      setEmailFileNote(e.body || e.subject ? '' : 'No text found in this file.')
+      checkEmailMatch(e.body, e.from, e.subject)
+    } catch (err) {
+      setEmailFileNote(err instanceof OutlookMsgError
+        ? 'Outlook .msg files can\'t be read. In Outlook: File > Save As > "Outlook Message Format - Unicode" is .msg; instead drag the email to the desktop from Outlook on the web (Download), or forward it to yourself and save it as .eml.'
+        : 'This file could not be read as an email (.eml).')
+    }
+  }
   function openEmailUpdate() {
+    setEmailFileNote('')
     focusProxyRef.current?.focus({ preventScroll: true })
     setEmailText('')
     setEmailSender('')
@@ -1647,8 +1676,27 @@ export default function JobTrack() {
               <span role="status" style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', color: 'var(--nebula-teal, #00ff41)' }}><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m7 12 3 3 7-7" /></svg>Matched</span>
               <button className="btn email-update-action" onClick={applyEmailUpdate} disabled={!emailCompany.trim()}>Update status</button>
             </div>}
+            <div className="fill-pills" role="tablist" aria-label="How to bring the email in">
+              {(['file', 'all', 'parts'] as EmailWay[]).map(w => <button key={w} type="button" role="tab" aria-selected={emailWay === w} className={'fill-pill' + (emailWay === w ? ' on' : '')} onClick={() => pickEmailWay(w)}><TapCount n={EMAIL_WAYS[w].taps} maxCount={14} big label={t('fd.tapsAria')} />{EMAIL_WAYS[w].name}</button>)}
+              <InfoTip label="The 3 ways, step by step" icon={<><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></>} text={<span className="eml-ways-info">
+                <b>Export file, 10 taps</b>: nothing to guess, subject and sender come along.<br />{EMAIL_WAYS.file.steps}<br />
+                Gmail: ⋮ More → Download message. Outlook (web): ⋯ More → Save as / Download. Proton: ⋯ More → Export. Thunderbird: File → Save As → File. Apple Mail: File → Save As.<br /><br />
+                <b>Select all, 8 taps</b>: fastest, but some mail sites copy the inbox list too, so check the match.<br />{EMAIL_WAYS.all.steps}<br /><br />
+                <b>Copy parts, 14 taps</b>: works everywhere, also on the phone.<br />{EMAIL_WAYS.parts.steps}
+              </span>} />
+            </div>
+            <p className="eml-way-steps">{EMAIL_WAYS[emailWay].steps}</p>
+            {emailWay === 'file' && <div className="eml-open-row">
+              <button type="button" className="btn-secondary" onClick={() => emailFileRef.current?.click()}>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3" /></svg>
+                Open email file (.eml)
+              </button>
+              <span className="eml-open-hint">or drop it on the box below</span>
+              <input ref={emailFileRef} type="file" accept=".eml,message/rfc822,.mbox,.txt" hidden onChange={e => { loadEmailFile(e.target.files?.[0]); e.target.value = '' }} />
+            </div>}
+            {emailFileNote && <p className="eml-open-note" role="alert">{emailFileNote}</p>}
             <label className="modal-label">Email body text</label>
-            <textarea ref={emailBodyRef} rows={8} placeholder="Paste the email text here…" value={emailText} onChange={e => checkEmailMatch(e.target.value, emailSender)} className="bulk-textarea" />
+            <textarea ref={emailBodyRef} onDragOver={e => e.preventDefault()} onDrop={e => { if (e.dataTransfer.files.length) { e.preventDefault(); loadEmailFile(e.dataTransfer.files[0]) } }} rows={8} placeholder="Paste the email text here…" value={emailText} onChange={e => checkEmailMatch(e.target.value, emailSender)} className="bulk-textarea" />
             {emailAmbiguous && !emailMatch && <div className="email-results">
               <p role="alert">Which position is this reply about? Tap the matching job:</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
