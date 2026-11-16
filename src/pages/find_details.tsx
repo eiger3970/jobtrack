@@ -7,6 +7,7 @@ import { PackList, openPacks, readPackToken } from '../lib/credit_packs'
 import { isApp } from '../lib/platform'
 import { PRO_KEY } from './job_track_pro'
 import { aiFind, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
+import { useHoverInfo } from '../lib/hover_info'
 
 type AiState = 'idle' | 'busy' | 'result' | 'used' | 'cap' | 'none' | 'err'
 
@@ -251,8 +252,9 @@ const PIN = 'M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11zM12 7a3 3 0 1 0 0
 // small "i" that floats a light note over the page for 7 seconds - nothing moves
 export function InfoI({ text, left, children }: { text?: string; left?: boolean; children?: ReactNode }) {
   const [on, setOn] = useState(false)
+  const hover = useHoverInfo(setOn)   // 2026-11-16 owner: computer = mouse over, phone = tap the i
   useEffect(() => { if (!on) return; const id = setTimeout(() => setOn(false), 7000); return () => clearTimeout(id) }, [on])
-  return <span className="fd-ibox"><button type="button" className="fd-i" aria-label={text ?? 'i'} aria-expanded={on} onClick={e => { e.stopPropagation(); setOn(v => !v) }}>i</button>{on && <span className={'fd-pop' + (left ? ' fd-pop-left' : '')} role="status">{children ?? text}</span>}</span>
+  return <span className="fd-ibox"><button ref={hover} type="button" className="fd-i" aria-label={text ?? 'i'} aria-expanded={on} onClick={e => { e.stopPropagation(); setOn(v => !v) }}>i</button>{on && <span className={'fd-pop' + (left ? ' fd-pop-left' : '')} role="status">{children ?? text}</span>}</span>
 }
 
 // the copy button sits inside the sentence, in place of its first words

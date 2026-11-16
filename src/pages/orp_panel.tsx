@@ -15,6 +15,7 @@ import { isApp } from '../lib/platform'
 import { countAdClick, useAdView } from '../lib/ad_count'
 import { useProKey, buyPro } from '../lib/pro'
 import { PRO_KEY, PRO_USD, PRO_SCOPE } from './job_track_pro'
+import { useHoverInfo } from '../lib/hover_info'
 
 // 2026-10-13 owner: ORP paperwork in one place - the filled 716.007 PDF for
 // any month or "avant chômage", and a Job-Room view with a Copy button per
@@ -74,6 +75,7 @@ export default function OrpPanel({ apps, t, onClose, onUpdate, initialCleanup = 
   }, [lang0, detected, country])
   const [busy, setBusy] = useState(false)
   const [info, setInfo] = useState(false)
+  const hoverInfo = useHoverInfo(setInfo, 'stay')   // 2026-11-16 owner: computer = mouse over, phone = tap the i
   const [dragged, setDragged] = useState(false)
   const [fillReady, setFillReady] = useState(false)
   const [entryMode, setEntryMode] = useState<'manual' | 'autofill'>('autofill')
@@ -243,10 +245,11 @@ export default function OrpPanel({ apps, t, onClose, onUpdate, initialCleanup = 
             </select>
             {country !== 'CH' && <input type="month" value={month} onFocus={() => setPeriodChosen(true)} onChange={e => setMonth(e.target.value)} />}
           </label>
+          <div className="hover-info-zone">
           <p className="orp-q orp-label-info">{t('orp.which')}
-            {country === 'CH' && <button type="button" className="info-btn info-btn-amber" aria-label={t('orp.info.title')} onClick={() => setInfo(v => !v)}>i</button>}
+            {country === 'CH' && <button ref={hoverInfo} type="button" className="info-btn info-btn-amber" aria-label={t('orp.info.title')} onClick={() => setInfo(v => !v)}>i</button>}
           </p>
-          {country === 'CH' && info && <ul className="orp-before-tip orp-tip-list">{t('orp.beforeTip').split('|').map(x => <li key={x}>{x}</li>)}</ul>}
+          {country === 'CH' && info && <ul className="orp-before-tip orp-tip-list">{t('orp.beforeTip').split('|').map(x => <li key={x}>{x}</li>)}</ul>}</div>
           {country === 'CH' && <div className={'orp-tabs' + (!periodChosen ? ' jr-glow' : '')}>
             <button className={mode === 'month' ? 'btn' : 'btn-secondary'} onClick={() => { setMode('month'); setPeriodChosen(true); setEntryChosen(false) }}>{t('orp.month')}</button>
             <div className="orp-before-row">

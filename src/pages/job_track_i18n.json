@@ -1434,14 +1434,16 @@
       "fr": "Important : l'office compte aussi vos recherches des 3 mois AVANT votre inscription.|Saisissez-les aussi.|Celles qui manquent peuvent coûter des jours d'indemnités ou retarder le premier paiement.|Personne ne vous préviendra peut-être."
     },
     "dk.white": {
-      "en": "this period - counts for your quota",
-      "de": "diese Periode - zählt für Ihre Quote",
-      "fr": "cette période - compte pour votre quota"
+      "en": "counts for your quota",
+      "de": "zählt für Ihre Quote",
+      "fr": "compte pour votre quota"
     },
+    "dk.to": {"en": "to", "de": "bis", "fr": "au"},
+    "dk.before": {"en": "before", "de": "vor dem", "fr": "avant le"},
     "dk.amber": {
-      "en": "older - not in this quota",
-      "de": "älter - nicht in dieser Quote",
-      "fr": "plus ancien - hors de ce quota"
+      "en": "not in this quota",
+      "de": "nicht in dieser Quote",
+      "fr": "hors de ce quota"
     },
     "period.tag": {
       "en": "↑ {n} this month",
@@ -1454,9 +1456,9 @@
       "fr": "↑ {n} sur {target} cette période"
     },
     "dk.line": {
-      "en": "where this period begins",
-      "de": "hier beginnt diese Periode",
-      "fr": "là où commence cette période"
+      "en": "quota period starts",
+      "de": "Quotenperiode beginnt",
+      "fr": "début de la période du quota"
     },
     "jr.bm.notHere": {
       "en": "Not here: drag this green button to your bookmarks bar. Then open Job-Room -> work-efforts -> ENTER, and click Job-Room fill in the bookmarks bar.",

@@ -24,6 +24,7 @@ declare const __BUILD_DATE__: string
 import jobTrackIcon from '../assets/jobtrack_icon.svg'
 import { GiftIcon, ShieldLink } from '../components/security_shield'
 import JobMap from '../components/job_map'
+import { useHoverInfo } from '../lib/hover_info'
 
 // same lookup pattern as home.tsx's getString - English fallback, then the raw key, never a blank string.
 function getString(key: string, lang: 'en' | 'de' | 'fr'): string {
@@ -189,6 +190,7 @@ function updateApplicationNote(apps: App[], id: number, notes: string): App[] {
 function InfoTip({ text, label, icon }: { text: ReactNode; label: string; icon: ReactNode }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLSpanElement>(null)
+  const hover = useHoverInfo(setOpen)
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
@@ -197,7 +199,7 @@ function InfoTip({ text, label, icon }: { text: ReactNode; label: string; icon: 
     return () => document.removeEventListener('mousedown', onClickOutside)
   }, [])
   return (
-    <span className="info-tip-wrap" ref={ref}>
+    <span className="info-tip-wrap" ref={el => { ref.current = el; return hover(el) }}>
       <button type="button" className="info-btn" aria-label={label} onClick={() => setOpen(v => !v)}>i</button>
       {open && (
         <div className="info-popover info-tip-popover">
@@ -580,6 +582,7 @@ export default function JobTrack() {
   // 2026-10-14 owner: white = counts for this period's quota, amber = older; a thick line where the old ones start
   const cutoff = (() => { const d = quota ? periodStart(quota.period) : new Date(new Date().getFullYear(), new Date().getMonth(), 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` })()
   const isOld = (a: App) => a.date < cutoff
+  const todayIso = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` })()
   // 2026-10-15 owner: the thick line follows the quota colour (same rule as the quota card)
   const lineColor = (() => { if (!quota) return '#ffb000'; const pct = Math.min(100, (countInPeriod(apps, quota.period) / quota.target) * 100); return pct >= 50 ? '#00ff41' : pct >= 15 ? '#f59e0b' : '#ef4444' })()
   const [reward, setReward] = useState(false)
@@ -593,6 +596,8 @@ export default function JobTrack() {
   const [reviewedUX, setReviewedUX] = useState<UXReport | null>(null)
   const [uxDeliveryNotice, setUXDeliveryNotice] = useState('')
   const [showDiagInfo, setShowDiagInfo] = useState(false)
+  // 2026-11-16 owner: computer = mouse over, phone = tap the i
+  const hoverStorage = useHoverInfo(setShowStorageInfo, 'prev'), hoverImport = useHoverInfo(setShowImportInfo, 'prev'), hoverEmailInfo = useHoverInfo(setShowEmailInfo), hoverDiag = useHoverInfo(setShowDiagInfo, 'stay')
   const diag = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('diag')
   function setLocalUXRecording(enabled: boolean) {
     setUXRecording(enabled)
@@ -799,6 +804,11 @@ export default function JobTrack() {
   type EmailWay = 'file' | 'all' | 'parts'
   const [emailWay, setEmailWay] = useState<EmailWay>(() => { try { const w = localStorage.getItem('kworld_jobtrack_emailway'); if (w === 'file' || w === 'all' || w === 'parts') return w } catch { /* private mode */ } return (isApp() || /iPhone|iPod|Android/i.test(navigator.userAgent)) ? 'parts' : 'file' })
   // 2026-11-16 owner: say which way is best on this device - computer: Export file; phone and app: Copy parts (phone email apps mostly cannot export an email file)
+  const EMAIL_WAY_TIPS: Record<EmailWay, ReactNode> = {
+    all: <><b>Select all, 8 taps</b><br />Fastest, but some email clients copy the inbox list too, so the match needs to be checked.</>,
+    file: <><b>Export file, 10 taps</b><br />Nothing to guess, the subject and sender come with the email file.<br />Best on computer.<br /><br />Export email location:<br />Apple Mail: File -&gt; Save As<br />Gmail: ⋮ More -&gt; Download message<br />Outlook (web): ⋯ More -&gt; Save as / Download<br />Proton: ⋯ (More) -&gt; Export<br />Thunderbird: File -&gt; Save As -&gt; File</>,
+    parts: <><b>Copy parts, 14 taps</b><br />Works everywhere, also on a phone.<br />Best on phone and in the app.</>,
+  }
   const bestEmailWay: EmailWay = phoneDevice ? 'parts' : 'file'
   const pickEmailWay = (w: EmailWay) => { setEmailWay(w); try { localStorage.setItem('kworld_jobtrack_emailway', w) } catch { /* private mode */ } }
   const EMAIL_WAYS: Record<EmailWay, { taps: number; name: string; steps: string }> = {
@@ -1211,7 +1221,7 @@ export default function JobTrack() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg>
               <span>{t('backup.export')}</span>
             </button>
-            <button type="button" className="info-btn" aria-label={t('backup.export')} onClick={() => setShowStorageInfo(v => !v)}>i</button>
+            <button ref={hoverStorage} type="button" className="info-btn" aria-label={t('backup.export')} onClick={() => setShowStorageInfo(v => !v)}>i</button>
             {showStorageInfo && (
               <div className="info-popover">
                 <button type="button" className="info-popover-close" onClick={() => setShowStorageInfo(false)} aria-label={t('close')}>✕</button>
@@ -1258,7 +1268,7 @@ export default function JobTrack() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2" /></svg>
               <span>{backupImported ? (importJoined ? `${t('backup.imported')} - ${importJoined} ${t('backup.joined')}` : t('backup.imported')) : t('backup.import')}</span>
             </button>
-            <button type="button" className="info-btn" aria-label={t('backup.importInfo.title')} onClick={() => setShowImportInfo(v => !v)}>i</button>
+            <button ref={hoverImport} type="button" className="info-btn" aria-label={t('backup.importInfo.title')} onClick={() => setShowImportInfo(v => !v)}>i</button>
             {showImportInfo && (
               <div className="info-popover import-info-popover">
                 <button type="button" className="info-popover-close" onClick={() => setShowImportInfo(false)} aria-label={t('close')}>✕</button>
@@ -1283,8 +1293,8 @@ export default function JobTrack() {
           {diag && <><div className="jt-ux-local"><label><input type="checkbox" checked={uxRecording} onChange={e => setLocalUXRecording(e.target.checked)} />{t('ux.local')}</label></div>
           <div className="jt-ux-local"><label><input type="checkbox" checked={includeUX} disabled={!uxRecording} onChange={e => { setIncludeUX(e.target.checked); setReviewedUX(null) }} />{t('ux.include')}</label></div>
           <p>{t('settings.ux')}</p></>}
-          {!diag && <><div className="jt-ux-local"><label><input type="checkbox" checked={uxRecording} onChange={e => setLocalUXRecording(e.target.checked)} />{t('diag.on')}</label><button type="button" className="info-btn" aria-label={t('ux.local')} aria-expanded={showDiagInfo} onClick={() => setShowDiagInfo(v => !v)}>i</button></div>
-          {showDiagInfo && <p className="jt-ux-info">{t('ux.localInfo')}</p>}</>}
+          {!diag && <div className="hover-info-zone"><div className="jt-ux-local"><label><input type="checkbox" checked={uxRecording} onChange={e => setLocalUXRecording(e.target.checked)} />{t('diag.on')}</label><button ref={hoverDiag} type="button" className="info-btn" aria-label={t('ux.local')} aria-expanded={showDiagInfo} onClick={() => setShowDiagInfo(v => !v)}>i</button></div>
+          {showDiagInfo && <p className="jt-ux-info">{t('ux.localInfo')}</p>}</div>}
           <div className="jt-notes-buttons"><button type="button" onClick={() => settingsDialogRef.current?.close()}>{t('close')}</button></div>
         </dialog>
 
@@ -1306,7 +1316,7 @@ export default function JobTrack() {
             {/* 2026-09-23: real feedback, live - "does copy from need copying
                 too, then where to paste?" Copying an email grabs the body
                 only; the sender's address is a separate, optional copy. */}
-            <button type="button" className="info-btn" aria-label={t('emailinfo.title')} onClick={() => setShowEmailInfo(v => !v)}>i</button>
+            <button ref={hoverEmailInfo} type="button" className="info-btn" aria-label={t('emailinfo.title')} onClick={() => setShowEmailInfo(v => !v)}>i</button>
             {showEmailInfo && (
               <div className="info-popover">
                 <button type="button" className="info-popover-close" onClick={() => setShowEmailInfo(false)} aria-label={t('close')}>✕</button>
@@ -1425,9 +1435,10 @@ export default function JobTrack() {
               <th data-ux-column="company" className={sortCls('company')} aria-sort={sortBy.col === 'company' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('company')} title="Sort A-Z"><HeaderIcon col="company" />{t('table.company')}{sortMark('company')}</th>
               <th data-ux-column="date" className={sortCls('date')} aria-sort={sortBy.col === 'date' ? (sortBy.asc ? 'ascending' : 'descending') : 'none'} onClick={() => sortOn('date')} title="Sort by date"><HeaderIcon col="date" />{t('table.date')}{sortMark('date')}<InfoTip label={t('stale.legend')} icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} text={
                 <span className="jt-datekey">
-                  <span><b className="jt-dk-white">2026-10-14</b> = {t('dk.white')}</span>
-                  <span><i className="jt-dk-line" style={{ background: lineColor }} /> = {t('dk.line')}</span>
-                  <span><b className="jt-dk-amber">2026-09-19</b> <span className="jt-dk-amber">= {t('dk.amber')}</span></span>
+                  {/* 2026-11-16 owner: "what does 2026-10-14 - this period mean? Just use the real date" */}
+                  <span><b className="jt-dk-white">{cutoff} {t('dk.to')} {todayIso}</b> = {t('dk.white')}</span>
+                  <span><i className="jt-dk-line" style={{ background: lineColor }} /> = {t('dk.line')} {cutoff}</span>
+                  <span><b className="jt-dk-amber">{t('dk.before')} {cutoff}</b> <span className="jt-dk-amber">= {t('dk.amber')}</span></span>
                 </span>} /></th>
               <th data-ux-column="status"><HeaderIcon col="status" />{t('table.status')}{statusCounts.length > 0 && <span className="jt-status-counts">{statusCounts.map(([st, n]) => <span key={st} className={`jt-sc jt-sc-${st}`}>{n} {STATUS_PLAIN[st]}</span>)}</span>}</th>
               <th data-ux-column="cover" title={t('table.cover')}><HeaderIcon col="cover" />{t('document.coverShort')}</th>
@@ -1682,15 +1693,17 @@ export default function JobTrack() {
             </div>}
             <div className="fill-pills" role="tablist" aria-label="How to bring the email in">
               {(['all', 'file', 'parts'] as EmailWay[]).map(w =>   // 2026-11-16 owner: fewest taps first
-                <button key={w} type="button" role="tab" aria-selected={emailWay === w} className={'fill-pill' + (emailWay === w ? ' on' : '')} onClick={() => pickEmailWay(w)}><TapCount n={EMAIL_WAYS[w].taps} maxCount={14} big label={t('fd.tapsAria')} /><span className="eml-pill-name">{EMAIL_WAYS[w].name}{w === bestEmailWay && <small className="eml-pill-best">{phoneDevice ? (isApp() ? 'Best in the app' : 'Best on phone') : 'Best on computer'}</small>}</span></button>)}
-              <InfoTip label="The 3 ways, step by step" icon={<><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></>} text={<span className="eml-ways-info">
+                <button key={w} type="button" role="tab" aria-selected={emailWay === w} className={'fill-pill' + (emailWay === w ? ' on' : '')} onClick={() => pickEmailWay(w)}><TapCount n={EMAIL_WAYS[w].taps} maxCount={14} big label={t('fd.tapsAria')} /><span className="eml-pill-name">{EMAIL_WAYS[w].name}{w === bestEmailWay && <small className="eml-pill-best">{phoneDevice ? (isApp() ? 'Best in the app' : 'Best on phone') : 'Best on computer'}</small>}</span>
+                  {/* 2026-11-16 owner: computer = mouse over the pill (hand) shows that way's info; phone and app = the i */}
+                  <span className={'eml-pill-tip' + (w === 'parts' ? ' eml-pill-tip-right' : '')} role="tooltip">{EMAIL_WAY_TIPS[w]}</span></button>)}
+              <span className="eml-ways-i"><InfoTip label="The 3 ways, step by step" icon={<><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></>} text={<span className="eml-ways-info">
                 {/* 2026-11-16 owner: the steps are under the pills already - the i only says how the 3 ways differ and where Export is */}
                 <b>Select all, 8 taps</b>: fastest, but some email clients copy the inbox list too, so the match needs to be checked.<br />
                 <b>Export file, 10 taps</b>: nothing to guess, the subject and sender come with the email file.<br />
                 <b>Copy parts, 14 taps</b>: works everywhere, also on a phone.<br /><br />
                 Best on computer: Export file<br />Best on phone and in the app: Copy parts<br /><br />
                 Export email location:<br />Apple Mail: File -&gt; Save As<br />Gmail: ⋮ More -&gt; Download message<br />Outlook (web): ⋯ More -&gt; Save as / Download<br />Proton: ⋯ (More) -&gt; Export<br />Thunderbird: File -&gt; Save As -&gt; File
-              </span>} />
+              </span>} /></span>
             </div>
             <p className="eml-way-steps"><SegSteps key={emailWay + emailTickRound} id={'jt_email_' + emailWay} text={EMAIL_WAYS[emailWay].steps} /></p>
             {emailWay === 'file' && <div className="eml-open-row">

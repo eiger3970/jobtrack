@@ -1621,3 +1621,11 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .eml-pill-name { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
 .eml-pill-best { font-size: .7rem; font-weight: 600; color: #f5a524; }
 .fd-guide .fd-seg:focus-visible { outline: 2px solid #00ff41; outline-offset: 2px; border-radius: 4px; }
+/* 2026-11-16 owner: email ways - mouse over a pill shows that way's info on a computer; the i is for phone and app only */
+.email-modal .fill-pill { position: relative; }
+.eml-pill-tip { display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 20; width: min(360px, 70vw); padding: .7rem .85rem; border: 1px solid var(--nebula-teal, #00ff41); border-radius: 10px; background: #03020a; color: #f0eeff; font-size: .85rem; font-weight: 400; line-height: 1.45; text-align: left; white-space: normal; pointer-events: none; }
+.eml-pill-tip-right { left: auto; right: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .email-modal .fill-pill:hover .eml-pill-tip, .email-modal .fill-pill:focus-visible .eml-pill-tip { display: block; }
+  .eml-ways-i { display: none; }
+}
