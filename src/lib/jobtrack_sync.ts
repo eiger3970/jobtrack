@@ -54,6 +54,11 @@ function fieldMerge(base: Record<string, unknown>, p: Application, q: Applicatio
 }
 
 export function merge(pc: Application[], pcBase: Base, phone: Application[], phoneBase: Base): MergeResult {
+  // 2026-11-16 owner (35 jobs on the computer, 0 in a freshly installed app, sync moved 0): a device whose whole list is
+  // empty but whose last-sync record is not has lost its storage (reinstall, cleared data) - it did not delete every job.
+  // Its record is ignored, so the other side's jobs are copied to it instead of deleted everywhere. Never lose data.
+  if (phone.length === 0 && Object.keys(phoneBase).length > 0) phoneBase = {}
+  if (pc.length === 0 && Object.keys(pcBase).length > 0) pcBase = {}
   const P = new Map(pc.map(a => [a.id, a]))
   const Q = new Map(phone.map(a => [a.id, a]))
   const ids = [...new Set([...P.keys(), ...Q.keys()])]
