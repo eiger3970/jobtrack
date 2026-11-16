@@ -864,19 +864,19 @@
       "fr": "Mise à jour depuis un e-mail"
     },
     "emailinfo.s1": {
-      "en": "Open the employer's email and copy its text (select all, then copy).",
-      "de": "Öffne die E-Mail des Arbeitgebers und kopiere den Text (alles auswählen, dann kopieren).",
-      "fr": "Ouvrez l'e-mail de l'employeur et copiez son texte (tout sélectionner, puis copier)."
+      "en": "Tap the {icon} Update from email button.",
+      "de": "Tippe auf {icon} Update from email.",
+      "fr": "Touchez le bouton {icon} Update from email."
     },
     "emailinfo.s2": {
-      "en": "Tap the {icon} Update from email button, then paste into box 1, Email text.",
-      "de": "Tippe auf die Schaltfläche {icon} Per E-Mail aktualisieren und füge den Text in Feld 1 (E-Mail-Text) ein.",
-      "fr": "Touchez le bouton {icon} Mettre à jour depuis un e-mail, puis collez dans le champ 1, texte de l'e-mail."
+      "en": "Pick 1 of the 3 ways: Export file (best on computer), Select all, or Copy parts (best on phone and in the app).",
+      "de": "Wähle 1 der 3 Wege: Export file (am besten am Computer), Select all oder Copy parts (am besten am Telefon und in der App).",
+      "fr": "Choisissez 1 des 3 façons : Export file (idéal sur ordinateur), Select all ou Copy parts (idéal sur téléphone et dans l'app)."
     },
     "emailinfo.s3": {
-      "en": "Optional: the sender's address isn't part of the copied text. Tap the sender's name at the top of the email, copy their address, and paste it into box 2.",
-      "de": "Optional: Die Absenderadresse ist nicht im kopierten Text. Tippe oben in der E-Mail auf den Absendernamen, kopiere die Adresse und füge sie in Feld 2 ein.",
-      "fr": "Facultatif : l'adresse de l'expéditeur n'est pas dans le texte copié. Touchez le nom de l'expéditeur en haut de l'e-mail, copiez l'adresse et collez-la dans le champ 2."
+      "en": "Follow the steps under the 3 ways. Tap a step once the step is done, and the step dims.",
+      "de": "Folge den Schritten unter den 3 Wegen. Tippe auf einen erledigten Schritt, dann wird der Schritt abgeblendet.",
+      "fr": "Suivez les étapes sous les 3 façons. Touchez une étape terminée, et l'étape s'estompe."
     },
     "emailinfo.s4": {
       "en": "Check the matched job and the suggested status, then tap Update status.",
