@@ -442,7 +442,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     if (out.kind === 'paused') { setAiErr(t('ai.paused')); setAi('err'); return }
     if (out.kind === 'none' || out.kind === 'webnone') { setAi('none'); return }
     if (out.kind === 'err') { setAiErr(out.detail); setAi('err'); return }
-    if (out.kind === 'jobs') { setAi('idle'); return }
+    if (out.kind === 'jobs' || out.kind === 'sender') { setAi('idle'); return }
     setFreeResult(out.free === true)
     const runs = mode === 'new' ? [out.locs] : [...aiRuns, out.locs]
     const contact = { ...(mode === 'new' ? {} : aiContact), ...out.contact }
