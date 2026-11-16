@@ -1688,7 +1688,7 @@ export default function JobTrack() {
                 <b>Select all, 8 taps</b>: fastest, but some email clients copy the inbox list too, so the match needs to be checked.<br />
                 <b>Export file, 10 taps</b>: nothing to guess, the subject and sender come with the email file.<br />
                 <b>Copy parts, 14 taps</b>: works everywhere, also on a phone.<br /><br />
-                Best on computer: Export file. Best on phone and in the app: Copy parts.<br /><br />
+                Best on computer: Export file<br />Best on phone and in the app: Copy parts<br /><br />
                 Export email location:<br />Apple Mail: File -&gt; Save As<br />Gmail: ⋮ More -&gt; Download message<br />Outlook (web): ⋯ More -&gt; Save as / Download<br />Proton: ⋯ (More) -&gt; Export<br />Thunderbird: File -&gt; Save As -&gt; File
               </span>} />
             </div>
