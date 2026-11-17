@@ -288,8 +288,8 @@ function postHistoryOnce(msg: Record<string, unknown>): boolean {
 // 2026-11-08 owner: a status line unfolds (height, then fade) the moment it appears - never pops in
 function Unfold({ children }: { children: ReactNode }) { return <div className="fd-unfold"><div className="fd-unfold-in">{children}</div></div> }
 
-export default function FindDetails({ a, e, live, allApps, onUpdate, t, requiredMissing, method, mobile = false, autoSearch = false, onPreview }: {
-  a: Application; e: JobRoomEntry; live?: JobRoomEntry; allApps?: Application[]; onUpdate: (id: number, patch: Patch) => void; t: (k: string) => string; requiredMissing: boolean; method?: string; mobile?: boolean; autoSearch?: boolean; onPreview?: (id: number, patch: Patch) => void
+export default function FindDetails({ a, e, live, allApps, onUpdate, t, requiredMissing, method, mobile = false, autoSearch = false, onPreview, batch }: {
+  batch?: { count: number; node: ReactNode }; a: Application; e: JobRoomEntry; live?: JobRoomEntry; allApps?: Application[]; onUpdate: (id: number, patch: Patch) => void; t: (k: string) => string; requiredMissing: boolean; method?: string; mobile?: boolean; autoSearch?: boolean; onPreview?: (id: number, patch: Patch) => void
 }) {
   const buyLive = useBuyCreditsLive()
   const ev = e as unknown as Rec
@@ -709,6 +709,14 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
 
         {/* 2026-11-03 owner: order is pills, free AI search, Easiest first, manual searches - and Easiest first sits closer to the list below it */}
         <li className="fd-guidance fd-guidance-row" hidden={!!method}><span>{t('fd.scoreL2')}</span><TapCount n={TAPS.twin} label={t('fd.tapsAria')} /><TapCount n={TAPS.ad} label={t('fd.tapsAria')} /></li>
+        {/* 2026-11-17 owner: the batch fill as a search option, above Email search - all red squares at once */}
+        {batch && <li hidden={!!method}>
+          <div className={'fd-opt' + (isOpen('batch') ? ' on' : ' jt-guidance-glow')} role="button" tabIndex={0} aria-expanded={isOpen('batch')} onClick={() => toggle('batch')} onKeyDown={x => { if (x.key === 'Enter' || x.key === ' ') { x.preventDefault(); toggle('batch') } }}>
+            <span className="fd-chev" aria-hidden="true">{isOpen('batch') ? '▾' : '▸'}</span>
+            <b><TapCount n={1} label={t('fd.tapsAria')} /><span className="fd-opt-txt">{t('fd.batchH')}<small>{t('fd.batchHint').replace('{n}', String(batch.count))}</small></span></b>
+          </div>
+          {isOpen('batch') && <div className="fd-body">{batch.node}</div>}
+        </li>}
         <li hidden={!!method && method !== 'mail'}>
           <div hidden={!!method} className={'fd-opt' + (isOpen('mail') ? ' on' : '')} role="button" tabIndex={0} aria-expanded={isOpen('mail')} onClick={() => toggle('mail')} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle('mail') } }}>
             <span className="fd-chev" aria-hidden="true">{isOpen('mail') ? '▾' : '▸'}</span>

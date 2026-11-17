@@ -86,6 +86,19 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
   }).filter(x => x.q)
   const fillable = finds.filter(f => f.hit && !skip.includes(f.r.id))
   const fillAll = () => { for (const f of fillable) onUpdate(f.r.id, f.patch as Patch); setSkip([]) }
+  // 2026-11-17 owner: "FOUND FOR YOU is missed as it is showing under the squares further up" - it is now a search option above Email search
+  const fillAllBox = <div className="jr-fillall">
+        <p className="jr-fillall-h">{t('jr.fillAllH')}</p>
+        {finds.map(f => <div key={f.r.id} className="jr-fillall-row">
+          <span className="jr-fillall-n">{f.n + 1}</span>
+          <span className="jr-fillall-t"><b>{f.r.company}{f.r.role ? ' - ' + f.r.role : ''}</b>
+            {f.hit ? <><span className="jr-fillall-src">{f.hit.from === 'jobroom' ? 'Job-Room:' : t('jr.fillAllSite')}</span> {[f.patch.email, [[f.patch.street, f.patch.streetNo].filter(Boolean).join(' '), [f.patch.postal, f.patch.city].filter(Boolean).join(' ')].filter(Boolean).join(', '), f.patch.contactPerson].filter(Boolean).join(' · ')}</>
+              : <span className="jr-fillall-none">{t('jr.fillAllNone')}</span>}</span>
+          {f.hit && <input type="checkbox" className="jr-fillall-cb" aria-label={f.r.company} checked={!skip.includes(f.r.id)} onChange={x => setSkip(s => x.target.checked ? s.filter(id => id !== f.r.id) : [...s, f.r.id])} />}
+        </div>)}
+        <button type="button" className="btn btn-glow jr-fillall-btn" disabled={!fillable.length} onClick={fillAll}>{t('jr.fillAllBtn').replace('{n}', String(fillable.length))}</button>
+        <p className="jr-fillall-note">{t('jr.fillAllNote')}</p>
+      </div>
   // 2026-11-17 owner: search every red square in the background (Job-Room + company website, free) when the panel opens
   useEffect(() => {
     const red = rows.filter(r => !r.jobroomDone && jobRoomMissing(jobRoomEntry(r)).length > 0)
@@ -238,23 +251,11 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
             onClick={() => chooseJob(n)}>{n + 1}</button>
         ))}
       </div>
-      {finds.some(f => f.hit) && <div className="jr-fillall fd-fade">
-        <p className="jr-fillall-h">{t('jr.fillAllH')}</p>
-        {finds.map(f => <div key={f.r.id} className="jr-fillall-row">
-          <span className="jr-fillall-n">{f.n + 1}</span>
-          <span className="jr-fillall-t"><b>{f.r.company}{f.r.role ? ' - ' + f.r.role : ''}</b>
-            {f.hit ? <><span className="jr-fillall-src">{f.hit.from === 'jobroom' ? 'Job-Room:' : t('jr.fillAllSite')}</span> {[f.patch.email, [[f.patch.street, f.patch.streetNo].filter(Boolean).join(' '), [f.patch.postal, f.patch.city].filter(Boolean).join(' ')].filter(Boolean).join(', '), f.patch.contactPerson].filter(Boolean).join(' · ')}</>
-              : <span className="jr-fillall-none">{t('jr.fillAllNone')}</span>}</span>
-          {f.hit && <input type="checkbox" className="jr-fillall-cb" aria-label={f.r.company} checked={!skip.includes(f.r.id)} onChange={x => setSkip(s => x.target.checked ? s.filter(id => id !== f.r.id) : [...s, f.r.id])} />}
-        </div>)}
-        <button type="button" className="btn btn-glow jr-fillall-btn" disabled={!fillable.length} onClick={fillAll}>{t('jr.fillAllBtn').replace('{n}', String(fillable.length))}</button>
-        <p className="jr-fillall-note">{t('jr.fillAllNote')}</p>
-      </div>}
 
       <div key={`${a.id}-${idx}`} id="jr-step2" hidden={allEntered} className={'jr-step2' + (glow32 ? ' jr-glow jt-guidance-glow' : '')} onClick={() => { tappedIn32.current = true; setS32Seen(true) }}><b className="jts-num">{mobile ? '1.2.' : cleanupOnly ? '2.' : '3.2.'}</b> <b>{t('jr.appliedTo')}</b> {a.company}{a.role ? ' - ' + a.role : ''}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}
         {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}
         {hasMissingDetails
-          ? <FindDetails mobile={mobile} autoSearch={picked && !a.jobroomDone && !allEntered} key={`${a.id}-${idx}`} a={a} e={storedEntry} live={e} onPreview={showAiPreview} allApps={allApps} onUpdate={onUpdate} t={t} requiredMissing={missing.length > 0} />
+          ? <FindDetails batch={finds.some(f => f.hit) ? { count: finds.filter(f => f.hit).length, node: fillAllBox } : undefined} mobile={mobile} autoSearch={picked && !a.jobroomDone && !allEntered} key={`${a.id}-${idx}`} a={a} e={storedEntry} live={e} onPreview={showAiPreview} allApps={allApps} onUpdate={onUpdate} t={t} requiredMissing={missing.length > 0} />
           : <p className="jr-nogaps">{ICON_CHECK}{t('jr.nogaps')}</p>}
       </div>
       <div hidden={allEntered}>

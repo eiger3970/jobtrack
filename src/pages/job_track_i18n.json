@@ -2148,6 +2148,8 @@
     "fd.quickSite": {"en": "Found on the company website {site}", "de": "Gefunden auf der Firmen-Website {site}", "fr": "Trouvé sur le site de l'entreprise {site}"},
     "fd.quickJobRoom": {"en": "Found on Job-Room: {title}", "de": "Gefunden auf Job-Room: {title}", "fr": "Trouvé sur Job-Room : {title}"},
     "fd.quickJobRoomAddr": {"en": "Company address found on Job-Room", "de": "Firmenadresse auf Job-Room gefunden", "fr": "Adresse de l'entreprise trouvée sur Job-Room"},
+    "fd.batchH": {"en": "Batch search", "de": "Sammelsuche", "fr": "Recherche groupée"},
+    "fd.batchHint": {"en": "{n} found: Job-Room and company websites", "de": "{n} gefunden: Job-Room und Firmen-Websites", "fr": "{n} trouvé(s) : Job-Room et sites d'entreprise"},
     "jr.fillAllH": {"en": "Found for you - check, then fill all", "de": "Für dich gefunden - prüfen, dann alle ausfüllen", "fr": "Trouvé pour vous - vérifiez, puis remplissez tout"},
     "jr.fillAllSite": {"en": "Company website:", "de": "Firmen-Website:", "fr": "Site de l'entreprise :"},
     "jr.fillAllNone": {"en": "Nothing found: try Email search", "de": "Nichts gefunden: E-Mail-Suche versuchen", "fr": "Rien trouvé : essayez la recherche dans les e-mails"},
