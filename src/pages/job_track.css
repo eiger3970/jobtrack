@@ -1717,3 +1717,10 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .fd-mailapp .fd-btn { flex: 1 1 8rem; }
 .fd-mailapp-msg { flex-basis: 100%; }
 .fd-mailapp-msg { color: #00ff41; font-size: .8rem; }
+.fd-mailapp-how { flex-basis: 100%; color: #f0eeff; font-size: .85rem; line-height: 1.4; }
+.fd-mailapp-how b { color: #00ff41; display: inline !important; }
+.fd-mailapp-how { display: flex; align-items: center; gap: .2rem .6rem; flex-wrap: wrap; white-space: nowrap; font-size: .82rem; }
+.fd-how-rest { display: inline-flex; align-items: center; gap: .3rem; }
+.fd-how-step { display: inline-flex; align-items: center; gap: .3rem; color: #f0eeff; font-weight: 600; }
+.fd-how-step svg { width: 20px; height: 20px; fill: none; stroke: #00ff41; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.fd-how-arrow { color: #9a98b8; }

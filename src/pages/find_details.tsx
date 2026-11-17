@@ -273,6 +273,13 @@ export function MailAppBtns({ company, t }: { company: string; t: (k: string) =>
     window.location.href = scheme
   }
   return <span className="fd-mailapp">
+    {/* 2026-11-17 owner: "needs to be clearly informed the search is copied and to tap search and paste" - said BEFORE the tap, the app covers anything shown after */}
+    <span className="fd-mailapp-how" aria-label={t('fd.mailAppHow').replace('{name}', company)}>
+      <span className="fd-how-step"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" /><path d="M11 14l2 2 4-4" /></svg>{t('fd.mailAppCopy')}</span>
+      <span className="fd-how-rest"><span className="fd-how-step"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 21 21" /></svg></span>
+      <span className="fd-how-arrow" aria-hidden="true">→</span>
+      <span className="fd-how-step"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="16" rx="2" /><path d="M9 5V3h6v2M9 12h6M9 16h4" /></svg>{t('fd.mailAppPaste')}</span></span>
+    </span>
     <button type="button" className="btn fd-btn" onClick={() => open('protonmail://')}>{t('fd.mailAppProton')}</button>
     <button type="button" className="btn fd-btn" onClick={() => open('googlegmail://')}>{t('fd.mailAppGmail')}</button>
     {msg && <span className="fd-t fd-mailapp-msg">{msg}</span>}
