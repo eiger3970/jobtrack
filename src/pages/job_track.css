@@ -1724,3 +1724,4 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .fd-how-step { display: inline-flex; align-items: center; gap: .3rem; color: #f0eeff; font-weight: 600; }
 .fd-how-step svg { width: 20px; height: 20px; fill: none; stroke: #00ff41; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .fd-how-arrow { color: #9a98b8; }
+.jr-fillall-note { white-space: pre-line; }
