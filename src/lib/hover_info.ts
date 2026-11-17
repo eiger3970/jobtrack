@@ -40,8 +40,11 @@ export function useHoverInfo(set: (on: boolean) => void, zone: 'parent' | 'prev'
     if (zone === 'stay') {
       const outside = (e: MouseEvent) => { if (!area.contains(e.target as Node)) set(false) }
       const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') set(false) }
-      area.addEventListener('mouseenter', open); document.addEventListener('mousedown', outside); document.addEventListener('keydown', esc)
-      return () => { area.removeEventListener('mouseenter', open); document.removeEventListener('mousedown', outside); document.removeEventListener('keydown', esc); window.removeEventListener('scroll', scrolled, { capture: true }); window.removeEventListener('wheel', scrolled) }
+      // 2026-11-17 owner: "when I tap on the Before registration date button, the info closes, the button doesn't action,
+      // and it needs to be tapped again" - closing on mousedown shrank the page, so the button slid away before the
+      // click landed. The info now closes on the finished click: the button gets the click first, then the info closes.
+      area.addEventListener('mouseenter', open); document.addEventListener('click', outside); document.addEventListener('keydown', esc)
+      return () => { area.removeEventListener('mouseenter', open); document.removeEventListener('click', outside); document.removeEventListener('keydown', esc); window.removeEventListener('scroll', scrolled, { capture: true }); window.removeEventListener('wheel', scrolled) }
     }
     const move = (e: MouseEvent) => { if (inZone(e.target)) open(); else close() }
     area.addEventListener('mouseover', move)
