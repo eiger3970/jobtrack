@@ -103,7 +103,7 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
         {finds.map(f => <div key={f.r.id} className="jr-fillall-row">
           <span className="jr-fillall-n">{f.n + 1}</span>
           <span className="jr-fillall-t"><b>{f.r.company}{f.r.role ? ' - ' + f.r.role : ''}</b>
-            {f.hit ? <><span className="jr-fillall-src">{f.hit.from === 'jobroom' ? 'Job-Room:' : t('jr.fillAllSite')}</span> {[f.patch.email, [[f.patch.street, f.patch.streetNo].filter(Boolean).join(' '), [f.patch.postal, f.patch.city].filter(Boolean).join(' ')].filter(Boolean).join(', '), f.patch.contactPerson].filter(Boolean).join(' · ')}</>
+            {f.hit ? <><span className="jr-fillall-src">{f.hit.from === 'jobroom' ? 'Job-Room:' : t('jr.fillAllSite')}</span> {/* 2026-11-17 owner: "I see no grey text after Job-Room:" - the link and phone were filled but not listed; every field that gets filled is shown */}{[f.patch.email, [[f.patch.street, f.patch.streetNo].filter(Boolean).join(' '), [f.patch.postal, f.patch.city].filter(Boolean).join(' ')].filter(Boolean).join(', '), f.patch.contactPerson, f.patch.phone, f.patch.link ? t('jr.fillAllLink') : ''].filter(Boolean).join(' · ')}</>
               : <>
                 {/* 2026-11-17 owner: email stays manual - but from this one list: search links per job + paste the found email or link here */}
                 <span className="jr-fillall-none">{t('jr.fillAllNone')}</span>
