@@ -6,7 +6,7 @@ import { useProKey } from '../lib/pro'
 import { PackList, openPacks, readPackToken } from '../lib/credit_packs'
 import { isApp } from '../lib/platform'
 import { PRO_KEY } from './job_track_pro'
-import { aiFind, quickFind, type QuickFind, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
+import { aiFind, quickFind, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
 import { useHoverInfo } from '../lib/hover_info'
 
 type AiState = 'idle' | 'busy' | 'result' | 'used' | 'cap' | 'none' | 'err'
@@ -307,7 +307,8 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   // solution in x". The history search is sent at once; whatever it (and the free quick search after it) finds is shown at 8 s.
   const holdUntil = useRef(0)
   const quickRef = useRef<() => void>(() => {})
-  const [siteFind, setSiteFind] = useState<QuickFind['site']>(null)
+  // the best quick find: Job-Room's ad for this job first (exact), else the company website
+  const [siteFind, setSiteFind] = useState<null | { label: string; fields: Rec }>(null)
   const [suggest, setSuggest] = useState<'' | 'mail' | 'site'>('')
   const afterHold = (fn: () => void) => { const wait = holdUntil.current - Date.now(); if (wait > 0) window.setTimeout(fn, wait); else fn() }
   // 2026-11-17 owner: "build that" - after installing the add-on the history search starts by itself, no F5 and no tap.
@@ -394,9 +395,14 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     setHist({ state: 'busy', src: 'history', results: [] })   // the add-on picture keeps running while the quick search works
     void quickFind(a.company, a.role, [a.postal, a.city].filter(Boolean).join(' '), app).then(q => afterHold(() => {
       const jobs = q.jobs.filter(j => isJobLink(j.url))
-      const useful = q.site && (q.site.email || q.site.postal) ? q.site : null
-      setSiteFind(useful)
-      setSuggest(jobs.length || useful ? '' : q.site ? 'site' : 'mail')
+      const pick = (o: Record<string, unknown>, keys: string[]): Rec => Object.fromEntries(keys.filter(k => typeof o[k] === 'string' && o[k]).map(k => [k, o[k] as string]))
+      const F = ['email', 'street', 'streetNo', 'postal', 'city', 'phone', 'contactPerson']
+      const jr = q.jobroom, st = q.site
+      const hit = jr && jr.url ? { label: t('fd.quickJobRoom').replace('{title}', jr.title), fields: { ...pick(jr, F), link: jr.formUrl || jr.url, linkFrom: jr.formUrl ? 'user' : 'company' } }
+        : st && (st.email || st.postal) ? { label: t('fd.quickSite').replace('{site}', st.site), fields: pick(st, F) }
+        : jr && jr.postal ? { label: t('fd.quickJobRoomAddr'), fields: pick(jr, F) } : null
+      setSiteFind(hit)
+      setSuggest(jobs.length || hit ? '' : st ? 'site' : 'mail')
       setHist({ state: 'done', src: 'history', via: jobs.length ? 'quick' : undefined, results: jobs })
     }))
   }
@@ -608,12 +614,13 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
           <span className="fd-warm-t"><b>{t('fd.histWarm')}</b><span className="fd-ell" /></span></span></div>}
         {hist.state === 'busy' && !histWarm && hist.src !== 'ai' && hist.src !== 'history' && <Unfold key={hist.src}><span className="fd-t fd-fade" role="status"><span className="fd-dots"><i /><i /><i /></span>{ hist.src === 'web' ? t('fd.webBusy') : hist.src === 'history' ? t('fd.histWarm') : t(pro ? 'fd.histBusy' : 'fd.histBusyFree')}</span></Unfold>}
         {hist.state === 'done' && !hist.results.length && siteFind && <div className="fd-hslot fd-hslot-in">
-          <span className="fd-t fd-found">{t('fd.quickSite').replace('{site}', siteFind.site)}</span>
-          <button type="button" className="btn btn-glow fd-btn fd-hist jt-use-link jt-guidance-glow" onClick={() => {
+          <span className="fd-t fd-found">{siteFind.label}</span>
+          <button type="button" className="btn btn-glow fd-btn fd-hist jt-use-link jt-guidance-glow fd-one-line" title={Object.values(siteFind.fields).join(' · ')} onClick={() => {
             const patch: Rec = {}
-            for (const k of ['email', 'street', 'streetNo', 'postal', 'city', 'phone'] as const) { const v = siteFind[k]; if (v && !(a as unknown as Rec)[k]) patch[k] = v }
+            for (const [k, v] of Object.entries(siteFind.fields)) if (v && !(a as unknown as Rec)[k]) patch[k] = v   // only fields still empty
+            if (!patch.link) delete patch.linkFrom   // link kind only goes with a link
             onUpdate(a.id, patch as Patch); setSiteFind(null); setHist({ state: 'idle', results: [] })
-          }}>{t('fd.quickUse')} {[siteFind.email, [[siteFind.street, siteFind.streetNo].filter(Boolean).join(' '), [siteFind.postal, siteFind.city].filter(Boolean).join(' ')].filter(Boolean).join(', ')].filter(Boolean).join(' · ')}</button>
+          }}>{t('fd.quickUse')} {(f => [f.email, [[f.street, f.streetNo].filter(Boolean).join(' '), [f.postal, f.city].filter(Boolean).join(' ')].filter(Boolean).join(', '), f.contactPerson].filter(Boolean).join(' · '))(siteFind.fields)}</button>
         </div>}
         {hist.state === 'done' && !hist.results.length && !siteFind && suggest && <div className="fd-hslot fd-hslot-in">
           <span className="fd-t fd-found">{t('fd.quickNone')}</span>

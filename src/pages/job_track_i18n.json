@@ -2146,6 +2146,8 @@
     "fd.webBusy": {"en": "Web search is running...", "de": "Websuche läuft...", "fr": "La recherche web est en cours..."},
     "fd.webNone": {"en": "Web search: no results ({why})", "de": "Websuche: keine Ergebnisse ({why})", "fr": "Recherche web : aucun résultat ({why})"},
     "fd.quickSite": {"en": "Found on the company website {site}", "de": "Gefunden auf der Firmen-Website {site}", "fr": "Trouvé sur le site de l'entreprise {site}"},
+    "fd.quickJobRoom": {"en": "Found on Job-Room: {title}", "de": "Gefunden auf Job-Room: {title}", "fr": "Trouvé sur Job-Room : {title}"},
+    "fd.quickJobRoomAddr": {"en": "Company address found on Job-Room", "de": "Firmenadresse auf Job-Room gefunden", "fr": "Adresse de l'entreprise trouvée sur Job-Room"},
     "fd.quickUse": {"en": "Use:", "de": "Übernehmen:", "fr": "Utiliser :"},
     "fd.quickNone": {"en": "Nothing found automatically. A solution might be in:", "de": "Automatisch nichts gefunden. Eine Lösung könnte hier sein:", "fr": "Rien trouvé automatiquement. Une solution pourrait se trouver ici :"},
     "fd.histWarm": {"en": "Add-on searching", "de": "Add-on sucht", "fr": "Module en recherche"},
