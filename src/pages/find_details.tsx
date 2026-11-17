@@ -715,7 +715,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
             <span className="fd-chev" aria-hidden="true">{isOpen('batch') ? '▾' : '▸'}</span>
             <b><TapCount n={1} label={t('fd.tapsAria')} /><span className="fd-opt-txt">{t('fd.batchH')}<small>{!batch.done ? t('fd.batchBusy') : batch.count ? t('fd.batchHint').replace('{n}', String(batch.count)) : t('fd.batchNone')}</small></span></b>
           </div>
-          {isOpen('batch') && <div className="fd-body">{batch.done && batch.count ? batch.node : <span className="fd-t">{!batch.done ? t('fd.batchBusy') : t('fd.batchNone')}</span>}</div>}
+          {isOpen('batch') && <div className="fd-body">{batch.done ? batch.node : <span className="fd-t">{t('fd.batchBusy')}</span>}</div>}
         </li>}
         <li hidden={!!method && method !== 'mail'}>
           <div hidden={!!method} className={'fd-opt' + (isOpen('mail') ? ' on' : '')} role="button" tabIndex={0} aria-expanded={isOpen('mail')} onClick={() => toggle('mail')} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle('mail') } }}>

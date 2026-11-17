@@ -1706,3 +1706,5 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jr-fillall-btn { width: 100%; margin-top: .7rem; }
 .jr-fillall-note { text-align: center; color: #9a98b8; font-size: .75rem; margin: .4rem 0 0; }
 .fd-opt.fd-batch-ready { border-color: #00ff41; box-shadow: 0 0 0 1px rgba(0,255,65,.35); transition: border-color .6s, box-shadow .6s; }   /* 2026-11-17: Batch search ready - a calm green edge, no pop-in */
+.jr-fillall-mail { display: flex; gap: 1rem; margin: .3rem 0; }
+.jr-fillall-paste { width: 100%; margin-top: .2rem; padding: .45rem .6rem; border-radius: 6px; border: 1px solid #2a2748; background: #14122a; color: #f0eeff; font-size: 16px; }   /* 16px: no iOS zoom */

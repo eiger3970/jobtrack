@@ -87,19 +87,35 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
   const fillable = finds.filter(f => f.hit && !skip.includes(f.r.id))
   // 2026-11-17 owner: the option popping in a second later distracted from 3.1 - it is there from the start, "searching" until every red square has its answer
   const redCount = rows.filter(r => !r.jobroomDone && jobRoomMissing(jobRoomEntry(r)).length > 0).length
+  // a pasted email goes into Email, a pasted address starting with http into the job link; anything else is left alone
+  const pasteFound = (r: Application, v: string) => {
+    const mail = v.match(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/)
+    if (mail) onUpdate(r.id, { email: mail[0] } as Patch)
+    else if (/^https?:\/\//i.test(v)) onUpdate(r.id, { link: v, linkFrom: 'user' } as Patch)
+  }
   const fillAll = () => { for (const f of fillable) onUpdate(f.r.id, f.patch as Patch); setSkip([]) }
   // 2026-11-17 owner: "FOUND FOR YOU is missed as it is showing under the squares further up" - it is now a search option above Email search
   const fillAllBox = <div className="jr-fillall">
-        <p className="jr-fillall-h">{t('jr.fillAllH')}</p>
+        {finds.some(f => f.hit) && <p className="jr-fillall-h">{t('jr.fillAllH')}</p>}
         {finds.map(f => <div key={f.r.id} className="jr-fillall-row">
           <span className="jr-fillall-n">{f.n + 1}</span>
           <span className="jr-fillall-t"><b>{f.r.company}{f.r.role ? ' - ' + f.r.role : ''}</b>
             {f.hit ? <><span className="jr-fillall-src">{f.hit.from === 'jobroom' ? 'Job-Room:' : t('jr.fillAllSite')}</span> {[f.patch.email, [[f.patch.street, f.patch.streetNo].filter(Boolean).join(' '), [f.patch.postal, f.patch.city].filter(Boolean).join(' ')].filter(Boolean).join(', '), f.patch.contactPerson].filter(Boolean).join(' · ')}</>
-              : <span className="jr-fillall-none">{t('jr.fillAllNone')}</span>}</span>
+              : <>
+                {/* 2026-11-17 owner: email stays manual - but from this one list: search links per job + paste the found email or link here */}
+                <span className="jr-fillall-none">{t('jr.fillAllNone')}</span>
+                <span className="jr-fillall-mail">
+                  <a className="fd-lnk" href={`https://mail.proton.me/u/0/all-mail#keyword=${encodeURIComponent(f.r.company)}`} target="_blank" rel="noopener noreferrer">{t('jr.mailProton')}</a>
+                  <a className="fd-lnk" href={`https://mail.google.com/mail/u/0/#search/${encodeURIComponent(f.r.company)}`} target="_blank" rel="noopener noreferrer">{t('jr.mailGmail')}</a>
+                </span>
+                <input className="jr-fillall-paste" type="text" inputMode="email" placeholder={t('jr.fillAllPaste')} aria-label={t('jr.fillAllPaste') + ' - ' + f.r.company}
+                  onPaste={x => { const v = x.clipboardData.getData('text').trim(); if (v) { x.preventDefault(); x.currentTarget.value = v; pasteFound(f.r, v) } }}
+                  onKeyDown={x => { if (x.key === 'Enter') pasteFound(f.r, x.currentTarget.value.trim()) }} />
+              </>}</span>
           {f.hit && <input type="checkbox" className="jr-fillall-cb" aria-label={f.r.company} checked={!skip.includes(f.r.id)} onChange={x => setSkip(s => x.target.checked ? s.filter(id => id !== f.r.id) : [...s, f.r.id])} />}
         </div>)}
-        <button type="button" className="btn btn-glow jr-fillall-btn" disabled={!fillable.length} onClick={fillAll}>{t('jr.fillAllBtn').replace('{n}', String(fillable.length))}</button>
-        <p className="jr-fillall-note">{t('jr.fillAllNote')}</p>
+        {fillable.length > 0 && <button type="button" className="btn btn-glow jr-fillall-btn" onClick={fillAll}>{t('jr.fillAllBtn').replace('{n}', String(fillable.length))}</button>}
+        {fillable.length > 0 && <p className="jr-fillall-note">{t('jr.fillAllNote')}</p>}
       </div>
   // 2026-11-17 owner: search every red square in the background (Job-Room + company website, free) when the panel opens
   useEffect(() => {
