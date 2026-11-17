@@ -303,6 +303,19 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   const [reloadPulse, setReloadPulse] = useState(false)   // 2026-11-17 owner: the tick -> F5 -> reload icons glow a while after Install is tapped
   const mountedAt = useRef(Date.now())
   const lateAddon = useRef(false)
+  const [lateGo, setLateGo] = useState(0)
+  // 2026-11-17 owner: "build that" - after installing the add-on the history search starts by itself, no F5 and no tap.
+  // The 11-07 rule stays: never while Firefox's install pop-ups are open (the Allow tab popped up mid-install). So wait
+  // 3 s, then until the page has the focus back (the Add / OK pop-ups hold it), then start.
+  useEffect(() => {
+    if (!addon || !lateAddon.current) return
+    const started = Date.now()
+    const id = window.setInterval(() => {
+      if (Date.now() - started < 3000 || !document.hasFocus() || document.visibilityState !== 'visible') return
+      window.clearInterval(id); lateAddon.current = false; setLateGo(n => n + 1)
+    }, 500)
+    return () => window.clearInterval(id)
+  }, [addon])
   const quietRef = useRef(false)
   const canAddon = typeof navigator !== 'undefined' && /Firefox|LibreWolf|Waterfox|Zen/i.test(navigator.userAgent) && !/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)   // add-on installs only on desktop Firefox-family browsers
   const [histPerm, setHistPerm] = useState(false)
@@ -346,7 +359,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     let allowed = false; try { allowed = localStorage.getItem('kworld_hist_granted') === '1' } catch { /* private mode */ }
     setHist({ state: 'busy', src: 'history', results: [] }); if (!allowed) setHistWarm(true)   // 2026-11-08 owner: the Allow picture only when the Allow tab will really open
     window.setTimeout(() => { setHistWarm(false); postHistoryOnce({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }) }, allowed ? 1500 : 4000)
-  }, [addon, needsLink, autoSearch, aiDone]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [addon, needsLink, autoSearch, aiDone, lateGo]) // eslint-disable-line react-hooks/exhaustive-deps
   // AI job-page search (no add-on needed): runs by itself when a link is needed and the history search is not available or found nothing
   // 2026-11-04 owner: the free web search runs by itself; the AI search only when the person taps it
   const jobLinkBase = () => ({ want: 'joblink' as const, date: a.date, company: a.company, role: a.role, hint: '', jobLocation: [a.postal, a.city].filter(Boolean).join(' '), tok, app })
