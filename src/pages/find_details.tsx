@@ -300,7 +300,6 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   // 2026-11-03 owner: with the Bookmarks add-on installed, one tap finds the page applied on in the browser history (nothing leaves the browser)
   const [addon, setAddon] = useState(false)
   const addonRef = useRef(false)
-  const [reloadPulse, setReloadPulse] = useState(false)   // 2026-11-17 owner: the tick -> F5 -> reload icons glow a while after Install is tapped
   const mountedAt = useRef(Date.now())
   const lateAddon = useRef(false)
   const [lateGo, setLateGo] = useState(0)
@@ -713,24 +712,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
               : <>
                 {app && <p className="fd-flow">{t('fd.addonWeb')}</p>}
                 {canAddon && <>
-                  <a className="btn btn-glow fd-btn" href="/free/bookmarks_search.xpi" onClick={() => { setReloadPulse(false); window.setTimeout(() => setReloadPulse(true), 8000) }}>{t('fd.addonInstall')}</a>
-                  {/* 2026-11-17 owner: "a note for users to refresh, it's essential", then "less verbose text, more svg images":
-                      add-on installed -> F5 -> page reloads. The words stay only as the hover/screen-reader label. */}
-                  <span className={'fd-reload-note' + (reloadPulse ? ' fd-reload-pulse' : '')} role="img" aria-label={t('fd.addonThen')} title={t('fd.addonThen')}>
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00ff41" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <circle cx="12" cy="12" r="9.5" /><path d="M7.5 12.5l3 3 6-6" />
-                    </svg>
-                    <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><path d="M2 8h16M13 3l5 5-5 5" fill="none" stroke="#ffb000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                    <svg width="34" height="30" viewBox="0 0 34 30" aria-hidden="true">
-                      <rect x="1.5" y="1.5" width="31" height="25" rx="5" fill="#1a1810" stroke="#ffb000" strokeWidth="2" />
-                      <rect x="1.5" y="23" width="31" height="5" rx="2.5" fill="#ffb000" opacity=".35" />
-                      <text x="17" y="18.5" textAnchor="middle" fontSize="12" fontWeight="700" fill="#ffb000" fontFamily="system-ui, sans-serif">F5</text>
-                    </svg>
-                    <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><path d="M2 8h16M13 3l5 5-5 5" fill="none" stroke="#ffb000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffb000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M20 12a8 8 0 1 1-2.34-5.66" /><path d="M20 4v5h-5" />
-                    </svg>
-                  </span>
+                  <a className="btn btn-glow fd-btn" href="/free/bookmarks_search.xpi">{t('fd.addonInstall')}</a>
                 </>}
                 {!failNoteTop && noteSlot(shortFail)}{inOpt && foundHere && resultBox}
                 {mobile
