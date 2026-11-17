@@ -1672,3 +1672,12 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .eml-export-ico { flex: none; }
 /* 2026-11-16 owner: a colour badge per email app so the eye finds its own app (no trademark logos) */
 .eml-badge { display: inline-flex; align-items: center; justify-content: center; width: 1.2rem; height: 1.2rem; margin: .12rem .4rem .12rem 0; border-radius: 50%; color: #fff; font-size: .7rem; font-weight: 800; font-style: normal; vertical-align: middle; }
+.fd-reload-note { display: flex; align-items: center; justify-content: center; gap: .5rem; margin: .5rem 0 .2rem; }   /* 2026-11-17: add-on -> F5 -> reload, icons only */
+/* 2026-11-17 owner: 8 s after Install is tapped (time to tap Continue, Add, OK) the reload icons glow and pulse */
+.fd-reload-note svg { transition: filter .3s; }
+.fd-reload-pulse svg { animation: fd-reload-pulse 1.4s ease-in-out infinite; }
+@keyframes fd-reload-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255,176,0,0)); }
+  50% { transform: scale(1.18); filter: drop-shadow(0 0 7px rgba(255,176,0,.95)); }
+}
+@media (prefers-reduced-motion: reduce) { .fd-reload-pulse svg { animation: none; filter: drop-shadow(0 0 6px rgba(255,176,0,.9)); } }
