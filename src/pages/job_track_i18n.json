@@ -2157,6 +2157,7 @@
     "jr.fillAllNone": {"en": "Nothing found: try Email search", "de": "Nichts gefunden: E-Mail-Suche versuchen", "fr": "Rien trouvé : essayez la recherche dans les e-mails"},
     "jr.fillAllPaste": {"en": "Paste the email or link you found", "de": "Gefundene E-Mail oder Link einfügen", "fr": "Collez l'e-mail ou le lien trouvé"},
     "jr.fillAllLink": {"en": "job link", "de": "Link zur Stelle", "fr": "lien de l'offre"},
+    "jr.leg.found": {"en": "found by Batch search", "de": "von der Sammelsuche gefunden", "fr": "trouvé par la recherche groupée"},
     "jr.fillAllBtn": {"en": "Fill all ({n})", "de": "Alle ausfüllen ({n})", "fr": "Tout remplir ({n})"},
     "jr.fillAllNote": {"en": "Only empty fields are filled. Untick a job to skip it.", "de": "Nur leere Felder werden ausgefüllt. Haken entfernen, um eine Stelle auszulassen.", "fr": "Seuls les champs vides sont remplis. Décochez une offre pour la sauter."},
     "fd.quickUse": {"en": "Use:", "de": "Übernehmen:", "fr": "Utiliser :"},

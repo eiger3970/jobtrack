@@ -85,6 +85,8 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
     return { ...x, q, hit: hit && Object.keys(patch).some(k => k !== 'linkFrom') ? hit : null, patch }
   }).filter(x => x.q)
   const fillable = finds.filter(f => f.hit && !skip.includes(f.r.id))
+  // 2026-11-17 owner: "scrolling down 35 long list to see what has a tick ... perhaps a tick in the top 35 boxes" - squares with a Batch find carry a green tick
+  const foundIds = fillable.map(f => f.r.id)
   // 2026-11-17 owner: the option popping in a second later distracted from 3.1 - it is there from the start, "searching" until every red square has its answer
   const redCount = rows.filter(r => !r.jobroomDone && jobRoomMissing(jobRoomEntry(r)).length > 0).length
   // a pasted email goes into Email, a pasted address starting with http into the job link; anything else is left alone
@@ -261,13 +263,14 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
         <span className="jr-leg"><span className="jr-lg done" />{t('jr.leg.done')}</span>
         <span className="jr-leg"><span className="jr-lg todo" />{t('jr.leg.todo')}</span>
         <span className="jr-leg"><span className="jr-lg need" />{t('jr.leg.need')}</span>
+        {foundIds.length > 0 && <span className="jr-leg"><span className="jr-lg-found">✓</span>{t('jr.leg.found')}</span>}
       </p>
       <div className="jr-dots" role="tablist">
         <svg className="jr-tapme" viewBox="0 0 24 24" width="26" height="26" role="img" aria-label={t('jr.flow2')}><path fill="#00ff41" d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.69-5.1c.01-.07.02-.13.02-.2 0-.62-.38-1.16-.91-1.38z" /></svg>
         {rows.map((r, n) => (
           <button key={r.id} type="button" role="tab" aria-selected={n === idx} aria-label={`${n + 1}. ${r.company}`} title={`${n + 1}. ${r.company} - ${swissDate(r.date)}`}
             className={'jr-dot' + (!picked && nextSquare >= 0 && n === nextSquare ? ' glow jt-guidance-glow' : '') + (r.jobroomDone ? ' done' : '') + (jobRoomMissing(jobRoomEntry(r)).length ? ' need' : '')}
-            onClick={() => chooseJob(n)}>{n + 1}</button>
+            onClick={() => chooseJob(n)}>{n + 1}{foundIds.includes(r.id) && <span className="jr-dot-found" aria-label={t('jr.leg.found')}>✓</span>}</button>
         ))}
       </div>
 

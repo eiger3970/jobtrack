@@ -1709,3 +1709,7 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jr-fillall-mail { display: flex; gap: 1rem; margin: .3rem 0; }
 .jr-fillall-paste { width: 100%; margin-top: .2rem; padding: .45rem .6rem; border-radius: 6px; border: 1px solid #2a2748; background: #14122a; color: #f0eeff; font-size: 16px; }   /* 16px: no iOS zoom */
 .jr-fillall-note { margin-bottom: .5rem !important; }
+/* 2026-11-17 owner: green tick on squares that Batch search found something for */
+.jr-dot { position: relative; }
+.jr-dot-found { position: absolute; top: -6px; right: -6px; width: 14px; height: 14px; border-radius: 50%; background: #00ff41; color: #000; font-size: 9px; font-weight: 900; line-height: 14px; text-align: center; pointer-events: none; }
+.jr-lg-found { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #00ff41; color: #000; font-size: 9px; font-weight: 900; line-height: 14px; text-align: center; margin-right: .3rem; }
