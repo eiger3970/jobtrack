@@ -121,3 +121,15 @@ export async function aiFind(o: { want?: 'joblink' | 'sender'; date?: string; co
   }
   return { kind: 'err', detail: '', trail: tr() }
 }
+
+// 2026-11-17 owner: when the history search finds nothing, a free search (web + the company's own website) runs in the
+// same 8 seconds. Only the company name, job title and place are sent, to kworld's own worker.
+export type QuickFind = { jobs: { url: string; title: string }[]; site: { site: string; email?: string; phone?: string; street?: string; streetNo?: string; postal?: string; city?: string } | null }
+export async function quickFind(company: string, role: string, place: string, app: boolean): Promise<QuickFind> {
+  try {
+    const r = await fetch(app ? APP_FIND_URL.replace('/find-details', '/quick-find') : '/api/jobtrack/quick', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ company, role, place }), signal: AbortSignal.timeout(7500) })
+    const j = await r.json()
+    return { jobs: Array.isArray(j?.jobs) ? j.jobs : [], site: j?.site && typeof j.site.site === 'string' ? j.site : null }
+  } catch { return { jobs: [], site: null } }
+}

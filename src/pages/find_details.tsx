@@ -6,7 +6,7 @@ import { useProKey } from '../lib/pro'
 import { PackList, openPacks, readPackToken } from '../lib/credit_packs'
 import { isApp } from '../lib/platform'
 import { PRO_KEY } from './job_track_pro'
-import { aiFind, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
+import { aiFind, quickFind, type QuickFind, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
 import { useHoverInfo } from '../lib/hover_info'
 
 type AiState = 'idle' | 'busy' | 'result' | 'used' | 'cap' | 'none' | 'err'
@@ -303,6 +303,13 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   const mountedAt = useRef(Date.now())
   const lateAddon = useRef(false)
   const [lateGo, setLateGo] = useState(0)
+  // 2026-11-17 owner: "run everything in the 8 seconds if the bookmarks/history has 0 searches, then suggest there might be a
+  // solution in x". The history search is sent at once; whatever it (and the free quick search after it) finds is shown at 8 s.
+  const holdUntil = useRef(0)
+  const quickRef = useRef<() => void>(() => {})
+  const [siteFind, setSiteFind] = useState<QuickFind['site']>(null)
+  const [suggest, setSuggest] = useState<'' | 'mail' | 'site'>('')
+  const afterHold = (fn: () => void) => { const wait = holdUntil.current - Date.now(); if (wait > 0) window.setTimeout(fn, wait); else fn() }
   // 2026-11-17 owner: "build that" - after installing the add-on the history search starts by itself, no F5 and no tap.
   // The 11-07 rule stays: never while Firefox's install pop-ups are open (the Allow tab popped up mid-install). So wait
   // 3 s, then until the page has the focus back (the Add / OK pop-ups hold it), then start.
@@ -324,7 +331,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   const searchJobLinkRef = useRef<() => void>(() => {})
   const linkAiTried = useRef(false)
   const histKeep = useRef<{ url: string; title: string }[]>([])   // 2026-11-04 owner: a result the browser history found must survive the AI search
-  const [hist, setHist] = useState<{ state: 'idle' | 'busy' | 'done'; src?: 'ai' | 'history' | 'web'; why?: 'cap' | 'procap' | 'err'; email?: string; web?: boolean; diag?: string; results: { url: string; title: string }[] }>({ state: 'idle', results: [] })
+  const [hist, setHist] = useState<{ state: 'idle' | 'busy' | 'done'; src?: 'ai' | 'history' | 'web'; via?: 'quick'; why?: 'cap' | 'procap' | 'err'; email?: string; web?: boolean; diag?: string; results: { url: string; title: string }[] }>({ state: 'idle', results: [] })
   useEffect(() => {
     const on = (ev: MessageEvent) => {
       if (ev.source !== window || !ev.data || ev.data.source !== 'bookmarks-search') return
@@ -335,9 +342,8 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
         setHistPerm(!!ev.data.needPermission)
         try { if (ev.data.needPermission) localStorage.removeItem('kworld_hist_granted'); else localStorage.setItem('kworld_hist_granted', '1') } catch { /* private mode */ }   // 2026-11-08 owner: once the person has allowed history search, the Allow picture must not show again
         if (quietRef.current) { quietRef.current = false; if (results.length) { histKeep.current = results; setHist({ state: 'done', src: 'history', results }) }; return }   // 2026-11-07 owner: the rerun after the Allow tab must not wipe an AI answer already on screen - it only adds a history find
-        if (results.length) histKeep.current = results
-        setHist({ state: 'done', src: 'history', results })
-        if (!results.length) searchJobLinkRef.current()   // nothing in the history: ask the AI for the job page
+        if (results.length) { histKeep.current = results; afterHold(() => setHist({ state: 'done', src: 'history', results })); return }
+        quickRef.current()   // nothing in the history: the free quick search (web + company website), shown at 8 s
       }
     }
     window.addEventListener('message', on)
@@ -357,7 +363,8 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     // 2026-11-07 owner: say what happens next during the wait - "installed add-on running... a moment", then the tab asks for permission
     let allowed = false; try { allowed = localStorage.getItem('kworld_hist_granted') === '1' } catch { /* private mode */ }
     setHist({ state: 'busy', src: 'history', results: [] }); if (!allowed) setHistWarm(true)   // 2026-11-08 owner: the Allow picture only when the Allow tab will really open
-    window.setTimeout(() => { setHistWarm(false); postHistoryOnce({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }) }, 8000)   // 2026-11-17 owner: "too fast for humans" (1.5 -> 4 s), then "give the add-on search twice as much time" -> 8 s
+    if (allowed) { holdUntil.current = Date.now() + 8000; postHistoryOnce({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }) }
+    else window.setTimeout(() => { setHistWarm(false); postHistoryOnce({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }) }, 8000)   // the Allow tab opens - 8 s to read first   // 2026-11-17 owner: "too fast for humans" (1.5 -> 4 s), then "give the add-on search twice as much time" -> 8 s
   }, [addon, needsLink, autoSearch, aiDone, lateGo]) // eslint-disable-line react-hooks/exhaustive-deps
   // AI job-page search (no add-on needed): runs by itself when a link is needed and the history search is not available or found nothing
   // 2026-11-04 owner: the free web search runs by itself; the AI search only when the person taps it
@@ -383,11 +390,21 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     showJobLinkOutcome(await atLeast(aiFind({ ...jobLinkBase(), skipWeb: true })))
   }
   searchJobLinkRef.current = () => { void searchJobLink() }
+  quickRef.current = () => {
+    setHist({ state: 'busy', src: 'history', results: [] })   // the add-on picture keeps running while the quick search works
+    void quickFind(a.company, a.role, [a.postal, a.city].filter(Boolean).join(' '), app).then(q => afterHold(() => {
+      const jobs = q.jobs.filter(j => isJobLink(j.url))
+      const useful = q.site && (q.site.email || q.site.postal) ? q.site : null
+      setSiteFind(useful)
+      setSuggest(jobs.length || useful ? '' : q.site ? 'site' : 'mail')
+      setHist({ state: 'done', src: 'history', via: jobs.length ? 'quick' : undefined, results: jobs })
+    }))
+  }
   useEffect(() => {
     if (!autoSearch || !needsLink || linkAiTried.current) return
     void searchJobLink()
   }, [autoSearch, needsLink]) // eslint-disable-line react-hooks/exhaustive-deps
-  const searchHistory = () => { setHist({ state: 'busy', src: 'history', results: [] }); window.postMessage({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }, window.location.origin) }
+  const searchHistory = () => { holdUntil.current = Date.now() + 8000; setSiteFind(null); setSuggest(''); setHist({ state: 'busy', src: 'history', results: [] }); window.postMessage({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }, window.location.origin) }
   const histBoxRef = useRef<HTMLDivElement>(null)
   useEffect(() => { if (histPerm) { setOpenOpt('link'); setUserOpt(true) } }, [histPerm])   // 2026-11-07 owner: History search opens at the permission note
   // 2026-11-07 owner: closing the Allow tab opened another one. Now the add-on says 'granted' once the permission is really given, and only then the search reruns.
@@ -590,8 +607,20 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
           </svg>
           <span className="fd-warm-t"><b>{t('fd.histWarm')}</b><span className="fd-ell" /></span></span></div>}
         {hist.state === 'busy' && !histWarm && hist.src !== 'ai' && hist.src !== 'history' && <Unfold key={hist.src}><span className="fd-t fd-fade" role="status"><span className="fd-dots"><i /><i /><i /></span>{ hist.src === 'web' ? t('fd.webBusy') : hist.src === 'history' ? t('fd.histWarm') : t(pro ? 'fd.histBusy' : 'fd.histBusyFree')}</span></Unfold>}
+        {hist.state === 'done' && !hist.results.length && siteFind && <div className="fd-hslot fd-hslot-in">
+          <span className="fd-t fd-found">{t('fd.quickSite').replace('{site}', siteFind.site)}</span>
+          <button type="button" className="btn btn-glow fd-btn fd-hist jt-use-link jt-guidance-glow" onClick={() => {
+            const patch: Rec = {}
+            for (const k of ['email', 'street', 'streetNo', 'postal', 'city', 'phone'] as const) { const v = siteFind[k]; if (v && !(a as unknown as Rec)[k]) patch[k] = v }
+            onUpdate(a.id, patch as Patch); setSiteFind(null); setHist({ state: 'idle', results: [] })
+          }}>{t('fd.quickUse')} {[siteFind.email, [[siteFind.street, siteFind.streetNo].filter(Boolean).join(' '), [siteFind.postal, siteFind.city].filter(Boolean).join(' ')].filter(Boolean).join(', ')].filter(Boolean).join(' · ')}</button>
+        </div>}
+        {hist.state === 'done' && !hist.results.length && !siteFind && suggest && <div className="fd-hslot fd-hslot-in">
+          <span className="fd-t fd-found">{t('fd.quickNone')}</span>
+          <button type="button" className="btn btn-glow fd-btn jt-guidance-glow" onClick={() => { setOpenOpt(suggest); setUserOpt(true) }}>{t(suggest === 'site' ? 'fd.siteH' : 'fd.mailH')}</button>
+        </div>}
         {histPerm && !hist.results.length && <span className="fd-t fd-ai-notice" role="status">{t('fd.histPerm')}</span>}
-        {hist.state === 'done' && !hist.results.length && !hist.email && !histPerm && !aiFail && <span className="fd-t">{t(hist.why === 'procap' ? 'fd.histProCap' : hist.why === 'cap' ? (pro ? 'fd.histErr' : buyLive ? 'fd.histCapPay' : 'fd.histCap') : hist.why === 'err' ? (pro ? 'fd.histErr' : 'fd.histBuy') : 'fd.histNone')}</span>}
+        {hist.state === 'done' && !hist.results.length && !hist.email && !histPerm && !aiFail && !siteFind && !suggest && <span className="fd-t">{t(hist.why === 'procap' ? 'fd.histProCap' : hist.why === 'cap' ? (pro ? 'fd.histErr' : buyLive ? 'fd.histCapPay' : 'fd.histCap') : hist.why === 'err' ? (pro ? 'fd.histErr' : 'fd.histBuy') : 'fd.histNone')}</span>}
   </>)   // 2026-11-07 owner: no result must be told at the button itself, not only in a box above the list
   // 2026-11-08 owner: the AI-failed note must sit where the person is looking - inside the search option that is open, not at the top of the list
   const failMsg = aiFail ? (aiFail.diag ? amberLead(t(/credit balance|insufficient|billing|\b402\b/i.test(aiFail.diag) ? 'fd.aiNoFunds' : /quota|\b429\b|exhausted/i.test(aiFail.diag) ? 'fd.aiQuota' : /overload|\b529\b|busy/i.test(aiFail.diag) ? 'fd.aiBusy' : 'fd.aiFailed') + ' (' + aiFail.diag + ')') : amberLead(t(pro ? 'fd.histProCap' : buyLive ? 'fd.histCapPay' : 'fd.histCap'))) : null   // 2026-11-09 owner: every search option shows the same AI-failed text
@@ -614,7 +643,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
         {hist.state === 'done' && !aiFail && (hist.why === 'cap' || hist.why === 'err') && buyLive && !pro && <div className="fd-ai-buy"><button type="button" className="btn btn-glow fd-btn" onClick={() => openPacks()}>{t('bulk.buy')}</button></div>}
         {foundHere && <div className={hist.src === 'history' ? 'fd-hslot fd-hslot-in' : 'fd-reveal'}><div className={hist.src === 'history' ? '' : 'fd-reveal-in'}>
         {hist.email && <><span className="fd-t fd-found">{t(pro ? 'fd.srcAi' : 'fd.srcAiFree')}</span><button type="button" className="btn btn-glow fd-btn fd-hist jt-use-link jt-guidance-glow" onClick={() => { onUpdate(a.id, { email: hist.email } as Patch); setHist({ state: 'idle', results: [] }) }}>{t('fd.emailUse')} {hist.email}</button></>}
-        {hist.results.length > 0 && <span className="fd-t fd-found">{hist.src === 'history' ? t('fd.srcHist') : hist.web ? t('fd.srcWeb') : t(pro ? 'fd.srcAi' : 'fd.srcAiFree')}</span>}
+        {hist.results.length > 0 && <span className="fd-t fd-found">{hist.via === 'quick' ? t('fd.srcWeb') : hist.src === 'history' ? t('fd.srcHist') : hist.web ? t('fd.srcWeb') : t(pro ? 'fd.srcAi' : 'fd.srcAiFree')}</span>}
         {hist.results.slice(0, 1).map(r => <button key={r.url} type="button" className="btn btn-glow fd-btn fd-hist jt-use-link jt-guidance-glow" onClick={() => { onUpdate(a.id, { link: cleanJobLink(r.url), linkFrom: 'user' } as Patch); setHist({ state: 'idle', results: [] }) }}>{t('fd.histUse')} {r.title || r.url}<small>{r.url.replace(/^https?:\/\/(www\.)?/, '').slice(0, 70)}</small></button>)}
         {hist.state === 'done' && hist.web && hist.results.length > 0 && buyLive && !pro && <button type="button" className="btn btn-glow fd-btn" onClick={() => openPacks()}>{t('bulk.buy')}</button>}
         {hist.results.length > 1 && <details className="fd-hist-more" onToggle={x => { const d = x.currentTarget as HTMLDetailsElement; if (!d.open) requestAnimationFrame(() => d.scrollIntoView({ block: 'nearest' })) }}><summary>{t('fd.histMore')}</summary>
@@ -629,7 +658,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     <details className="fd" open={open} onToggle={x => { if (x.target === x.currentTarget) setOpen((x.target as HTMLDetailsElement).open) }}>
       <summary className="fd-sum"><span><span className="fd-chev" aria-hidden="true">{open ? '▾' : '▸'}</span> {requiredMissing ? t('details.choose') : t('fd.titleMore')}</span><RequiredChecklist keys={reqKeys} live={live ?? e} t={t} /></summary>
       {failNoteTop && noteSlot(shortFail)}
-      {!(inOpt && (foundHere || openOpt !== 'link')) && !(statusBelow && hist.state === 'busy') && resultBox}   {/* 2026-11-17: an empty box here while the status shows below shifted the list 4 px when it went */}
+      {!(inOpt && (foundHere || openOpt !== 'link')) && !(statusBelow && (hist.state === 'busy' || !!siteFind || !!suggest)) && resultBox}   {/* 2026-11-17: an empty box here while the status shows below shifted the list 4 px when it went */}
 
 
       {needsLink && (hist.results.length > 0 || mobile) && !inOpt && <details className="fd-fold fd-others" open={showOthers} onToggle={x => { const d = x.currentTarget as HTMLDetailsElement; setShowOthers(d.open); if (!d.open) requestAnimationFrame(() => d.scrollIntoView({ block: 'nearest' })) }}><summary>{t('fd.othersShow')}</summary></details>}
