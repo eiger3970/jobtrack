@@ -629,7 +629,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     <details className="fd" open={open} onToggle={x => { if (x.target === x.currentTarget) setOpen((x.target as HTMLDetailsElement).open) }}>
       <summary className="fd-sum"><span><span className="fd-chev" aria-hidden="true">{open ? '▾' : '▸'}</span> {requiredMissing ? t('details.choose') : t('fd.titleMore')}</span><RequiredChecklist keys={reqKeys} live={live ?? e} t={t} /></summary>
       {failNoteTop && noteSlot(shortFail)}
-      {!(inOpt && (foundHere || openOpt !== 'link')) && resultBox}
+      {!(inOpt && (foundHere || openOpt !== 'link')) && !(statusBelow && hist.state === 'busy') && resultBox}   {/* 2026-11-17: an empty box here while the status shows below shifted the list 4 px when it went */}
 
 
       {needsLink && (hist.results.length > 0 || mobile) && !inOpt && <details className="fd-fold fd-others" open={showOthers} onToggle={x => { const d = x.currentTarget as HTMLDetailsElement; setShowOthers(d.open); if (!d.open) requestAnimationFrame(() => d.scrollIntoView({ block: 'nearest' })) }}><summary>{t('fd.othersShow')}</summary></details>}
