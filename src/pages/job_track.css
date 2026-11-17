@@ -1691,3 +1691,4 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .fd-hslot .fd-warm { flex-direction: row-reverse; justify-content: flex-end; align-items: flex-start; gap: .6rem; }
 .fd-hslot .fd-warm-t { font-size: .85rem; line-height: 19px; flex: 0 0 auto; }   /* picture right next to the text, not pushed to the far right */
 .fd-hslot .fd-hscan { margin-top: 4px; }
+.fd-hslot .fd-ell { display: inline-block; width: 1.1em; text-align: left; }   /* 2026-11-17 owner: the growing dots pushed the picture sideways - fixed width keeps it still */
