@@ -2152,7 +2152,7 @@
     "fd.batchBusy": {"en": "Searching Job-Room and company websites...", "de": "Suche auf Job-Room und Firmen-Websites...", "fr": "Recherche sur Job-Room et les sites d'entreprise..."},
     "fd.batchNone": {"en": "Nothing found: try Email search", "de": "Nichts gefunden: E-Mail-Suche versuchen", "fr": "Rien trouvé : essayez la recherche dans les e-mails"},
     "fd.batchHint": {"en": "{n} found: Job-Room and company websites", "de": "{n} gefunden: Job-Room und Firmen-Websites", "fr": "{n} trouvé(s) : Job-Room et sites d'entreprise"},
-    "jr.fillAllH": {"en": "Found - check, then fill all", "de": "Gefunden - prüfen, dann alle ausfüllen", "fr": "Trouvé - vérifiez, puis remplissez tout"},
+    "jr.fillAllH": {"en": "Found - review, then fill all", "de": "Gefunden - ansehen, dann alle ausfüllen", "fr": "Trouvé - relisez, puis remplissez tout"},
     "jr.fillAllSite": {"en": "Company website:", "de": "Firmen-Website:", "fr": "Site de l'entreprise :"},
     "jr.fillAllNone": {"en": "Nothing found: try Email search", "de": "Nichts gefunden: E-Mail-Suche versuchen", "fr": "Rien trouvé : essayez la recherche dans les e-mails"},
     "jr.fillAllPaste": {"en": "Paste the email or link you found", "de": "Gefundene E-Mail oder Link einfügen", "fr": "Collez l'e-mail ou le lien trouvé"},
