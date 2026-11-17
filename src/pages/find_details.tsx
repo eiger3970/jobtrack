@@ -258,6 +258,27 @@ export function InfoI({ text, left, children }: { text?: string; left?: boolean;
 }
 
 // the copy button sits inside the sentence, in place of its first words
+// 2026-11-17 owner: on the phone the Proton/Gmail web search needs a login and the search is lost -
+// copy the company name and open the mail APP instead (already logged in), the owner pastes it into the app's search
+export const phoneLike = (): boolean => typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches
+export function MailAppBtns({ company, t }: { company: string; t: (k: string) => string }) {
+  const [msg, setMsg] = useState('')
+  const open = (scheme: string) => {
+    navigator.clipboard?.writeText(company).catch(() => {})
+    setMsg(t('fd.mailAppCopied'))
+    let left = false
+    const onHide = () => { if (document.visibilityState === 'hidden') left = true }
+    document.addEventListener('visibilitychange', onHide)
+    setTimeout(() => { document.removeEventListener('visibilitychange', onHide); if (!left) setMsg(t('fd.mailAppMissing')) }, 1800)
+    window.location.href = scheme
+  }
+  return <span className="fd-mailapp">
+    <button type="button" className="btn fd-btn" onClick={() => open('protonmail://')}>{t('fd.mailAppProton')}</button>
+    <button type="button" className="btn fd-btn" onClick={() => open('googlegmail://')}>{t('fd.mailAppGmail')}</button>
+    {msg && <span className="fd-t fd-mailapp-msg">{msg}</span>}
+  </span>
+}
+
 function CopyBtn({ text, label, t }: { text: string; label: string; t: (k: string) => string }) {
   const [done, setDone] = useState(false)
   return <button type="button" className="fd-copy" onClick={() => navigator.clipboard?.writeText(text).then(() => { setDone(true); setTimeout(() => setDone(false), 2000) }).catch(() => {})}>{done ? t('fd.copied') : label}</button>
@@ -723,11 +744,11 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
             <b><TapCount n={TAPS.mail} label={t('fd.tapsAria')} /><span className="fd-opt-txt">{t('fd.mailH')}<small>{t('fd.mailHint')}</small></span></b>
           </div>
           {isOpen('mail') && <div className="fd-body">{!failNoteTop && noteSlot(shortFail)}{inOpt && (foundHere || openOpt !== 'link') && resultBox}
-          <div className="fd-mailrow">
+          {phoneLike() ? <MailAppBtns company={a.company} t={t} /> : <div className="fd-mailrow">
             <a className={'fd-lnk' + (aiFail ? ' jt-guidance-glow' : '')} href={`https://mail.proton.me/u/0/all-mail#keyword=${q(a.company)}`} {...ext}>{t('jr.mailProton')}</a>
             <a className={'fd-lnk' + (aiFail ? ' jt-guidance-glow' : '')} href={`https://mail.google.com/mail/u/0/#search/${q(a.company)}`} {...ext}>{t('jr.mailGmail')}</a>
             <CopyBtn text={a.company} label={t('fd.mailOther')} t={t} />
-          </div>
+          </div>}
           <p className="fd-flow">{flow(t('fd.flowMail'), { date: <b className="fd-data">{date}</b> })}</p>
           {pasteBox(ad, setAd)}
           {jobRoomMissing(e).includes('email') && <button type="button" className="btn-secondary fd-btn" onClick={() => setOpenOpt('link')}>{t('fd.mailNext')}</button>}

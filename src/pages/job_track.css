@@ -1713,3 +1713,7 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jr-dot { position: relative; }
 .jr-dot-found { position: absolute; top: -6px; right: -6px; width: 14px; height: 14px; border-radius: 50%; background: #00ff41; color: #000; font-size: 9px; font-weight: 900; line-height: 14px; text-align: center; pointer-events: none; }
 .jr-lg-found { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #00ff41; color: #000; font-size: 9px; font-weight: 900; line-height: 14px; text-align: center; margin-right: .3rem; }
+.fd-mailapp { display: flex; flex-wrap: wrap; gap: .4rem; margin: .4rem 0; }
+.fd-mailapp .fd-btn { flex: 1 1 8rem; }
+.fd-mailapp-msg { flex-basis: 100%; }
+.fd-mailapp-msg { color: #00ff41; font-size: .8rem; }

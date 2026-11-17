@@ -1,5 +1,5 @@
 import FillRate from './fill_rate'
-import FindDetails, { MissingDetailsKey } from './find_details'
+import FindDetails, { MissingDetailsKey, MailAppBtns, phoneLike } from './find_details'
 import { prefetchQuick, quickResult, onQuickDone, quickHit, quickPatch } from '../lib/ai_find'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { swissDate, type Application, JR_METHOD, jobRoomEntry, jobRoomMissing, looksWrong } from '../lib/orp'
@@ -109,10 +109,10 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
               : <>
                 {/* 2026-11-17 owner: email stays manual - but from this one list: search links per job + paste the found email or link here */}
                 <span className="jr-fillall-none">{t('jr.fillAllNone')}</span>
-                <span className="jr-fillall-mail">
+                {phoneLike() ? <MailAppBtns company={f.r.company} t={t} /> : <span className="jr-fillall-mail">
                   <a className="fd-lnk" href={`https://mail.proton.me/u/0/all-mail#keyword=${encodeURIComponent(f.r.company)}`} target="_blank" rel="noopener noreferrer">{t('jr.mailProton')}</a>
                   <a className="fd-lnk" href={`https://mail.google.com/mail/u/0/#search/${encodeURIComponent(f.r.company)}`} target="_blank" rel="noopener noreferrer">{t('jr.mailGmail')}</a>
-                </span>
+                </span>}
                 <input className="jr-fillall-paste" type="text" inputMode="email" placeholder={t('jr.fillAllPaste')} aria-label={t('jr.fillAllPaste') + ' - ' + f.r.company}
                   onPaste={x => { const v = x.clipboardData.getData('text').trim(); if (v) { x.preventDefault(); x.currentTarget.value = v; pasteFound(f.r, v) } }}
                   onKeyDown={x => { if (x.key === 'Enter') pasteFound(f.r, x.currentTarget.value.trim()) }} />
