@@ -141,8 +141,31 @@ const quickCache = new Map<string, Promise<QuickFind>>()
 export function quickFindCached(company: string, role: string, place: string, app: boolean): Promise<QuickFind> {
   const k = (company + '|' + role).toLowerCase()
   let p = quickCache.get(k)
-  if (!p) { p = quickFind(company, role, place, app); quickCache.set(k, p) }
+  if (!p) { p = quickFind(company, role, place, app); quickCache.set(k, p); p.then(q => { quickDone.set(k, q); quickListeners.forEach(f => f()) }) }
   return p
+}
+// finished background searches, for the Fill all list (2026-11-17 owner)
+const quickDone = new Map<string, QuickFind>()
+const quickListeners = new Set<() => void>()
+export function quickResult(company: string, role: string): QuickFind | undefined { return quickDone.get((company + '|' + role).toLowerCase()) }
+export function onQuickDone(f: () => void): () => void { quickListeners.add(f); return () => { quickListeners.delete(f) } }
+// the best find, most complete first: Job-Room's ad for this exact job, then the company website, then Job-Room's company address
+export function quickHit(q: QuickFind | undefined, t: (k: string) => string): null | { from: 'jobroom' | 'site'; label: string; fields: Record<string, string> } {
+  if (!q) return null
+  const pick = (o: Record<string, unknown>, keys: string[]) => Object.fromEntries(keys.filter(k => typeof o[k] === 'string' && o[k]).map(k => [k, o[k] as string])) as Record<string, string>
+  const F = ['email', 'street', 'streetNo', 'postal', 'city', 'phone', 'contactPerson']
+  const jr = q.jobroom, st = q.site
+  if (jr && jr.url) return { from: 'jobroom', label: t('fd.quickJobRoom').replace('{title}', jr.title), fields: { ...pick(jr, F), link: jr.formUrl || jr.url, linkFrom: jr.formUrl ? 'user' : 'company' } }
+  if (st && (st.email || st.postal)) return { from: 'site', label: t('fd.quickSite').replace('{site}', st.site), fields: pick(st, F) }
+  if (jr && jr.postal) return { from: 'jobroom', label: t('fd.quickJobRoomAddr'), fields: pick(jr, F) }
+  return null
+}
+// only the fields the job does not have yet; the link kind only together with a link
+export function quickPatch(a: object, fields: Record<string, string>): Record<string, string> {
+  const patch: Record<string, string> = {}
+  for (const [k, v] of Object.entries(fields)) if (v && !(a as Record<string, unknown>)[k]) patch[k] = v
+  if (!patch.link) delete patch.linkFrom
+  return patch
 }
 let prefetchRunning = false
 export async function prefetchQuick(list: { company: string; role: string; place: string }[], app: boolean) {

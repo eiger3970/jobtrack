@@ -1,6 +1,6 @@
 import FillRate from './fill_rate'
 import FindDetails, { MissingDetailsKey } from './find_details'
-import { prefetchQuick } from '../lib/ai_find'
+import { prefetchQuick, quickResult, onQuickDone, quickHit, quickPatch } from '../lib/ai_find'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { swissDate, type Application, JR_METHOD, jobRoomEntry, jobRoomMissing, looksWrong } from '../lib/orp'
 import { fillPayload, FILL_KEY } from '../lib/jobroom_fill'
@@ -75,9 +75,19 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
   const a = rows[idx]
   const storedEntry = jobRoomEntry(a)
   const [aiPreview, setAiPreview] = useState<{ id: number; patch: Patch } | null>(null)
+  // 2026-11-17 owner (2): "Fill all" - every find from the background search in one list, ticked; one tap fills the empty fields
+  const [, setQuickTick] = useState(0)
+  useEffect(() => onQuickDone(() => setQuickTick(n => n + 1)), [])
+  const [skip, setSkip] = useState<number[]>([])
+  const finds = rows.map((r, n) => ({ r, n, miss: !r.jobroomDone && jobRoomMissing(jobRoomEntry(r)).length > 0 })).filter(x => x.miss).map(x => {
+    const q = quickResult(x.r.company, x.r.role); const hit = quickHit(q, t)
+    const patch = hit ? quickPatch(x.r, hit.fields) : {}
+    return { ...x, q, hit: hit && Object.keys(patch).some(k => k !== 'linkFrom') ? hit : null, patch }
+  }).filter(x => x.q)
+  const fillable = finds.filter(f => f.hit && !skip.includes(f.r.id))
+  const fillAll = () => { for (const f of fillable) onUpdate(f.r.id, f.patch as Patch); setSkip([]) }
   // 2026-11-17 owner: search every red square in the background (Job-Room + company website, free) when the panel opens
   useEffect(() => {
-    if (cleanupOnly) return
     const red = rows.filter(r => !r.jobroomDone && jobRoomMissing(jobRoomEntry(r)).length > 0)
     void prefetchQuick(red.map(r => ({ company: r.company, role: r.role, place: [r.postal, r.city].filter(Boolean).join(' ') })), isApp())
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -228,6 +238,18 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
             onClick={() => chooseJob(n)}>{n + 1}</button>
         ))}
       </div>
+      {finds.some(f => f.hit) && <div className="jr-fillall fd-fade">
+        <p className="jr-fillall-h">{t('jr.fillAllH')}</p>
+        {finds.map(f => <div key={f.r.id} className="jr-fillall-row">
+          <span className="jr-fillall-n">{f.n + 1}</span>
+          <span className="jr-fillall-t"><b>{f.r.company}{f.r.role ? ' - ' + f.r.role : ''}</b>
+            {f.hit ? <><span className="jr-fillall-src">{f.hit.from === 'jobroom' ? 'Job-Room:' : t('jr.fillAllSite')}</span> {[f.patch.email, [[f.patch.street, f.patch.streetNo].filter(Boolean).join(' '), [f.patch.postal, f.patch.city].filter(Boolean).join(' ')].filter(Boolean).join(', '), f.patch.contactPerson].filter(Boolean).join(' · ')}</>
+              : <span className="jr-fillall-none">{t('jr.fillAllNone')}</span>}</span>
+          {f.hit && <input type="checkbox" className="jr-fillall-cb" aria-label={f.r.company} checked={!skip.includes(f.r.id)} onChange={x => setSkip(s => x.target.checked ? s.filter(id => id !== f.r.id) : [...s, f.r.id])} />}
+        </div>)}
+        <button type="button" className="btn btn-glow jr-fillall-btn" disabled={!fillable.length} onClick={fillAll}>{t('jr.fillAllBtn').replace('{n}', String(fillable.length))}</button>
+        <p className="jr-fillall-note">{t('jr.fillAllNote')}</p>
+      </div>}
 
       <div key={`${a.id}-${idx}`} id="jr-step2" hidden={allEntered} className={'jr-step2' + (glow32 ? ' jr-glow jt-guidance-glow' : '')} onClick={() => { tappedIn32.current = true; setS32Seen(true) }}><b className="jts-num">{mobile ? '1.2.' : cleanupOnly ? '2.' : '3.2.'}</b> <b>{t('jr.appliedTo')}</b> {a.company}{a.role ? ' - ' + a.role : ''}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}
         {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}

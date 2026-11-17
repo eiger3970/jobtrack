@@ -1693,3 +1693,15 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .fd-hslot .fd-hscan { margin-top: 4px; }
 .fd-hslot .fd-ell { display: inline-block; width: 1.1em; text-align: left; }   /* 2026-11-17 owner: the growing dots pushed the picture sideways - fixed width keeps it still */
 .fd-btn.fd-one-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 100%; }   /* 2026-11-17: quick-find Use button stays one line inside the fixed slot */
+/* 2026-11-17 owner: Fill all - every background find in one list */
+.jr-fillall { margin: .8rem 0 1rem; padding: .8rem 1rem; border: 1px solid #2a2748; border-radius: 10px; background: #0d0d1a; }
+.jr-fillall-h { color: #00ff41; font-weight: 700; letter-spacing: .05em; font-size: .8rem; text-transform: uppercase; margin: 0 0 .4rem; }
+.jr-fillall-row { display: grid !important; grid-template-columns: 24px minmax(0, 1fr) 20px; gap: .6rem; align-items: start; padding: .55rem 0; border-top: 1px solid #1c1a33; font-size: .85rem; }
+.jr-fillall-n { flex: none; width: 24px; height: 24px; border: 1.5px solid #ff4d4d; color: #ff4d4d; border-radius: 5px; display: grid; place-items: center; font-size: .75rem; font-weight: 700; }
+.jr-fillall-t { display: block !important; min-width: 0; color: #9a98b8; line-height: 1.4; overflow-wrap: break-word; text-align: left; }
+.jr-fillall-t b { display: block; color: #f0eeff; }
+.jr-fillall-src { color: #00ff41; }
+.jr-fillall-none { color: #ffb000; }
+.jr-fillall-cb { flex: none; width: 18px; height: 18px; accent-color: #00ff41; margin-top: 2px; }
+.jr-fillall-btn { width: 100%; margin-top: .7rem; }
+.jr-fillall-note { text-align: center; color: #9a98b8; font-size: .75rem; margin: .4rem 0 0; }

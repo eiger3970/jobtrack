@@ -6,7 +6,7 @@ import { useProKey } from '../lib/pro'
 import { PackList, openPacks, readPackToken } from '../lib/credit_packs'
 import { isApp } from '../lib/platform'
 import { PRO_KEY } from './job_track_pro'
-import { aiFind, quickFindCached, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
+import { aiFind, quickFindCached, quickHit, quickPatch, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
 import { useHoverInfo } from '../lib/hover_info'
 
 type AiState = 'idle' | 'busy' | 'result' | 'used' | 'cap' | 'none' | 'err'
@@ -399,14 +399,9 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
       // most complete first: Job-Room's ad for this exact job (email, address, contact), then the history link, then the company website
       if (histResults.length && !(q.jobroom && q.jobroom.url)) { setSiteFind(null); setSuggest(''); setHist({ state: 'done', src: 'history', results: histResults }); return }
       const jobs = q.jobs.filter(j => isJobLink(j.url))
-      const pick = (o: Record<string, unknown>, keys: string[]): Rec => Object.fromEntries(keys.filter(k => typeof o[k] === 'string' && o[k]).map(k => [k, o[k] as string]))
-      const F = ['email', 'street', 'streetNo', 'postal', 'city', 'phone', 'contactPerson']
-      const jr = q.jobroom, st = q.site
-      const hit = jr && jr.url ? { label: t('fd.quickJobRoom').replace('{title}', jr.title), fields: { ...pick(jr, F), link: jr.formUrl || jr.url, linkFrom: jr.formUrl ? 'user' : 'company' } }
-        : st && (st.email || st.postal) ? { label: t('fd.quickSite').replace('{site}', st.site), fields: pick(st, F) }
-        : jr && jr.postal ? { label: t('fd.quickJobRoomAddr'), fields: pick(jr, F) } : null
+      const hit = quickHit(q, t)
       setSiteFind(hit)
-      setSuggest(jobs.length || hit ? '' : st ? 'site' : 'mail')
+      setSuggest(jobs.length || hit ? '' : q.site ? 'site' : 'mail')
       setHist({ state: 'done', src: 'history', via: jobs.length ? 'quick' : undefined, results: jobs })
     }))
   }
@@ -620,10 +615,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
         {hist.state === 'done' && !hist.results.length && siteFind && <div className="fd-hslot fd-hslot-in">
           <span className="fd-t fd-found">{siteFind.label}</span>
           <button type="button" className="btn btn-glow fd-btn fd-hist jt-use-link jt-guidance-glow fd-one-line" title={Object.values(siteFind.fields).join(' · ')} onClick={() => {
-            const patch: Rec = {}
-            for (const [k, v] of Object.entries(siteFind.fields)) if (v && !(a as unknown as Rec)[k]) patch[k] = v   // only fields still empty
-            if (!patch.link) delete patch.linkFrom   // link kind only goes with a link
-            onUpdate(a.id, patch as Patch); setSiteFind(null); setHist({ state: 'idle', results: [] })
+            onUpdate(a.id, quickPatch(a, siteFind.fields) as Patch); setSiteFind(null); setHist({ state: 'idle', results: [] })
           }}>{t('fd.quickUse')} {(f => [f.email, [[f.street, f.streetNo].filter(Boolean).join(' '), [f.postal, f.city].filter(Boolean).join(' ')].filter(Boolean).join(', '), f.contactPerson].filter(Boolean).join(' · '))(siteFind.fields)}</button>
         </div>}
         {hist.state === 'done' && !hist.results.length && !siteFind && suggest && <div className="fd-hslot fd-hslot-in">
