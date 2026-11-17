@@ -1681,3 +1681,12 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
   50% { transform: scale(1.18); filter: drop-shadow(0 0 7px rgba(255,176,0,.95)); }
 }
 @media (prefers-reduced-motion: reduce) { .fd-reload-pulse svg { animation: none; filter: drop-shadow(0 0 6px rgba(255,176,0,.9)); } }
+/* 2026-11-17 owner: add-on searching picture - the magnifier walks down the history rows, each row lights up as it passes */
+.fd-hscan-lens { animation: fd-hscan-lens 2.4s ease-in-out infinite; }
+@keyframes fd-hscan-lens { 0% { transform: translate(0, 0); } 25% { transform: translate(-14px, 17px); } 50% { transform: translate(0, 34px); } 75% { transform: translate(-14px, 51px); } 100% { transform: translate(0, 0); } }
+.fd-hscan-row rect:first-child { animation: fd-hscan-row 2.4s linear infinite; }
+.fd-hscan-r1 rect:first-child { animation-delay: .6s; }
+.fd-hscan-r2 rect:first-child { animation-delay: 1.2s; }
+.fd-hscan-r3 rect:first-child { animation-delay: 1.8s; }
+@keyframes fd-hscan-row { 0%, 30%, 100% { fill: #1c1a33; } 8%, 18% { fill: #0f3d22; } }
+@media (prefers-reduced-motion: reduce) { .fd-hscan-lens, .fd-hscan-row rect:first-child { animation: none; } }

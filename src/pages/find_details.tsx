@@ -574,7 +574,22 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   const histStatus = (<>
         {hist.state === 'busy' && histWarm && <Unfold><span className="fd-warm fd-fade" role="status"><svg viewBox="0 0 160 96" width="160" height="96" aria-hidden="true"><rect x="2" y="2" width="156" height="92" rx="6" fill="#0d0d1a" stroke="#6b6b8a" strokeWidth="2" /><rect x="2" y="2" width="156" height="14" rx="4" fill="#2a2748" /><text x="10" y="12" fontSize="7" fill="#c8c8d8">Allow history search</text><circle cx="80" cy="38" r="14" fill="none" stroke="#00ff41" strokeWidth="2.5" /><path d="M80 30v8l5 3" fill="none" stroke="#00ff41" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /><rect x="22" y="62" width="116" height="22" rx="6" fill="#00ff41" /><text x="80" y="76" textAnchor="middle" fontSize="9" fontWeight="700" fill="#000">Allow history search</text></svg><span className="fd-warm-t"><b>{t('fd.histWarm')}</b><span className="fd-ell" /></span></span></Unfold>}
         {hist.state === 'done' && (hist.results.length > 0 || !!hist.email) && hist.src === 'history' && <div className="fd-fold-out" aria-hidden="true"><div className="fd-unfold-in"><span className="fd-t"><span className="fd-dots"><i /><i /><i /></span>{t('fd.histWarm')}</span></div></div>}
-        {hist.state === 'busy' && !histWarm && hist.src !== 'ai' && <Unfold key={hist.src}><span className="fd-t fd-fade" role="status"><span className="fd-dots"><i /><i /><i /></span>{ hist.src === 'web' ? t('fd.webBusy') : hist.src === 'history' ? t('fd.histWarm') : t(pro ? 'fd.histBusy' : 'fd.histBusyFree')}</span></Unfold>}
+        {/* 2026-11-17 owner: "needs a human activity progress image so user knows Add-on is searching, then shows the found data" -
+            a browser-history list with a magnifier moving down it, row by row lighting up */}
+        {hist.state === 'busy' && !histWarm && hist.src === 'history' && <Unfold key="hscan"><span className="fd-warm fd-fade" role="status">
+          <svg className="fd-hscan" viewBox="0 0 160 96" width="160" height="96" aria-hidden="true">
+            <rect x="2" y="2" width="156" height="92" rx="6" fill="#0d0d1a" stroke="#6b6b8a" strokeWidth="2" />
+            <rect x="2" y="2" width="156" height="14" rx="4" fill="#2a2748" />
+            <circle cx="11" cy="9" r="4" fill="none" stroke="#c8c8d8" strokeWidth="1.3" /><path d="M11 6.5V9l1.7 1" fill="none" stroke="#c8c8d8" strokeWidth="1.2" strokeLinecap="round" />
+            {[0, 1, 2, 3].map(i => <g key={i} className={'fd-hscan-row fd-hscan-r' + i}>
+              <rect x="10" y={24 + i * 17} width="140" height="12" rx="3" fill="#1c1a33" />
+              <rect x="15" y={27.5 + i * 17} width="6" height="5" rx="1" fill="#6b6b8a" />
+              <rect x="26" y={28 + i * 17} width={[90, 70, 100, 60][i]} height="4" rx="2" fill="#6b6b8a" />
+            </g>)}
+            <g className="fd-hscan-lens"><circle cx="128" cy="30" r="9" fill="rgba(0,255,65,.12)" stroke="#00ff41" strokeWidth="2.5" /><path d="M134.5 36.5l7 7" stroke="#00ff41" strokeWidth="3" strokeLinecap="round" /></g>
+          </svg>
+          <span className="fd-warm-t"><b>{t('fd.histWarm')}</b><span className="fd-ell" /></span></span></Unfold>}
+        {hist.state === 'busy' && !histWarm && hist.src !== 'ai' && hist.src !== 'history' && <Unfold key={hist.src}><span className="fd-t fd-fade" role="status"><span className="fd-dots"><i /><i /><i /></span>{ hist.src === 'web' ? t('fd.webBusy') : hist.src === 'history' ? t('fd.histWarm') : t(pro ? 'fd.histBusy' : 'fd.histBusyFree')}</span></Unfold>}
         {histPerm && !hist.results.length && <span className="fd-t fd-ai-notice" role="status">{t('fd.histPerm')}</span>}
         {hist.state === 'done' && !hist.results.length && !hist.email && !histPerm && !aiFail && <span className="fd-t">{t(hist.why === 'procap' ? 'fd.histProCap' : hist.why === 'cap' ? (pro ? 'fd.histErr' : buyLive ? 'fd.histCapPay' : 'fd.histCap') : hist.why === 'err' ? (pro ? 'fd.histErr' : 'fd.histBuy') : 'fd.histNone')}</span>}
   </>)   // 2026-11-07 owner: no result must be told at the button itself, not only in a box above the list
