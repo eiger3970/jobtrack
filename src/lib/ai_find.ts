@@ -134,3 +134,23 @@ export async function quickFind(company: string, role: string, place: string, ap
     return { jobs: Array.isArray(j?.jobs) ? j.jobs : [], site: j?.site && typeof j.site.site === 'string' ? j.site : null, jobroom: j?.jobroom && typeof j.jobroom.url === 'string' ? j.jobroom : null }
   } catch { return { jobs: [], site: null, jobroom: null } }
 }
+
+// 2026-11-17 owner (1): every red square is searched in the background as soon as the Job-Room panel opens, so a tapped
+// square has its answer ready. One promise per company + job title for this visit; 2 at a time, so the worker is not flooded.
+const quickCache = new Map<string, Promise<QuickFind>>()
+export function quickFindCached(company: string, role: string, place: string, app: boolean): Promise<QuickFind> {
+  const k = (company + '|' + role).toLowerCase()
+  let p = quickCache.get(k)
+  if (!p) { p = quickFind(company, role, place, app); quickCache.set(k, p) }
+  return p
+}
+let prefetchRunning = false
+export async function prefetchQuick(list: { company: string; role: string; place: string }[], app: boolean) {
+  if (prefetchRunning) return
+  prefetchRunning = true
+  try {
+    const queue = list.filter(x => x.company && !quickCache.has((x.company + '|' + x.role).toLowerCase()))
+    const worker = async () => { for (let x = queue.shift(); x; x = queue.shift()) await quickFindCached(x.company, x.role, x.place, app) }
+    await Promise.all([worker(), worker()])
+  } finally { prefetchRunning = false }
+}

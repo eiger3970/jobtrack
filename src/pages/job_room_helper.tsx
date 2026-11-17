@@ -1,5 +1,6 @@
 import FillRate from './fill_rate'
 import FindDetails, { MissingDetailsKey } from './find_details'
+import { prefetchQuick } from '../lib/ai_find'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { swissDate, type Application, JR_METHOD, jobRoomEntry, jobRoomMissing, looksWrong } from '../lib/orp'
 import { fillPayload, FILL_KEY } from '../lib/jobroom_fill'
@@ -74,6 +75,12 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
   const a = rows[idx]
   const storedEntry = jobRoomEntry(a)
   const [aiPreview, setAiPreview] = useState<{ id: number; patch: Patch } | null>(null)
+  // 2026-11-17 owner: search every red square in the background (Job-Room + company website, free) when the panel opens
+  useEffect(() => {
+    if (cleanupOnly) return
+    const red = rows.filter(r => !r.jobroomDone && jobRoomMissing(jobRoomEntry(r)).length > 0)
+    void prefetchQuick(red.map(r => ({ company: r.company, role: r.role, place: [r.postal, r.city].filter(Boolean).join(' ') })), isApp())
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const previewFields = aiPreview?.id === a.id ? Object.fromEntries(Object.entries(aiPreview.patch).filter(([key]) => !(a as unknown as Record<string, unknown>)[key])) : {}
   const e = jobRoomEntry({ ...a, ...previewFields })
   const missing = jobRoomMissing(storedEntry)

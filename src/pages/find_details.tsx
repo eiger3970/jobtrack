@@ -6,7 +6,7 @@ import { useProKey } from '../lib/pro'
 import { PackList, openPacks, readPackToken } from '../lib/credit_packs'
 import { isApp } from '../lib/platform'
 import { PRO_KEY } from './job_track_pro'
-import { aiFind, quickFind, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
+import { aiFind, quickFindCached, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
 import { useHoverInfo } from '../lib/hover_info'
 
 type AiState = 'idle' | 'busy' | 'result' | 'used' | 'cap' | 'none' | 'err'
@@ -307,6 +307,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   // solution in x". The history search is sent at once; whatever it (and the free quick search after it) finds is shown at 8 s.
   const holdUntil = useRef(0)
   const quickRef = useRef<() => void>(() => {})
+  const finishRef = useRef<(results: { url: string; title: string }[]) => void>(() => {})
   // the best quick find: Job-Room's ad for this job first (exact), else the company website
   const [siteFind, setSiteFind] = useState<null | { label: string; fields: Rec }>(null)
   const [suggest, setSuggest] = useState<'' | 'mail' | 'site'>('')
@@ -343,8 +344,8 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
         setHistPerm(!!ev.data.needPermission)
         try { if (ev.data.needPermission) localStorage.removeItem('kworld_hist_granted'); else localStorage.setItem('kworld_hist_granted', '1') } catch { /* private mode */ }   // 2026-11-08 owner: once the person has allowed history search, the Allow picture must not show again
         if (quietRef.current) { quietRef.current = false; if (results.length) { histKeep.current = results; setHist({ state: 'done', src: 'history', results }) }; return }   // 2026-11-07 owner: the rerun after the Allow tab must not wipe an AI answer already on screen - it only adds a history find
-        if (results.length) { histKeep.current = results; afterHold(() => setHist({ state: 'done', src: 'history', results })); return }
-        quickRef.current()   // nothing in the history: the free quick search (web + company website), shown at 8 s
+        if (results.length) histKeep.current = results
+        finishRef.current(results)   // 2026-11-17 owner (3): history + the free quick search (Job-Room, company website) together, shown at 8 s
       }
     }
     window.addEventListener('message', on)
@@ -391,9 +392,12 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     showJobLinkOutcome(await atLeast(aiFind({ ...jobLinkBase(), skipWeb: true })))
   }
   searchJobLinkRef.current = () => { void searchJobLink() }
-  quickRef.current = () => {
-    setHist({ state: 'busy', src: 'history', results: [] })   // the add-on picture keeps running while the quick search works
-    void quickFind(a.company, a.role, [a.postal, a.city].filter(Boolean).join(' '), app).then(q => afterHold(() => {
+  quickRef.current = () => finishRef.current([])
+  finishRef.current = (histResults) => {
+    setHist({ state: 'busy', src: 'history', results: [] })   // the add-on picture keeps running until 8 s
+    void quickFindCached(a.company, a.role, [a.postal, a.city].filter(Boolean).join(' '), app).then(q => afterHold(() => {
+      // most complete first: Job-Room's ad for this exact job (email, address, contact), then the history link, then the company website
+      if (histResults.length && !(q.jobroom && q.jobroom.url)) { setSiteFind(null); setSuggest(''); setHist({ state: 'done', src: 'history', results: histResults }); return }
       const jobs = q.jobs.filter(j => isJobLink(j.url))
       const pick = (o: Record<string, unknown>, keys: string[]): Rec => Object.fromEntries(keys.filter(k => typeof o[k] === 'string' && o[k]).map(k => [k, o[k] as string]))
       const F = ['email', 'street', 'streetNo', 'postal', 'city', 'phone', 'contactPerson']
