@@ -97,6 +97,9 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
   // 2026-11-17 owner: "FOUND FOR YOU is missed as it is showing under the squares further up" - it is now a search option above Email search
   const fillAllBox = <div className="jr-fillall">
         {finds.some(f => f.hit) && <p className="jr-fillall-h">{t('jr.fillAllH')}</p>}
+        {/* 2026-11-17 owner: "Fill all is too hidden with the long list" - the button sits on top, under the heading */}
+        {fillable.length > 0 && <button type="button" className="btn btn-glow jr-fillall-btn" onClick={fillAll}>{t('jr.fillAllBtn').replace('{n}', String(fillable.length))}</button>}
+        {fillable.length > 0 && <p className="jr-fillall-note">{t('jr.fillAllNote')}</p>}
         {finds.map(f => <div key={f.r.id} className="jr-fillall-row">
           <span className="jr-fillall-n">{f.n + 1}</span>
           <span className="jr-fillall-t"><b>{f.r.company}{f.r.role ? ' - ' + f.r.role : ''}</b>
@@ -114,8 +117,6 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
               </>}</span>
           {f.hit && <input type="checkbox" className="jr-fillall-cb" aria-label={f.r.company} checked={!skip.includes(f.r.id)} onChange={x => setSkip(s => x.target.checked ? s.filter(id => id !== f.r.id) : [...s, f.r.id])} />}
         </div>)}
-        {fillable.length > 0 && <button type="button" className="btn btn-glow jr-fillall-btn" onClick={fillAll}>{t('jr.fillAllBtn').replace('{n}', String(fillable.length))}</button>}
-        {fillable.length > 0 && <p className="jr-fillall-note">{t('jr.fillAllNote')}</p>}
       </div>
   // 2026-11-17 owner: search every red square in the background (Job-Room + company website, free) when the panel opens
   useEffect(() => {
