@@ -85,6 +85,8 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
     return { ...x, q, hit: hit && Object.keys(patch).some(k => k !== 'linkFrom') ? hit : null, patch }
   }).filter(x => x.q)
   const fillable = finds.filter(f => f.hit && !skip.includes(f.r.id))
+  // 2026-11-17 owner: the option popping in a second later distracted from 3.1 - it is there from the start, "searching" until every red square has its answer
+  const redCount = rows.filter(r => !r.jobroomDone && jobRoomMissing(jobRoomEntry(r)).length > 0).length
   const fillAll = () => { for (const f of fillable) onUpdate(f.r.id, f.patch as Patch); setSkip([]) }
   // 2026-11-17 owner: "FOUND FOR YOU is missed as it is showing under the squares further up" - it is now a search option above Email search
   const fillAllBox = <div className="jr-fillall">
@@ -255,7 +257,7 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
       <div key={`${a.id}-${idx}`} id="jr-step2" hidden={allEntered} className={'jr-step2' + (glow32 ? ' jr-glow jt-guidance-glow' : '')} onClick={() => { tappedIn32.current = true; setS32Seen(true) }}><b className="jts-num">{mobile ? '1.2.' : cleanupOnly ? '2.' : '3.2.'}</b> <b>{t('jr.appliedTo')}</b> {a.company}{a.role ? ' - ' + a.role : ''}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}
         {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}
         {hasMissingDetails
-          ? <FindDetails batch={finds.some(f => f.hit) ? { count: finds.filter(f => f.hit).length, node: fillAllBox } : undefined} mobile={mobile} autoSearch={picked && !a.jobroomDone && !allEntered} key={`${a.id}-${idx}`} a={a} e={storedEntry} live={e} onPreview={showAiPreview} allApps={allApps} onUpdate={onUpdate} t={t} requiredMissing={missing.length > 0} />
+          ? <FindDetails batch={redCount ? { count: finds.filter(f => f.hit).length, done: finds.length >= redCount, node: fillAllBox } : undefined} mobile={mobile} autoSearch={picked && !a.jobroomDone && !allEntered} key={`${a.id}-${idx}`} a={a} e={storedEntry} live={e} onPreview={showAiPreview} allApps={allApps} onUpdate={onUpdate} t={t} requiredMissing={missing.length > 0} />
           : <p className="jr-nogaps">{ICON_CHECK}{t('jr.nogaps')}</p>}
       </div>
       <div hidden={allEntered}>

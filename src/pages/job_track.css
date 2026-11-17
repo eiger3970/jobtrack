@@ -1705,3 +1705,4 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jr-fillall-cb { flex: none; width: 18px; height: 18px; accent-color: #00ff41; margin-top: 2px; }
 .jr-fillall-btn { width: 100%; margin-top: .7rem; }
 .jr-fillall-note { text-align: center; color: #9a98b8; font-size: .75rem; margin: .4rem 0 0; }
+.fd-opt.fd-batch-ready { border-color: #00ff41; box-shadow: 0 0 0 1px rgba(0,255,65,.35); transition: border-color .6s, box-shadow .6s; }   /* 2026-11-17: Batch search ready - a calm green edge, no pop-in */
