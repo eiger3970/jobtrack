@@ -357,7 +357,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     // 2026-11-07 owner: say what happens next during the wait - "installed add-on running... a moment", then the tab asks for permission
     let allowed = false; try { allowed = localStorage.getItem('kworld_hist_granted') === '1' } catch { /* private mode */ }
     setHist({ state: 'busy', src: 'history', results: [] }); if (!allowed) setHistWarm(true)   // 2026-11-08 owner: the Allow picture only when the Allow tab will really open
-    window.setTimeout(() => { setHistWarm(false); postHistoryOnce({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }) }, 4000)   // 2026-11-17 owner: "too fast for humans, have the Add-on searching... show for longer" - 4 s either way (was 1.5 s once allowed)
+    window.setTimeout(() => { setHistWarm(false); postHistoryOnce({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }) }, 8000)   // 2026-11-17 owner: "too fast for humans" (1.5 -> 4 s), then "give the add-on search twice as much time" -> 8 s
   }, [addon, needsLink, autoSearch, aiDone, lateGo]) // eslint-disable-line react-hooks/exhaustive-deps
   // AI job-page search (no add-on needed): runs by itself when a link is needed and the history search is not available or found nothing
   // 2026-11-04 owner: the free web search runs by itself; the AI search only when the person taps it
