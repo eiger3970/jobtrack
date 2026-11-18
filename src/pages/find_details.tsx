@@ -288,7 +288,7 @@ export function MailAppBtns({ company, t }: { company: string; t: (k: string) =>
 
 function CopyBtn({ text, label, t, glow = false, onCopied }: { text: string; label: string; t: (k: string) => string; glow?: boolean; onCopied?: () => void }) {
   const [done, setDone] = useState(false)
-  return <button type="button" className={'fd-copy' + (glow ? ' btn-glow' : '')} onClick={() => navigator.clipboard?.writeText(text).then(() => { setDone(true); onCopied?.(); setTimeout(() => setDone(false), 2000) }).catch(() => {})}>{done ? t('fd.copied') : label}</button>
+  return <button type="button" className={'fd-copy' + (glow ? ' jt-guidance-glow' : '')} onClick={() => navigator.clipboard?.writeText(text).then(() => { setDone(true); onCopied?.(); setTimeout(() => setDone(false), 2000) }).catch(() => {})}>{done ? t('fd.copied') : label}</button>
 }
 
 // "{copy} -> open ..." : tokens in the sentence become the given nodes
@@ -614,7 +614,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   // 2026-11-18 owner: History and bookmarks open on the phone -> Copy company name pulses; once tapped, the Ctrl+V here box pulses until something is pasted
   const [coCopied, setCoCopied] = useState(false)
   const pasteBox = (val: string, set: (v: string) => void) => <>
-    <textarea className={'jr-ad' + (coCopied && !val.trim() ? ' jr-glow' : '')} rows={2} placeholder={t('fd.pasteHere')} value={val} onChange={x => set(x.target.value)}
+    <textarea className={'jr-ad' + (coCopied && !val.trim() ? ' jt-guidance-glow' : '')} rows={2} placeholder={t('fd.pasteHere')} value={val} onChange={x => set(x.target.value)}
       onPaste={x => { const v = x.clipboardData.getData('text'); if (v.trim().length >= 12) { x.preventDefault(); fill(v) } }} />
     {val.trim() && <button type="button" className="btn-secondary fd-btn" onClick={() => fill(val)}>{t('jr.adFill')}</button>}
     {note && <span className="fd-note">{note}</span>}

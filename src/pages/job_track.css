@@ -1725,3 +1725,8 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .fd-how-step svg { width: 20px; height: 20px; fill: none; stroke: #00ff41; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .fd-how-arrow { color: #9a98b8; }
 .jr-fillall-note { white-space: pre-line; }
+
+/* 2026-11-18 owner: phone History and bookmarks - Copy company name pulses, then the paste box pulses until something is pasted (guidance class, as .fd strips .btn-glow) */
+.jobtrack-page .fd .fd-copy.jt-guidance-glow { animation: btn-glow-pulse 1.8s ease-in-out infinite; }
+.jobtrack-page .fd textarea.jr-ad.jt-guidance-glow { animation: jr-glow-pulse 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .jobtrack-page .fd .fd-copy.jt-guidance-glow, .jobtrack-page .fd textarea.jr-ad.jt-guidance-glow { animation: none; box-shadow: 0 0 10px rgba(0,255,65,.6); } }
