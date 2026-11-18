@@ -1733,3 +1733,5 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jobtrack-page .fd .fd-hand li.jt-guidance-glow { border-radius: 6px; padding: .2rem .4rem; animation: jr-glow-pulse 1.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .jobtrack-page .fd .fd-hand li.jt-guidance-glow { animation: none; box-shadow: 0 0 10px rgba(0,255,65,.6); } }
 .jobtrack-page .fd .fd-hand .fd-done { text-decoration: line-through; }   /* 2026-11-18 owner: hand search steps dim AND strike through */
+.jobtrack-page .fd .fd-fill-ad.jt-guidance-glow { animation: btn-glow-pulse 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .jobtrack-page .fd .fd-fill-ad.jt-guidance-glow { animation: none; box-shadow: 0 0 10px rgba(0,255,65,.6); } }

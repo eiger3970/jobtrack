@@ -151,10 +151,10 @@ function useHasVideo(group: string): boolean {
   }, [group])
   return has
 }
-function GuideRow({ t, title, group, vars, children }: { t: (k: string) => string; title: string; group: string; vars?: Record<string, string>; children: ReactNode }) {
+function GuideRow({ t, title, group, vars, children, noText = false }: { t: (k: string) => string; title: string; group: string; vars?: Record<string, string>; children?: ReactNode; noText?: boolean }) {
   const [open, setOpen] = useState<GuideKind | null>(null)
   const hasVideo = useHasVideo(group)
-  const kinds: GuideKind[] = hasVideo ? ['images', 'text', 'video'] : ['images', 'text']   // alphabetical
+  const kinds: GuideKind[] = ((hasVideo ? ['images', 'text', 'video'] : ['images', 'text']) as GuideKind[]).filter(k => !(noText && k === 'text'))   // alphabetical; noText: the steps are already on screen
   const [done, setDone] = useState<string[]>([])           // step parts the user dimmed, kept while the window is closed
   const box = useRef<HTMLDivElement>(null)
   // 2026-11-06 owner: Close sat below the steps (scroll, tap) and then the paste box needed another scroll - Close is now pinned at the top and, after the phone steps, the page jumps to the paste box
@@ -642,12 +642,12 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
 
   // paste target right where the sentence ends; pasting fills the form
   // 2026-11-18 owner: History and bookmarks open on the phone -> Copy company name pulses; once tapped, the Ctrl+V here box pulses until something is pasted
-  const [coCopied, setCoCopied] = useState(false)
+  const [, setCoCopied] = useState(false)   // kept for the copy callback; the paste box now follows handStep
   const [handStep, setHandStep] = useState(0)   // phone hand search: the step the user is on (4 = paste the job ad)
   const pasteBox = (val: string, set: (v: string) => void) => <>
     <textarea className={'jr-ad' + (handStep === 4 && !val.trim() ? ' jt-guidance-glow' : '')} rows={2} onFocus={x => { const el = x.currentTarget; setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400) }} placeholder={t('fd.pasteHere')} value={val} onChange={x => set(x.target.value)}
       onPaste={x => { const v = x.clipboardData.getData('text'); if (v.trim().length >= 12) { x.preventDefault(); fill(v) } }} />
-    {val.trim() && <button type="button" className="btn-secondary fd-btn" onClick={() => fill(val)}>{t('jr.adFill')}</button>}
+    {val.trim() && <button type="button" className="btn-secondary fd-btn fd-fill-ad jt-guidance-glow" onClick={() => fill(val)}>{t('jr.adFill')}</button>}   {/* 2026-11-18 owner: once pasted, Fill from the ad is the next tap, so it pulses */}
     {note && <span className="fd-note">{note}</span>}
     {rej && <button type="button" className="btn-secondary fd-btn" onClick={() => { onUpdate(a.id, { status: 'rejected' }); setRej(false) }}>{t('jr.setRejected')}</button>}
   </>
@@ -821,17 +821,11 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
                   ? <>
                   {/* 2026-11-18 owner: "No user will find that" - Copy company sat inside the Text window; now on screen as step 1, the guide buttons follow */}
                   {/* 2026-11-18 owner: "If I have to search by hand, show the user how" - the hand search as 4 numbered steps on screen; Copy pulses first, then step 2 and the paste box */}
+                  {/* 2026-11-18 owner: the on-screen steps 1-4 replace the Text guide; Images and Video sit between the heading and step 1 */}
                   <div className="fd-hand"><b>{t('fd.handH')}</b>
+                    <GuideRow t={t} title={t('fd.linkH')} group="phone" noText />
                     <HandSteps id={String(a.id)} t={t} company={a.company} onCopied={() => setCoCopied(true)} onStep={setHandStep} />
-                  </div>
-                  <GuideRow t={t} title={t('fd.linkH')} group="phone">
-                  <ol className="fd-flow fd-phone-steps">
-                    <li><Segs id="ph1" text={t('fd.ph1')} /> <CopyBtn text={a.company} label={t('fd.copyCompany')} t={t} glow={!coCopied} onCopied={() => setCoCopied(true)} /></li>
-                    <li><Segs id="ph2" text={t('fd.ph2')} /></li>
-                    <li><Segs id="ph2c" text={t('fd.ph2c')} /><br /><span className="fd-side"><Segs id="ph2b" text={t('fd.ph2b')} /></span></li>
-                    <li><Segs id="ph4" text={t('fd.ph4')} /></li>
-                  </ol>
-                  </GuideRow></>
+                  </div></>
                   : <GuideRow t={t} title={t('fd.addonInstall')} group="computer"><ol className="fd-flow fd-phone-steps"><li><Segs id="fd.inst1" text={t('fd.inst1')} /></li><li><Segs id="fd.inst2" text={t('fd.inst2')} /></li><li><Segs id="fd.inst3" text={t('fd.inst3')} /></li></ol></GuideRow>}
               </>}
             {pasteBox(ad, setAd)}
