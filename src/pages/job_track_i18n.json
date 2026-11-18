@@ -2211,6 +2211,10 @@
     },
     "fd.coNext": {"en": "Next: Firefox -> ⋯ (3 dots) -> History -> search icon -> Paste -> copy the job ad -> paste it in the box below.", "de": "Weiter: Firefox -> ⋯ (3 Punkte) -> Verlauf -> Suchsymbol -> Einfügen -> Stelleninserat kopieren -> unten ins Feld einfügen.", "fr": "Ensuite : Firefox -> ⋯ (3 points) -> Historique -> icône de recherche -> Coller -> copiez l'annonce -> collez-la dans le champ ci-dessous."},
     "fd.coPasted": {"en": "That is the company name. Search Firefox History with it, copy the job ad, then paste the job ad here.", "de": "Das ist der Firmenname. Damit im Firefox-Verlauf suchen, das Stelleninserat kopieren und hier einfügen.", "fr": "C'est le nom de l'entreprise. Cherchez-le dans l'historique de Firefox, copiez l'annonce, puis collez-la ici."},
+    "fd.handH": {"en": "Search Firefox History by hand:", "de": "Firefox-Verlauf von Hand durchsuchen:", "fr": "Chercher à la main dans l'historique de Firefox :"},
+    "fd.hand2": {"en": "Firefox -> ⋯ (3 dots) -> History -> search icon -> paste into Firefox's search box", "de": "Firefox -> ⋯ (3 Punkte) -> Verlauf -> Suchsymbol -> in das Firefox-Suchfeld einfügen", "fr": "Firefox -> ⋯ (3 points) -> Historique -> icône de recherche -> collez dans le champ de recherche de Firefox"},
+    "fd.hand3": {"en": "Press and hold the job ad -> Share -> Copy", "de": "Stelleninserat gedrückt halten -> Teilen -> Kopieren", "fr": "Appuyez longuement sur l'annonce -> Partager -> Copier"},
+    "fd.hand4": {"en": "Back in JobTrack, paste into the Ctrl+V here box below", "de": "Zurück in JobTrack, unten in das Feld Ctrl+V hier einfügen", "fr": "De retour dans JobTrack, collez dans le champ Ctrl+V ici ci-dessous"},
     "fd.copyCompany": {
       "en": "Copy company name",
       "de": "Firmennamen kopieren",

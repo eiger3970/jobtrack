@@ -791,7 +791,15 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
                 {mobile
                   ? <>
                   {/* 2026-11-18 owner: "No user will find that" - Copy company sat inside the Text window; now on screen as step 1, the guide buttons follow */}
-                  <div className="fd-flow"><CopyBtn text={a.company} label={t('fd.copyCompany')} t={t} glow={!coCopied} onCopied={() => setCoCopied(true)} />{coCopied && <span className="fd-side" style={{ display: 'block' }}>{t('fd.coNext')}</span>}</div>
+                  {/* 2026-11-18 owner: "If I have to search by hand, show the user how" - the hand search as 4 numbered steps on screen; Copy pulses first, then step 2 and the paste box */}
+                  <div className="fd-hand"><b>{t('fd.handH')}</b>
+                    <ol className="fd-flow fd-phone-steps">
+                      <li><CopyBtn text={a.company} label={t('fd.copyCompany')} t={t} glow={!coCopied} onCopied={() => setCoCopied(true)} /></li>
+                      <li className={coCopied ? 'jt-guidance-glow' : ''}>{t('fd.hand2')}</li>
+                      <li>{t('fd.hand3')}</li>
+                      <li>{t('fd.hand4')}</li>
+                    </ol>
+                  </div>
                   <GuideRow t={t} title={t('fd.linkH')} group="phone">
                   <ol className="fd-flow fd-phone-steps">
                     <li><Segs id="ph1" text={t('fd.ph1')} /> <CopyBtn text={a.company} label={t('fd.copyCompany')} t={t} glow={!coCopied} onCopied={() => setCoCopied(true)} /></li>
