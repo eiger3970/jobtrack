@@ -31,6 +31,8 @@ type GuideKind = 'images' | 'text' | 'video'
 // 2026-11-06 owner: Images = one small image per step with its step text under it, Video = one short clip per group.
 // Files go in public/assets/jobtrack/ as history_search_<group>_1.jpg (plus _1b, _1c for more shots of the same step), _2.jpg ... and history_search_<group>.mp4; a missing file just hides itself.
 const GUIDE_DIR = '/assets/jobtrack/history_search_'
+// 2026-11-18 owner: the app had no Video button - the clips are not bundled, so the app streams them from the website (online only)
+const videoDir = () => (isApp() ? 'https://kworld.space' : '') + GUIDE_DIR
 const GUIDE_STEPS: Record<string, string[]> = {
   sync: ['fd.sync1', 'fd.sync2'],
   phone: ['fd.ph1', 'fd.ph2', 'fd.ph2c', 'fd.ph4'],
@@ -59,13 +61,12 @@ const GUIDE_CLIPS: Record<string, { file: string; label?: string }[]> = {}
 function GuideVideo({ t, group }: { t: (k: string) => string; group: string }) {
   const [bad, setBad] = useState<string[]>([])
   const clips = GUIDE_CLIPS[group] || [{ file: group }]
-  if (isApp()) return <p className="fd-flow">{t('fd.g.web')}</p>   // the guide videos live on the website, not inside the app
   const shown = clips.filter(c => !bad.includes(c.file))
   if (!shown.length) return <p className="fd-flow">{t('fd.g.soon')}</p>
   const fail = (f: string) => setBad(b => b.includes(f) ? b : [...b, f])
   return <>{shown.map(c => <div key={c.file}>
     {c.label && <p className="fd-gvlabel">{t(c.label)}</p>}
-    <video className="fd-gvideo" controls playsInline preload="none" onError={() => fail(c.file)}><source src={`${GUIDE_DIR}${c.file}.mp4?v=10`} type="video/mp4" onError={() => fail(c.file)} /></video>
+    <video className="fd-gvideo" controls playsInline preload="none" onError={() => fail(c.file)}><source src={`${videoDir()}${c.file}.mp4?v=10`} type="video/mp4" onError={() => fail(c.file)} /></video>
   </div>)}</>
 }
 // 2026-11-06 owner: tapping one part of a step (the text between the arrows) dims it, so the user sees where they are up to
@@ -144,7 +145,7 @@ function useHasVideo(group: string): boolean {
   useEffect(() => {
     if (group in videoSeen) { setHas(videoSeen[group]); return }
     let live = true
-    fetch(`${GUIDE_DIR}${group}.mp4`, { method: 'HEAD' })
+    fetch(`${videoDir()}${group}.mp4`, { method: 'HEAD' })
       .then(r => { const ok = r.ok && (r.headers.get('content-type') || '').startsWith('video/'); videoSeen[group] = ok; if (live) setHas(ok) })
       .catch(() => { if (live) setHas(false) })
     return () => { live = false }
