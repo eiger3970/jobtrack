@@ -109,6 +109,34 @@ export function SegSteps({ id, text, map }: { id: string; text: string; map?: Re
     onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && tap(e.target)) e.preventDefault() }}><Segs id={id} text={text} map={map} /></span></DoneCtx.Provider>
 }
 
+// 2026-11-18 owner: the phone hand search steps must remember where the user is when they go to Firefox History and come back -
+// tap a part to dim it (as in the guide window), kept per job on this device; the next unfinished step pulses
+function HandSteps({ id, t, company, onCopied, onStep }: { id: string; t: (k: string) => string; company: string; onCopied: () => void; onStep: (n: number) => void }) {
+  const key = 'jt-hand-' + id
+  const [done, setDone] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem(key) || '[]') } catch { return [] } })
+  useEffect(() => { try { localStorage.setItem(key, JSON.stringify(done)) } catch { /* private mode */ } }, [done, key])
+  const keys = ['fd.hand2', 'fd.hand3', 'fd.hand4']
+  const ids = (k: string) => t(k).split(/\s*->\s*/).map((_, i) => k + ':' + i)
+  const complete = (k: string) => ids(k).every(x => done.includes(x))
+  const next = !done.includes('h1') ? 1 : keys.findIndex(k => !complete(k)) + 2   // 1 = copy, 2-4 = steps, 1 (findIndex -1 + 2) = all done
+  const allDone = done.includes('h1') && keys.every(complete)
+  useEffect(() => { onStep(allDone ? 0 : next) }, [next, allDone])   // the parent pulses the paste box only at step 4
+  const box = useRef<HTMLOListElement>(null)
+  const tap = (target: EventTarget) => {
+    const el = (target as Element).closest('[data-sid]') as HTMLElement | null; if (!el) return false
+    // 2026-11-18 owner: across steps - tapping a part dims it and everything before it (copy step included); tapping a dimmed part undims it and everything after it
+    const all = ['h1', ...Array.from(box.current?.querySelectorAll<HTMLElement>('[data-sid]') ?? []).map(x => x.dataset.sid as string)]
+    const i = all.indexOf(el.dataset.sid as string)
+    setDone(d => d.includes(all[i]) ? all.slice(0, i) : all.slice(0, i + 1)); return true
+  }
+  return <DoneCtx.Provider value={{ done }}>
+    <ol ref={box} className="fd-flow fd-phone-steps fd-guide fd-segbox" onClick={e => { tap(e.target) }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && tap(e.target)) e.preventDefault() }}>
+      <li className={done.includes('h1') ? 'fd-done' : ''}><CopyBtn text={company} label={t('fd.copyCompany')} t={t} glow={!allDone && next === 1} onCopied={() => { onCopied(); setDone(d => d.includes('h1') ? d : [...d, 'h1']) }} /></li>
+      {keys.map((k, i) => <li key={k} className={!allDone && next === i + 2 ? 'jt-guidance-glow' : ''}><Segs id={k} text={t(k)} /></li>)}
+    </ol>
+  </DoneCtx.Provider>
+}
+
 // 2026-11-07 owner: a Video button that only says "Coming soon" wastes the user's time - the button shows only once the clip is confirmed to exist (a missing file may answer 200 with the page itself, so the type must be video)
 const videoSeen: Record<string, boolean> = {}
 function useHasVideo(group: string): boolean {
@@ -615,8 +643,9 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   // paste target right where the sentence ends; pasting fills the form
   // 2026-11-18 owner: History and bookmarks open on the phone -> Copy company name pulses; once tapped, the Ctrl+V here box pulses until something is pasted
   const [coCopied, setCoCopied] = useState(false)
+  const [handStep, setHandStep] = useState(0)   // phone hand search: the step the user is on (4 = paste the job ad)
   const pasteBox = (val: string, set: (v: string) => void) => <>
-    <textarea className={'jr-ad' + (coCopied && !val.trim() ? ' jt-guidance-glow' : '')} rows={2} onFocus={x => { const el = x.currentTarget; setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400) }} placeholder={t('fd.pasteHere')} value={val} onChange={x => set(x.target.value)}
+    <textarea className={'jr-ad' + (handStep === 4 && !val.trim() ? ' jt-guidance-glow' : '')} rows={2} onFocus={x => { const el = x.currentTarget; setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400) }} placeholder={t('fd.pasteHere')} value={val} onChange={x => set(x.target.value)}
       onPaste={x => { const v = x.clipboardData.getData('text'); if (v.trim().length >= 12) { x.preventDefault(); fill(v) } }} />
     {val.trim() && <button type="button" className="btn-secondary fd-btn" onClick={() => fill(val)}>{t('jr.adFill')}</button>}
     {note && <span className="fd-note">{note}</span>}
@@ -793,12 +822,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
                   {/* 2026-11-18 owner: "No user will find that" - Copy company sat inside the Text window; now on screen as step 1, the guide buttons follow */}
                   {/* 2026-11-18 owner: "If I have to search by hand, show the user how" - the hand search as 4 numbered steps on screen; Copy pulses first, then step 2 and the paste box */}
                   <div className="fd-hand"><b>{t('fd.handH')}</b>
-                    <ol className="fd-flow fd-phone-steps">
-                      <li><CopyBtn text={a.company} label={t('fd.copyCompany')} t={t} glow={!coCopied} onCopied={() => setCoCopied(true)} /></li>
-                      <li className={coCopied ? 'jt-guidance-glow' : ''}>{t('fd.hand2')}</li>
-                      <li>{t('fd.hand3')}</li>
-                      <li>{t('fd.hand4')}</li>
-                    </ol>
+                    <HandSteps id={String(a.id)} t={t} company={a.company} onCopied={() => setCoCopied(true)} onStep={setHandStep} />
                   </div>
                   <GuideRow t={t} title={t('fd.linkH')} group="phone">
                   <ol className="fd-flow fd-phone-steps">
