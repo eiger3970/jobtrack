@@ -286,9 +286,9 @@ export function MailAppBtns({ company, t }: { company: string; t: (k: string) =>
   </span>
 }
 
-function CopyBtn({ text, label, t }: { text: string; label: string; t: (k: string) => string }) {
+function CopyBtn({ text, label, t, glow = false, onCopied }: { text: string; label: string; t: (k: string) => string; glow?: boolean; onCopied?: () => void }) {
   const [done, setDone] = useState(false)
-  return <button type="button" className="fd-copy" onClick={() => navigator.clipboard?.writeText(text).then(() => { setDone(true); setTimeout(() => setDone(false), 2000) }).catch(() => {})}>{done ? t('fd.copied') : label}</button>
+  return <button type="button" className={'fd-copy' + (glow ? ' btn-glow' : '')} onClick={() => navigator.clipboard?.writeText(text).then(() => { setDone(true); onCopied?.(); setTimeout(() => setDone(false), 2000) }).catch(() => {})}>{done ? t('fd.copied') : label}</button>
 }
 
 // "{copy} -> open ..." : tokens in the sentence become the given nodes
@@ -611,8 +611,10 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   const term = `${a.role} ${a.company}`
 
   // paste target right where the sentence ends; pasting fills the form
+  // 2026-11-18 owner: History and bookmarks open on the phone -> Copy company name pulses; once tapped, the Ctrl+V here box pulses until something is pasted
+  const [coCopied, setCoCopied] = useState(false)
   const pasteBox = (val: string, set: (v: string) => void) => <>
-    <textarea className="jr-ad" rows={2} placeholder={t('fd.pasteHere')} value={val} onChange={x => set(x.target.value)}
+    <textarea className={'jr-ad' + (coCopied && !val.trim() ? ' jr-glow' : '')} rows={2} placeholder={t('fd.pasteHere')} value={val} onChange={x => set(x.target.value)}
       onPaste={x => { const v = x.clipboardData.getData('text'); if (v.trim().length >= 12) { x.preventDefault(); fill(v) } }} />
     {val.trim() && <button type="button" className="btn-secondary fd-btn" onClick={() => fill(val)}>{t('jr.adFill')}</button>}
     {note && <span className="fd-note">{note}</span>}
@@ -786,9 +788,11 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
                 {!failNoteTop && noteSlot(shortFail)}{inOpt && foundHere && resultBox}
                 {mobile
                   ? <>
+                  {/* 2026-11-18 owner: "No user will find that" - Copy company sat inside the Text window; now on screen as step 1, the guide buttons follow */}
+                  <div className="fd-flow"><CopyBtn text={a.company} label={t('fd.copyCompany')} t={t} glow={!coCopied} onCopied={() => setCoCopied(true)} /></div>
                   <GuideRow t={t} title={t('fd.linkH')} group="phone">
                   <ol className="fd-flow fd-phone-steps">
-                    <li><Segs id="ph1" text={t('fd.ph1')} /> <CopyBtn text={a.company} label={t('fd.copyCompany')} t={t} /></li>
+                    <li><Segs id="ph1" text={t('fd.ph1')} /> <CopyBtn text={a.company} label={t('fd.copyCompany')} t={t} glow={!coCopied} onCopied={() => setCoCopied(true)} /></li>
                     <li><Segs id="ph2" text={t('fd.ph2')} /></li>
                     <li><Segs id="ph2c" text={t('fd.ph2c')} /><br /><span className="fd-side"><Segs id="ph2b" text={t('fd.ph2b')} /></span></li>
                     <li><Segs id="ph4" text={t('fd.ph4')} /></li>
