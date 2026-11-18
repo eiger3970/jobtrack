@@ -586,6 +586,8 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   }
 
   function fill(text: string) {
+    // 2026-11-18 owner: pasting the copied company name here found nothing (and would have been kept as the ad text) - say what to paste instead
+    if (a.company && text.trim().toLowerCase() === a.company.trim().toLowerCase()) { setNote(t('fd.coPasted')); setAd(''); setAd2(''); return }
     const p = parseAd(text)
     const patch: Rec = {}
     const put = (k: string, v: string | undefined, have: string) => { if (v && !have) patch[k] = v }
@@ -614,7 +616,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   // 2026-11-18 owner: History and bookmarks open on the phone -> Copy company name pulses; once tapped, the Ctrl+V here box pulses until something is pasted
   const [coCopied, setCoCopied] = useState(false)
   const pasteBox = (val: string, set: (v: string) => void) => <>
-    <textarea className={'jr-ad' + (coCopied && !val.trim() ? ' jt-guidance-glow' : '')} rows={2} placeholder={t('fd.pasteHere')} value={val} onChange={x => set(x.target.value)}
+    <textarea className={'jr-ad' + (coCopied && !val.trim() ? ' jt-guidance-glow' : '')} rows={2} onFocus={x => { const el = x.currentTarget; setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400) }} placeholder={t('fd.pasteHere')} value={val} onChange={x => set(x.target.value)}
       onPaste={x => { const v = x.clipboardData.getData('text'); if (v.trim().length >= 12) { x.preventDefault(); fill(v) } }} />
     {val.trim() && <button type="button" className="btn-secondary fd-btn" onClick={() => fill(val)}>{t('jr.adFill')}</button>}
     {note && <span className="fd-note">{note}</span>}
@@ -789,7 +791,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
                 {mobile
                   ? <>
                   {/* 2026-11-18 owner: "No user will find that" - Copy company sat inside the Text window; now on screen as step 1, the guide buttons follow */}
-                  <div className="fd-flow"><CopyBtn text={a.company} label={t('fd.copyCompany')} t={t} glow={!coCopied} onCopied={() => setCoCopied(true)} /></div>
+                  <div className="fd-flow"><CopyBtn text={a.company} label={t('fd.copyCompany')} t={t} glow={!coCopied} onCopied={() => setCoCopied(true)} />{coCopied && <span className="fd-side" style={{ display: 'block' }}>{t('fd.coNext')}</span>}</div>
                   <GuideRow t={t} title={t('fd.linkH')} group="phone">
                   <ol className="fd-flow fd-phone-steps">
                     <li><Segs id="ph1" text={t('fd.ph1')} /> <CopyBtn text={a.company} label={t('fd.copyCompany')} t={t} glow={!coCopied} onCopied={() => setCoCopied(true)} /></li>

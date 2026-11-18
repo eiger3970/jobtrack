@@ -2209,6 +2209,8 @@
       "de": "{copy} -> {room} öffnen -> anmelden -> Suche antippen -> einfügen -> Ergebnisse durchsehen -> Adresse kopieren (Dreifachklick auf die Adresse, Strg+C) -> hierher zurückkehren -> einfügen:",
       "fr": "{copy} -> ouvrir {room} -> se connecter -> appuyer sur recherche -> coller -> parcourir les résultats -> copier l'adresse (triple-clic sur l'adresse, Ctrl+C) -> revenir ici -> coller :"
     },
+    "fd.coNext": {"en": "Next: Firefox -> ⋯ (3 dots) -> History -> search icon -> Paste -> copy the job ad -> paste it in the box below.", "de": "Weiter: Firefox -> ⋯ (3 Punkte) -> Verlauf -> Suchsymbol -> Einfügen -> Stelleninserat kopieren -> unten ins Feld einfügen.", "fr": "Ensuite : Firefox -> ⋯ (3 points) -> Historique -> icône de recherche -> Coller -> copiez l'annonce -> collez-la dans le champ ci-dessous."},
+    "fd.coPasted": {"en": "That is the company name. Search Firefox History with it, copy the job ad, then paste the job ad here.", "de": "Das ist der Firmenname. Damit im Firefox-Verlauf suchen, das Stelleninserat kopieren und hier einfügen.", "fr": "C'est le nom de l'entreprise. Cherchez-le dans l'historique de Firefox, copiez l'annonce, puis collez-la ici."},
     "fd.copyCompany": {
       "en": "Copy company name",
       "de": "Firmennamen kopieren",
