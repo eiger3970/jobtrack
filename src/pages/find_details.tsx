@@ -132,7 +132,7 @@ function HandSteps({ id, t, company, onCopied, onStep }: { id: string; t: (k: st
   return <DoneCtx.Provider value={{ done }}>
     <ol ref={box} className="fd-flow fd-phone-steps fd-guide fd-segbox" onClick={e => { tap(e.target) }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && tap(e.target)) e.preventDefault() }}>
       <li className={done.includes('h1') ? 'fd-done' : ''}><CopyBtn text={company} label={t('fd.copyCompany')} t={t} glow={!allDone && next === 1} onCopied={() => { onCopied(); setDone(d => d.includes('h1') ? d : [...d, 'h1']) }} /></li>
-      {keys.map((k, i) => <li key={k} className={!allDone && next === i + 2 ? 'jt-guidance-glow' : ''}><Segs id={k} text={t(k)} /></li>)}
+      {keys.map((k, i) => <li key={k} className={!allDone && next === i + 2 ? 'jt-guidance-glow' : ''}><Segs id={k} text={t(k)} />{k === 'fd.hand2' && <><br /><span className="fd-side"><Segs id="ph2b" text={t('fd.ph2b')} /></span></>}</li>)}   {/* 2026-11-18 owner: the Bookmarks line from the old Text guide, under step 2 */}
     </ol>
   </DoneCtx.Provider>
 }
