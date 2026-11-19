@@ -337,6 +337,7 @@ function amberLead(s: string) {
   const m = s.match(/^([^:.]+)([\s\S]*)$/)
   return m ? <><span className="fd-failword">{m[1]}</span>{m[2]}</> : <>{s}</>
 }
+const addonClock = new Map<string | number, number>()   // 2026-11-19: the 8 s add-on picture per job survives the panel being rebuilt mid-search
 let histLastPost = 0   // 2026-11-07 owner: two Allow tabs opened - automatic history searches (also from a second open job card) are sent at most once every 8 s
 function postHistoryOnce(msg: Record<string, unknown>): boolean {
   if (Date.now() - histLastPost < 8000) return false
@@ -356,18 +357,31 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   const [open, setOpen] = useState(true)
   // 2026-11-03 owner: with the Bookmarks add-on installed, one tap finds the page applied on in the browser history (nothing leaves the browser)
   const [addon, setAddon] = useState(false)
+  const [installClicked, setInstallClicked] = useState(false)   // 15 s after Install, add-on still not heard: offer the reload (owner: an instant change distracted mid-install, and mostly the add-on arrives by itself)
   const addonRef = useRef(false)
   const mountedAt = useRef(Date.now())
   const lateAddon = useRef(false)
   const [lateGo, setLateGo] = useState(0)
   // 2026-11-17 owner: "run everything in the 8 seconds if the bookmarks/history has 0 searches, then suggest there might be a
   // solution in x". The history search is sent at once; whatever it (and the free quick search after it) finds is shown at 8 s.
-  const holdUntil = useRef(0)
+  const holdUntil = useRef(addonClock.get(a.id) ?? 0)
   const quickRef = useRef<() => void>(() => {})
+  const startAddonShowRef = useRef<() => void>(() => {})
+  const waitPermRef = useRef(false)   // the add-on asked for permission: its real search comes after the Allow tab
   const finishRef = useRef<(results: { url: string; title: string }[]) => void>(() => {})
   // the best quick find: Job-Room's ad for this job first (exact), else the company website
   const [siteFind, setSiteFind] = useState<null | { label: string; fields: Rec }>(null)
   const [suggest, setSuggest] = useState<'' | 'mail' | 'site'>('')
+  // 2026-11-19 owner: "where is the 8 second timer?" - the seconds left are shown beside "Add-on searching"
+  const [, setTick] = useState(0)
+  useEffect(() => { const id = window.setInterval(() => { if (holdUntil.current > Date.now() - 1000) setTick(n => n + 1) }, 250); return () => window.clearInterval(id) }, [])
+  const holdLeft = Math.max(0, Math.ceil((holdUntil.current - Date.now()) / 1000))
+  // 2026-11-19 owner: "I'm still not seeing an 8 second working Add-on image" on desktop - the picture hung on the search state,
+  // which other steps finished early (gone after ~1.5 s in a local test). Now it has its own 8 s clock; results wait behind it.
+  const [addonShowUntil, setAddonShowUntil] = useState(() => addonClock.get(a.id) ?? 0)
+  const startAddonShow = () => { const u = Date.now() + 8000; holdUntil.current = Math.max(holdUntil.current, u); addonClock.set(a.id, u); setAddonShowUntil(u) }
+  const addonShowing = addonShowUntil > Date.now()
+  startAddonShowRef.current = startAddonShow
   const afterHold = (fn: () => void) => { const wait = holdUntil.current - Date.now(); if (wait > 0) window.setTimeout(fn, wait); else fn() }
   // 2026-11-17 owner: "build that" - after installing the add-on the history search starts by itself, no F5 and no tap.
   // The 11-07 rule stays: never while Firefox's install pop-ups are open (the Allow tab popped up mid-install). So wait
@@ -400,9 +414,16 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
         const results = ev.data.needPermission || !Array.isArray(ev.data.results) ? [] : ev.data.results.filter((r: { url: string }) => isJobLink(r.url))
         setHistPerm(!!ev.data.needPermission)
         try { if (ev.data.needPermission) localStorage.removeItem('kworld_hist_granted'); else localStorage.setItem('kworld_hist_granted', '1') } catch { /* private mode */ }   // 2026-11-08 owner: once the person has allowed history search, the Allow picture must not show again
-        if (quietRef.current) { quietRef.current = false; if (results.length) { histKeep.current = results; setHist({ state: 'done', src: 'history', results }) }; return }   // 2026-11-07 owner: the rerun after the Allow tab must not wipe an AI answer already on screen - it only adds a history find
+        // 2026-11-19 owner: "Add-on found nothing" showed before the add-on had searched - its first answer after a new install is
+        // "needs permission", not a search. Wait for the Allow tab; the search that follows the approval is the real one.
+        if (ev.data.needPermission) { waitPermRef.current = true; return }
+        if (quietRef.current) { quietRef.current = false; if (!waitPermRef.current) { if (results.length) { histKeep.current = results; setHist({ state: 'done', src: 'history', results }) }; return } }
+        waitPermRef.current = false   // 2026-11-07 owner: the rerun after the Allow tab must not wipe an AI answer already on screen - it only adds a history find
         if (results.length) histKeep.current = results
-        finishRef.current(results)   // 2026-11-17 owner (3): history + the free quick search (Job-Room, company website) together, shown at 8 s
+        // 2026-11-19 owner: after the Allow tab the add-on was never seen working - the 8 s start once the person is back on this page
+        const go = () => { if (holdUntil.current < Date.now() + 1000) startAddonShowRef.current(); finishRef.current(results) }
+        if (document.visibilityState === 'visible' && document.hasFocus()) go()
+        else { const id = window.setInterval(() => { if (document.visibilityState === 'visible' && document.hasFocus()) { window.clearInterval(id); go() } }, 300) }   // 2026-11-17 owner (3): history + the free quick search (Job-Room, company website) together, shown at 8 s
       }
     }
     window.addEventListener('message', on)
@@ -422,8 +443,8 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     // 2026-11-07 owner: say what happens next during the wait - "installed add-on running... a moment", then the tab asks for permission
     let allowed = false; try { allowed = localStorage.getItem('kworld_hist_granted') === '1' } catch { /* private mode */ }
     setHist({ state: 'busy', src: 'history', results: [] }); if (!allowed) setHistWarm(true)   // 2026-11-08 owner: the Allow picture only when the Allow tab will really open
-    if (allowed) { holdUntil.current = Date.now() + 8000; postHistoryOnce({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }) }
-    else window.setTimeout(() => { setHistWarm(false); postHistoryOnce({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }) }, 8000)   // the Allow tab opens - 8 s to read first   // 2026-11-17 owner: "too fast for humans" (1.5 -> 4 s), then "give the add-on search twice as much time" -> 8 s
+    if (allowed) { startAddonShow(); postHistoryOnce({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }) }
+    else window.setTimeout(() => { setHistWarm(false); startAddonShow(); postHistoryOnce({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }) }, 8000)   // the Allow tab opens - 8 s to read first   // 2026-11-17 owner: "too fast for humans" (1.5 -> 4 s), then "give the add-on search twice as much time" -> 8 s
   }, [addon, needsLink, autoSearch, aiDone, lateGo]) // eslint-disable-line react-hooks/exhaustive-deps
   // AI job-page search (no add-on needed): runs by itself when a link is needed and the history search is not available or found nothing
   // 2026-11-04 owner: the free web search runs by itself; the AI search only when the person taps it
@@ -466,7 +487,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     if (!autoSearch || !needsLink || linkAiTried.current) return
     void searchJobLink()
   }, [autoSearch, needsLink]) // eslint-disable-line react-hooks/exhaustive-deps
-  const searchHistory = () => { holdUntil.current = Date.now() + 8000; setSiteFind(null); setSuggest(''); setHist({ state: 'busy', src: 'history', results: [] }); window.postMessage({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }, window.location.origin) }
+  const searchHistory = () => { startAddonShow(); setSiteFind(null); setSuggest(''); setHist({ state: 'busy', src: 'history', results: [] }); window.postMessage({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }, window.location.origin) }
   const histBoxRef = useRef<HTMLDivElement>(null)
   useEffect(() => { if (histPerm) { setOpenOpt('link'); setUserOpt(true) } }, [histPerm])   // 2026-11-07 owner: History search opens at the permission note
   // 2026-11-07 owner: closing the Allow tab opened another one. Now the add-on says 'granted' once the permission is really given, and only then the search reruns.
@@ -629,7 +650,9 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     // 2026-11-05 owner: after a fill, show the form (check no pills are left), then point at the next job needing details
     if (filled.length) {
       setTimeout(() => document.getElementById('jr-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 500)
-      setTimeout(() => { const b = document.getElementById('jr-nextgap'); if (b) { b.scrollIntoView({ behavior: 'smooth', block: 'center' }); b.classList.add('jt-guidance-glow') } }, 3500)
+      // 2026-11-19 owner: the form copy went by "too fast for me to study" - no second jump; the Next button only glows, the person scrolls on when ready
+      ;(window as unknown as { __jrHold?: number }).__jrHold = Date.now()
+      setTimeout(() => { document.getElementById('jr-nextgap')?.classList.add('jt-guidance-glow') }, 1500)
     }
     setSite(p.siteDomain); setRej(p.statusHint === 'rejected' && a.status !== 'rejected')
     setNote(filled.length ? t('jr.adDone').replace('{list}', filled.join(', ')) : (p.postal || p.city || p.street ? t('jr.adHave') : (p.statusHint || p.siteDomain ? t('jr.adEmailOnly') : t('jr.adNone'))))
@@ -660,7 +683,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
             a browser-history list with a magnifier moving down it, row by row lighting up */}
         {/* 2026-11-17 owner: "the page jumps around whilst transitioning from Add-on searching to ... found data" - the picture and
             the found link share one slot of the same height (fd-hslot) and crossfade, so nothing below moves */}
-        {hist.state === 'busy' && !histWarm && hist.src === 'history' && <div key="hscan" className="fd-hslot"><span className="fd-warm fd-fade" role="status">
+        {(addonShowing || (hist.state === 'busy' && !histWarm && hist.src === 'history')) && <div key="hscan" className="fd-hslot"><span className="fd-warm fd-fade" role="status">
           <svg className="fd-hscan" viewBox="0 0 160 96" width="107" height="64" aria-hidden="true">
             <rect x="2" y="2" width="156" height="92" rx="6" fill="#0d0d1a" stroke="#6b6b8a" strokeWidth="2" />
             <rect x="2" y="2" width="156" height="14" rx="4" fill="#2a2748" />
@@ -672,7 +695,8 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
             </g>)}
             <g className="fd-hscan-lens"><circle cx="128" cy="30" r="9" fill="rgba(0,255,65,.12)" stroke="#00ff41" strokeWidth="2.5" /><path d="M134.5 36.5l7 7" stroke="#00ff41" strokeWidth="3" strokeLinecap="round" /></g>
           </svg>
-          <span className="fd-warm-t"><b>{t('fd.histWarm')}</b><span className="fd-ell" /></span></span></div>}
+          <span className="fd-warm-t"><b>{t('fd.histWarm')}</b><span className="fd-ell" />{holdLeft > 0 && <span className="fd-count"> {holdLeft} s</span>}</span></span></div>}
+        {!addonShowing && <>{/* results and "found nothing" wait until the 8 s add-on picture is over */}
         {hist.state === 'busy' && !histWarm && hist.src !== 'ai' && hist.src !== 'history' && <Unfold key={hist.src}><span className="fd-t fd-fade" role="status"><span className="fd-dots"><i /><i /><i /></span>{ hist.src === 'web' ? t('fd.webBusy') : hist.src === 'history' ? t('fd.histWarm') : t(pro ? 'fd.histBusy' : 'fd.histBusyFree')}</span></Unfold>}
         {hist.state === 'done' && !hist.results.length && siteFind && <div className="fd-hslot fd-hslot-in">
           <span className="fd-t fd-found">{siteFind.label}</span>
@@ -681,11 +705,15 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
           }}>{t('fd.quickUse')} {(f => [f.email, [[f.street, f.streetNo].filter(Boolean).join(' '), [f.postal, f.city].filter(Boolean).join(' ')].filter(Boolean).join(', '), f.contactPerson].filter(Boolean).join(' · '))(siteFind.fields)}</button>
         </div>}
         {hist.state === 'done' && !hist.results.length && !siteFind && suggest && <div className="fd-hslot fd-hslot-in">
-          <span className="fd-t fd-found">{t('fd.quickNone')}</span>
-          <button type="button" className="btn btn-glow fd-btn jt-guidance-glow" onClick={() => { setOpenOpt(suggest); setUserOpt(true) }}>{t(suggest === 'site' ? 'fd.siteH' : 'fd.mailH')}</button>
+          {/* 2026-11-19 owner: say that the ADD-ON found nothing, and point DOWN the list (easiest to hardest): Email search sits above and was already tried, so the next one is Web search */}
+          {(() => { const next = addon && suggest === 'mail' ? 'webs' : suggest; return <>
+          <span className="fd-t fd-found">{t(addon ? (next === 'site' ? 'fd.addonNoneSite' : 'fd.addonNone') : 'fd.quickNone')}</span>
+          {openOpt !== next && next !== 'webs' && <button type="button" className="btn btn-glow fd-btn jt-guidance-glow" onClick={() => { setOpenOpt(next); setUserOpt(true) }}>{t(next === 'site' ? 'fd.siteH' : 'fd.mailH')}</button>}
+          </> })()}{/* 2026-11-19 owner: once tapped, the same search is open below - a second Email search button is noise */}
         </div>}
         {histPerm && !hist.results.length && <span className="fd-t fd-ai-notice" role="status">{t('fd.histPerm')}</span>}
         {hist.state === 'done' && !hist.results.length && !hist.email && !histPerm && !aiFail && !siteFind && !suggest && <span className="fd-t">{t(hist.why === 'procap' ? 'fd.histProCap' : hist.why === 'cap' ? (pro ? 'fd.histErr' : buyLive ? 'fd.histCapPay' : 'fd.histCap') : hist.why === 'err' ? (pro ? 'fd.histErr' : 'fd.histBuy') : 'fd.histNone')}</span>}
+        </>}
   </>)   // 2026-11-07 owner: no result must be told at the button itself, not only in a box above the list
   // 2026-11-08 owner: the AI-failed note must sit where the person is looking - inside the search option that is open, not at the top of the list
   const failMsg = aiFail ? (aiFail.diag ? amberLead(t(/credit balance|insufficient|billing|\b402\b/i.test(aiFail.diag) ? 'fd.aiNoFunds' : /quota|\b429\b|exhausted/i.test(aiFail.diag) ? 'fd.aiQuota' : /overload|\b529\b|busy/i.test(aiFail.diag) ? 'fd.aiBusy' : 'fd.aiFailed') + ' (' + aiFail.diag + ')') : amberLead(t(pro ? 'fd.histProCap' : buyLive ? 'fd.histCapPay' : 'fd.histCap'))) : null   // 2026-11-09 owner: every search option shows the same AI-failed text
@@ -815,7 +843,12 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
               : <>
                 {app && <p className="fd-flow">{t('fd.addonWeb')}</p>}
                 {canAddon && <>
-                  <a className="btn btn-glow fd-btn" href="/free/bookmarks_search.xpi">{t('fd.addonInstall')}</a>
+                  {/* 2026-11-19 owner: after installing, the button stayed - Firefox gives the add-on's page script only to pages
+                      loaded AFTER the install, so this open page can't hear it. After the click: one button that reloads. */}
+                  {!installClicked
+                    ? <a className="btn btn-glow fd-btn" href="/free/bookmarks_search.xpi" onClick={() => setTimeout(() => setInstallClicked(true), 15000)}>{t('fd.addonInstall')}</a>
+                    : <button type="button" className="btn btn-glow fd-btn" onClick={() => window.location.reload()}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: '.4rem' }}><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>{t('fd.addonReload')}</button>}
                 </>}
                 {!failNoteTop && noteSlot(shortFail)}{inOpt && foundHere && resultBox}
                 {mobile

@@ -128,7 +128,9 @@ type QuickFields = { email?: string; phone?: string; street?: string; streetNo?:
 export type QuickFind = { jobs: { url: string; title: string }[]; site: ({ site: string } & QuickFields) | null; jobroom: ({ url: string; title: string; formUrl?: string } & QuickFields) | null }
 export async function quickFind(company: string, role: string, place: string, app: boolean): Promise<QuickFind> {
   try {
-    const r = await fetch(app ? APP_FIND_URL.replace('/find-details', '/quick-find') : '/api/jobtrack/quick', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    // 2026-11-19 owner: the app found 7, the website 1 - kworld.space's /api/ rate limit (3 per 10 s) blocked the batch with 1015. Direct, like the app (CORS allows kworld.space).
+    void app
+    const r = await fetch(APP_FIND_URL.replace('/find-details', '/quick-find'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ company, role, place }), signal: AbortSignal.timeout(7500) })
     const j = await r.json()
     return { jobs: Array.isArray(j?.jobs) ? j.jobs : [], site: j?.site && typeof j.site.site === 'string' ? j.site : null, jobroom: j?.jobroom && typeof j.jobroom.url === 'string' ? j.jobroom : null }

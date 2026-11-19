@@ -1304,9 +1304,9 @@
       "fr": "Collez ici un e-mail, une annonce ou une adresse (Ctrl+V)"
     },
     "jr.adFill": {
-      "en": "Fill from the ad",
-      "de": "Aus dem Inserat füllen",
-      "fr": "Remplir depuis l'annonce"
+      "en": "Fill from pasted text",
+      "de": "Aus eingefügtem Text füllen",
+      "fr": "Remplir depuis le texte collé"
     },
     "jr.zefix": {
       "en": "Address: company register (Zefix)",
@@ -2118,12 +2118,13 @@
     "fd.ph2c": {"en": "Turn phone sideways -> scroll to the job ad result -> press and hold the result -> tap Share -> tap Copy -> turn phone upright -> tap Done -> tap Done (closes History).", "de": "Handy quer halten -> zur Stellenanzeige scrollen -> Ergebnis gedrückt halten -> Teilen antippen -> Kopieren antippen -> Handy hochkant halten -> Fertig antippen -> Fertig antippen (schliesst den Verlauf).", "fr": "Tournez le téléphone en paysage -> défilez jusqu'à l'offre -> maintenez le résultat -> touchez Partager -> touchez Copier -> tournez le téléphone à la verticale -> touchez OK -> touchez OK (ferme l'historique)."},
     "fd.ph2b": {"en": "Not in History? Phone -> Firefox -> tap ellipse (3 dots) -> tap Bookmarks -> tap the folder.", "de": "Nicht im Verlauf? Handy -> Firefox -> Ellipse (3 Punkte) antippen -> Lesezeichen antippen -> Ordner antippen.", "fr": "Pas dans l'historique ? Téléphone -> Firefox -> touchez l'ellipse (3 points) -> touchez Favoris -> touchez le dossier."},
     "fd.ph3": {"en": "Phone, Firefox: on the job page, tap the address bar and copy the address.", "de": "Handy, Firefox: auf der Stellenseite die Adressleiste antippen und die Adresse kopieren.", "fr": "Téléphone, Firefox : sur la page de l'offre, touchez la barre d'adresse et copiez l'adresse."},
-    "fd.ph4": {"en": "Phone -> JobTrack -> tap Close -> tap the Ctrl+V here box -> tap Paste -> tap Fill from the ad.", "de": "Handy -> JobTrack -> Schliessen antippen -> Feld Strg+V hier antippen -> Einfügen antippen -> Aus dem Inserat füllen antippen.", "fr": "Téléphone -> JobTrack -> touchez Fermer -> touchez le champ Ctrl+V ici -> touchez Coller -> touchez Remplir depuis l'annonce."},
+    "fd.ph4": {"en": "Phone -> JobTrack -> tap Close -> tap the Ctrl+V here box -> tap Paste -> tap Fill from pasted text.", "de": "Handy -> JobTrack -> Schliessen antippen -> Feld Strg+V hier antippen -> Einfügen antippen -> Aus eingefügtem Text füllen antippen.", "fr": "Téléphone -> JobTrack -> touchez Fermer -> touchez le champ Ctrl+V ici -> touchez Coller -> touchez Remplir depuis l'annonce."},
     "fd.linkPortal": {"en": "Or log in to the company portal (the sender of the email shows which) and open My applications.", "de": "Oder im Firmenportal anmelden (der Absender der E-Mail zeigt es) und Meine Bewerbungen öffnen.", "fr": "Ou se connecter au portail de l'entreprise (l'expéditeur de l'e-mail l'indique) et ouvrir Mes candidatures."},
     "fd.inst1": {"en": "Computer -> JobTrack -> tap Install Firefox add-on -> Firefox -> tap Continue to Installation.", "de": "Computer -> JobTrack -> Firefox-Add-on installieren antippen -> Firefox -> Weiter zur Installation antippen.", "fr": "Ordinateur -> JobTrack -> touchez Installer le module Firefox -> Firefox -> touchez Poursuivre l'installation."},
     "fd.inst2": {"en": "Computer -> Firefox -> tap Add.", "de": "Computer -> Firefox -> Hinzufügen antippen.", "fr": "Ordinateur -> Firefox -> touchez Ajouter."},
     "fd.inst3": {"en": "Computer -> Firefox -> tick Pin extension to toolbar -> tap OK -> JobTrack -> the job link is found for you.", "de": "Computer -> Firefox -> Erweiterung an Symbolleiste anheften ankreuzen -> OK antippen -> JobTrack -> der Link zur Stelle wird für Sie gefunden.", "fr": "Ordinateur -> Firefox -> cochez Épingler l'extension à la barre d'outils -> touchez OK -> JobTrack -> le lien de l'offre est trouvé pour vous."},
     "fd.addonInstall": {"en": "Install Firefox add-on", "de": "Firefox-Add-on installieren", "fr": "Installer le module Firefox"},
+    "fd.addonReload": {"en": "Installed? Reload the page", "de": "Installiert? Seite neu laden", "fr": "Installé ? Recharger la page"},
     "fd.addonThen": {"en": "After installing: press F5 to reload this page. The add-on starts only after a reload.", "de": "Nach der Installation: F5 drücken, um diese Seite neu zu laden. Das Add-on startet erst nach dem Neuladen.", "fr": "Après l'installation : appuyez sur F5 pour recharger cette page. Le module ne démarre qu'après le rechargement."},
     "fd.histBtn": {"en": "History and bookmarks search", "de": "Verlauf- und Lesezeichen-Suche", "fr": "Recherche historique et favoris"},
     "bm.saveH": {"en": "Set up the bookmark, then tap it on a job page", "de": "Lesezeichen einrichten, dann auf einer Stellenseite antippen", "fr": "Configurer le favori, puis le toucher sur une page d'offre"},
@@ -2168,6 +2169,8 @@
     "jr.fillAllBtn": {"en": "Fill all ({n})", "de": "Alle ausfüllen ({n})", "fr": "Tout remplir ({n})"},
     "jr.fillAllNote": {"en": "Only empty fields are filled.\nUntick a job to skip it.", "de": "Nur leere Felder werden ausgefüllt.\nHaken entfernen, um eine Stelle auszulassen.", "fr": "Seuls les champs vides sont remplis.\nDécochez une offre pour la sauter."},
     "fd.quickUse": {"en": "Use:", "de": "Übernehmen:", "fr": "Utiliser :"},
+    "fd.addonNone": {"en": "Add-on found nothing. Try the next search below.", "de": "Add-on hat nichts gefunden. Nächste Suche unten versuchen.", "fr": "Le module n'a rien trouvé. Essayez la recherche suivante ci-dessous."},
+    "fd.addonNoneSite": {"en": "Add-on found nothing. A solution might be in:", "de": "Add-on hat nichts gefunden. Eine Lösung könnte hier sein:", "fr": "Le module n'a rien trouvé. Une solution pourrait se trouver ici :"},
     "fd.quickNone": {"en": "Nothing found automatically. A solution might be in:", "de": "Automatisch nichts gefunden. Eine Lösung könnte hier sein:", "fr": "Rien trouvé automatiquement. Une solution pourrait se trouver ici :"},
     "fd.histWarm": {"en": "Add-on searching", "de": "Add-on sucht", "fr": "Module en recherche"},
     "fd.histBusyHist": {"en": "History and bookmarks search is running...", "de": "Verlauf- und Lesezeichen-Suche läuft...", "fr": "La recherche historique et favoris est en cours..."},
@@ -2212,7 +2215,7 @@
     "fd.coNext": {"en": "Next: Firefox -> ⋯ (3 dots) -> History -> search icon -> Paste -> copy the job ad -> paste it in the box below.", "de": "Weiter: Firefox -> ⋯ (3 Punkte) -> Verlauf -> Suchsymbol -> Einfügen -> Stelleninserat kopieren -> unten ins Feld einfügen.", "fr": "Ensuite : Firefox -> ⋯ (3 points) -> Historique -> icône de recherche -> Coller -> copiez l'annonce -> collez-la dans le champ ci-dessous."},
     "fd.coPasted": {"en": "That is the company name. Search Firefox History with it, copy the job ad, then paste the job ad here.", "de": "Das ist der Firmenname. Damit im Firefox-Verlauf suchen, das Stelleninserat kopieren und hier einfügen.", "fr": "C'est le nom de l'entreprise. Cherchez-le dans l'historique de Firefox, copiez l'annonce, puis collez-la ici."},
     "fd.handH": {"en": "Search Firefox History by hand:", "de": "Firefox-Verlauf von Hand durchsuchen:", "fr": "Chercher à la main dans l'historique de Firefox :"},
-    "fd.hand2": {"en": "Firefox -> ⋯ (3 dots) -> History -> search icon -> paste into Firefox's search box", "de": "Firefox -> ⋯ (3 Punkte) -> Verlauf -> Suchsymbol -> in das Firefox-Suchfeld einfügen", "fr": "Firefox -> ⋯ (3 points) -> Historique -> icône de recherche -> collez dans le champ de recherche de Firefox"},
+    "fd.hand2": {"en": "Firefox -> ⋯ (3 dots) -> History -> search icon -> paste into Firefox's search box -> tap the keyboard's blue arrow (the keyboard closes) -> long titles: turn the phone sideways", "de": "Firefox -> ⋯ (3 Punkte) -> Verlauf -> Suchsymbol -> in das Firefox-Suchfeld einfügen -> blauen Pfeil der Tastatur antippen (Tastatur schliesst) -> lange Titel: Handy quer drehen", "fr": "Firefox -> ⋯ (3 points) -> Historique -> icône de recherche -> collez dans le champ de recherche de Firefox -> touchez la flèche bleue du clavier (le clavier se ferme) -> titres longs : tournez le téléphone"},
     "fd.hand3": {"en": "Press and hold the job ad -> Share -> Copy", "de": "Stelleninserat gedrückt halten -> Teilen -> Kopieren", "fr": "Appuyez longuement sur l'annonce -> Partager -> Copier"},
     "fd.hand4": {"en": "Back in JobTrack, paste into the Ctrl+V here box below", "de": "Zurück in JobTrack, unten in das Feld Ctrl+V hier einfügen", "fr": "De retour dans JobTrack, collez dans le champ Ctrl+V ici ci-dessous"},
     "fd.copyCompany": {

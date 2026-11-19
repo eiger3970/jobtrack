@@ -161,7 +161,8 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
   const tappedIn32 = useRef(false)   // 2026-11-09 owner: a card the auto-search completes by itself must stay at 1.2 on the phone - only a tap inside 1.2 (e.g. Use this address) moves on to 1.3
   const wasReady = useRef({ id: a.id, ready: readyForForm })   // same card only: picking another job must not jump to the choice
   useEffect(() => {
-    if (wasReady.current.id === a.id && !wasReady.current.ready && readyForForm && !cleanupOnly && (mobile ? tappedIn32.current : !fillReady)) setTimeout(() => (mobile ? document.getElementById('jr-step3') : document.querySelector('.orp-entry-choice'))?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150)   // phone: no choice, the next step is 3.3 itself
+    const justFilled = Date.now() - ((window as unknown as { __jrHold?: number }).__jrHold ?? 0) < 15000   // 2026-11-19 owner: after Fill the form copy stays in view to study
+    if (!justFilled && wasReady.current.id === a.id && !wasReady.current.ready && readyForForm && !cleanupOnly && (mobile ? tappedIn32.current : !fillReady)) setTimeout(() => (mobile ? document.getElementById('jr-step3') : document.querySelector('.orp-entry-choice'))?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150)   // phone: no choice, the next step is 3.3 itself
     wasReady.current = { id: a.id, ready: readyForForm }
   }, [readyForForm, a.id]) // eslint-disable-line react-hooks/exhaustive-deps
   const hasGap = (r: Application) => !r.jobroomDone && jobRoomMissing(jobRoomEntry(r)).length > 0   // red squares only, so the count matches what the user sees
@@ -263,7 +264,8 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
         <span className="jr-leg"><span className="jr-lg done" />{t('jr.leg.done')}</span>
         <span className="jr-leg"><span className="jr-lg todo" />{t('jr.leg.todo')}</span>
         <span className="jr-leg"><span className="jr-lg need" />{t('jr.leg.need')}</span>
-        {foundIds.length > 0 && <span className="jr-leg"><span className="jr-lg-found">✓</span>{t('jr.leg.found')}</span>}
+        {/* 2026-11-19 owner (phone): the squares jumped down when this line appeared - its place is kept from the start, it only fades in */}
+        <span className={'jr-leg jr-leg-found' + (foundIds.length > 0 ? ' on' : '')} aria-hidden={foundIds.length === 0}><span className="jr-lg-found">✓</span>{t('jr.leg.found')}</span>
       </p>
       <div className="jr-dots" role="tablist">
         <svg className="jr-tapme" viewBox="0 0 24 24" width="26" height="26" role="img" aria-label={t('jr.flow2')}><path fill="#00ff41" d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.69-5.1c.01-.07.02-.13.02-.2 0-.62-.38-1.16-.91-1.38z" /></svg>
