@@ -2013,6 +2013,15 @@
       "de": "Weitere Angaben (optional)",
       "fr": "Ajouter des infos (facultatif)"
     },
+    "fd.mailTwin": {"en": "Same company, your application of {date}:", "de": "Gleiches Unternehmen, Ihre Bewerbung vom {date}:", "fr": "Même entreprise, votre candidature du {date} :"},
+    "fd.mailTwinUse": {"en": "Use", "de": "Verwenden:", "fr": "Utiliser"},
+    "fd.justFilled": {"en": "Just filled - check:", "de": "Gerade ausgefüllt - prüfen:", "fr": "Vient d'être rempli - vérifiez :"},
+    "fd.undo": {"en": "Undo", "de": "Rückgängig", "fr": "Annuler"},
+    "jr.newTag": {"en": "new", "de": "neu", "fr": "nouveau"},
+    "fd.mailMany": {"en": "Too many emails? Add the job title:", "de": "Zu viele E-Mails? Stellentitel dazunehmen:", "fr": "Trop d'e-mails ? Ajoutez le titre du poste :"},
+    "fd.mailProtonRole": {"en": "Proton: + {role}", "de": "Proton: + {role}", "fr": "Proton : + {role}"},
+    "fd.mailGmailRole": {"en": "Gmail: + {role}", "de": "Gmail: + {role}", "fr": "Gmail : + {role}"},
+    "fd.copyRole": {"en": "Copy job title", "de": "Stellentitel kopieren", "fr": "Copier le titre du poste"},
     "fd.twinH": {"en": "Same company search", "de": "Suche beim gleichen Unternehmen", "fr": "Recherche du même employeur"},
     "fd.mailH": {"en": "Email search", "de": "E-Mail-Suche", "fr": "Recherche dans les e-mails"},
     "fd.siteH": {"en": "Company website search", "de": "Suche auf der Firmen-Website", "fr": "Recherche sur le site de l'entreprise"},
@@ -2086,9 +2095,9 @@
       "fr": "Le plus facile (effort pour trouver les infos manquantes de la candidature)"
     },
     "fd.flowMail": {
-      "en": "Look near {date}. Copy the email address (or the job link), then paste:",
-      "de": "Um {date} suchen. E-Mail-Adresse (oder Stellenlink) kopieren, dann einfügen:",
-      "fr": "Chercher vers le {date}. Copier l'adresse e-mail (ou le lien de l'offre), puis coller :"
+      "en": "Open the company's first reply after {date}. Copy the sender's name and email address (or the job link), then paste:",
+      "de": "Die erste Antwort des Unternehmens nach dem {date} öffnen. Name und E-Mail-Adresse des Absenders (oder Stellenlink) kopieren, dann einfügen:",
+      "fr": "Ouvrir la première réponse de l'entreprise après le {date}. Copier le nom et l'adresse e-mail de l'expéditeur (ou le lien de l'offre), puis coller :"
     },
     "fd.linkH": {"en": "History and bookmarks search", "de": "Verlauf- und Lesezeichen-Suche", "fr": "Recherche historique et favoris"},
     "fd.linkHist": {"en": "Computer -> JobTrack -> tap {copy} -> Firefox -> press Ctrl+H -> tap Search history -> press Ctrl+V -> scroll to {date} -> press and hold the job ad result -> tap Copy Link.", "de": "Computer -> JobTrack -> {copy} antippen -> Firefox -> Strg+H drücken -> Verlauf durchsuchen antippen -> Strg+V drücken -> zu {date} scrollen -> Ergebnis der Stellenanzeige gedrückt halten -> Link kopieren antippen.", "fr": "Ordinateur -> JobTrack -> touchez {copy} -> Firefox -> appuyez sur Ctrl+H -> touchez Rechercher dans l'historique -> appuyez sur Ctrl+V -> défilez jusqu'au {date} -> maintenez le résultat de l'offre -> touchez Copier le lien."},
@@ -2158,6 +2167,7 @@
     "jr.fillAllNone": {"en": "Nothing found: try Email search", "de": "Nichts gefunden: E-Mail-Suche versuchen", "fr": "Rien trouvé : essayez la recherche dans les e-mails"},
     "jr.fillAllPaste": {"en": "Paste the email or link you found", "de": "Gefundene E-Mail oder Link einfügen", "fr": "Collez l'e-mail ou le lien trouvé"},
     "jr.fillAllLink": {"en": "job link", "de": "Link zur Stelle", "fr": "lien de l'offre"},
+    "jr.leg.foundGo": {"en": "{n} found by Batch search: review and fill", "de": "{n} von der Sammelsuche gefunden: ansehen und ausfüllen", "fr": "{n} trouvé(s) par la recherche groupée : vérifier et remplir"},
     "jr.leg.found": {"en": "found by Batch search", "de": "von der Sammelsuche gefunden", "fr": "trouvé par la recherche groupée"},
     "fd.mailAppProton": {"en": "Proton Mail app", "de": "Proton-Mail-App", "fr": "App Proton Mail"},
     "fd.mailAppGmail": {"en": "Gmail app", "de": "Gmail-App", "fr": "App Gmail"},
@@ -2170,6 +2180,7 @@
     "jr.fillAllNote": {"en": "Only empty fields are filled.\nUntick a job to skip it.", "de": "Nur leere Felder werden ausgefüllt.\nHaken entfernen, um eine Stelle auszulassen.", "fr": "Seuls les champs vides sont remplis.\nDécochez une offre pour la sauter."},
     "fd.quickUse": {"en": "Use:", "de": "Übernehmen:", "fr": "Utiliser :"},
     "fd.addonNone": {"en": "Add-on found nothing. Try the next search below.", "de": "Add-on hat nichts gefunden. Nächste Suche unten versuchen.", "fr": "Le module n'a rien trouvé. Essayez la recherche suivante ci-dessous."},
+    "fd.addonNoneOpen": {"en": "Add-on found nothing. {h} is open below.", "de": "Add-on hat nichts gefunden. {h} ist unten geöffnet.", "fr": "Le module n'a rien trouvé. {h} est ouvert ci-dessous."},
     "fd.addonNoneSite": {"en": "Add-on found nothing. A solution might be in:", "de": "Add-on hat nichts gefunden. Eine Lösung könnte hier sein:", "fr": "Le module n'a rien trouvé. Une solution pourrait se trouver ici :"},
     "fd.quickNone": {"en": "Nothing found automatically. A solution might be in:", "de": "Automatisch nichts gefunden. Eine Lösung könnte hier sein:", "fr": "Rien trouvé automatiquement. Une solution pourrait se trouver ici :"},
     "fd.histWarm": {"en": "Add-on searching", "de": "Add-on sucht", "fr": "Module en recherche"},
@@ -2215,7 +2226,7 @@
     "fd.coNext": {"en": "Next: Firefox -> ⋯ (3 dots) -> History -> search icon -> Paste -> copy the job ad -> paste it in the box below.", "de": "Weiter: Firefox -> ⋯ (3 Punkte) -> Verlauf -> Suchsymbol -> Einfügen -> Stelleninserat kopieren -> unten ins Feld einfügen.", "fr": "Ensuite : Firefox -> ⋯ (3 points) -> Historique -> icône de recherche -> Coller -> copiez l'annonce -> collez-la dans le champ ci-dessous."},
     "fd.coPasted": {"en": "That is the company name. Search Firefox History with it, copy the job ad, then paste the job ad here.", "de": "Das ist der Firmenname. Damit im Firefox-Verlauf suchen, das Stelleninserat kopieren und hier einfügen.", "fr": "C'est le nom de l'entreprise. Cherchez-le dans l'historique de Firefox, copiez l'annonce, puis collez-la ici."},
     "fd.handH": {"en": "Search Firefox History by hand:", "de": "Firefox-Verlauf von Hand durchsuchen:", "fr": "Chercher à la main dans l'historique de Firefox :"},
-    "fd.hand2": {"en": "Firefox -> ⋯ (3 dots) -> History -> search icon -> paste into Firefox's search box -> tap the keyboard's blue arrow (the keyboard closes) -> long titles: turn the phone sideways", "de": "Firefox -> ⋯ (3 Punkte) -> Verlauf -> Suchsymbol -> in das Firefox-Suchfeld einfügen -> blauen Pfeil der Tastatur antippen (Tastatur schliesst) -> lange Titel: Handy quer drehen", "fr": "Firefox -> ⋯ (3 points) -> Historique -> icône de recherche -> collez dans le champ de recherche de Firefox -> touchez la flèche bleue du clavier (le clavier se ferme) -> titres longs : tournez le téléphone"},
+    "fd.hand2": {"en": "Firefox -> ⋯ (3 dots) -> History -> search icon -> paste into Firefox's search box -> tap X or the keyboard's blue arrow (the keyboard closes) -> long titles: turn the phone sideways", "de": "Firefox -> ⋯ (3 Punkte) -> Verlauf -> Suchsymbol -> in das Firefox-Suchfeld einfügen -> X oder blauen Pfeil der Tastatur antippen (Tastatur schliesst) -> lange Titel: Handy quer drehen", "fr": "Firefox -> ⋯ (3 points) -> Historique -> icône de recherche -> collez dans le champ de recherche de Firefox -> touchez X ou la flèche bleue du clavier (le clavier se ferme) -> titres longs : tournez le téléphone"},
     "fd.hand3": {"en": "Press and hold the job ad -> Share -> Copy", "de": "Stelleninserat gedrückt halten -> Teilen -> Kopieren", "fr": "Appuyez longuement sur l'annonce -> Partager -> Copier"},
     "fd.hand4": {"en": "Back in JobTrack, paste into the Ctrl+V here box below", "de": "Zurück in JobTrack, unten in das Feld Ctrl+V hier einfügen", "fr": "De retour dans JobTrack, collez dans le champ Ctrl+V ici ci-dessous"},
     "fd.copyCompany": {

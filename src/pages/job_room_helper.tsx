@@ -1,9 +1,10 @@
 import FillRate from './fill_rate'
-import FindDetails, { MissingDetailsKey, MailAppBtns, phoneLike } from './find_details'
+import FindDetails, { MissingDetailsKey, MailAppBtns, phoneLike, mailName } from './find_details'
 import { prefetchQuick, quickResult, onQuickDone, quickHit, quickPatch } from '../lib/ai_find'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { swissDate, type Application, JR_METHOD, jobRoomEntry, jobRoomMissing, looksWrong } from '../lib/orp'
 import { fillPayload, FILL_KEY } from '../lib/jobroom_fill'
+import { rememberSeen, newlyFilled } from '../lib/jr_seen'
 import { useProKey, buyPro } from '../lib/pro'
 import { isApp } from '../lib/platform'
 import { PRO_KEY, PRO_USD, PRO_SCOPE } from './job_track_pro'
@@ -57,6 +58,7 @@ export default function JobRoomHelper(props: JobRoomHelperProps) {
 }
 
 function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup, cleanupOnly = false, mobile = false, manual = false, fillChoice, fillNext, fillReady = true }: JobRoomHelperProps) {
+  rows.forEach(r => rememberSeen(r.id, jobRoomEntry(r)))   // 2026-11-19: the before-picture, to mark what gets filled now
   const firstMissing = rows.findIndex(a => !a.jobroomDone && jobRoomMissing(jobRoomEntry(a)).length > 0)
   const firstAmber = rows.findIndex(a => !a.jobroomDone && jobRoomMissing(jobRoomEntry(a)).length === 0)
   const nextSquare = firstMissing >= 0 ? firstMissing : firstAmber
@@ -100,7 +102,7 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
   const fillAllBox = <div className="jr-fillall">
         {finds.some(f => f.hit) && <p className="jr-fillall-h">{t('jr.fillAllH')}</p>}
         {/* 2026-11-17 owner: "Fill all is too hidden with the long list" - the button sits on top, under the heading */}
-        {fillable.length > 0 && <button type="button" className="btn btn-glow jr-fillall-btn" onClick={fillAll}>{t('jr.fillAllBtn').replace('{n}', String(fillable.length))}</button>}
+        {fillable.length > 0 && <button type="button" className="btn btn-glow jr-fillall-btn jt-guidance-glow" onClick={fillAll}>{t('jr.fillAllBtn').replace('{n}', String(fillable.length))}</button>}
         {fillable.length > 0 && <p className="jr-fillall-note">{t('jr.fillAllNote')}</p>}
         {finds.map(f => <div key={f.r.id} className="jr-fillall-row">
           <span className="jr-fillall-n">{f.n + 1}</span>
@@ -109,9 +111,9 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
               : <>
                 {/* 2026-11-17 owner: email stays manual - but from this one list: search links per job + paste the found email or link here */}
                 <span className="jr-fillall-none">{t('jr.fillAllNone')}</span>
-                {phoneLike() ? <MailAppBtns company={f.r.company} t={t} /> : <span className="jr-fillall-mail">
-                  <a className="fd-lnk" href={`https://mail.proton.me/u/0/all-mail#keyword=${encodeURIComponent(f.r.company)}`} target="_blank" rel="noopener noreferrer">{t('jr.mailProton')}</a>
-                  <a className="fd-lnk" href={`https://mail.google.com/mail/u/0/#search/${encodeURIComponent(f.r.company)}`} target="_blank" rel="noopener noreferrer">{t('jr.mailGmail')}</a>
+                {phoneLike() ? <MailAppBtns company={mailName(f.r.company)} t={t} /> : <span className="jr-fillall-mail">
+                  <a className="fd-lnk" href={`https://mail.proton.me/u/0/all-mail#keyword=${encodeURIComponent(mailName(f.r.company))}`} target="_blank" rel="noopener noreferrer">{t('jr.mailProton')}</a>
+                  <a className="fd-lnk" href={`https://mail.google.com/mail/u/0/#search/${encodeURIComponent(mailName(f.r.company))}`} target="_blank" rel="noopener noreferrer">{t('jr.mailGmail')}</a>
                 </span>}
                 <input className="jr-fillall-paste" type="text" inputMode="email" placeholder={t('jr.fillAllPaste')} aria-label={t('jr.fillAllPaste') + ' - ' + f.r.company}
                   onPaste={x => { const v = x.clipboardData.getData('text').trim(); if (v) { x.preventDefault(); x.currentTarget.value = v; pasteFound(f.r, v) } }}
@@ -127,6 +129,7 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const previewFields = aiPreview?.id === a.id ? Object.fromEntries(Object.entries(aiPreview.patch).filter(([key]) => !(a as unknown as Record<string, unknown>)[key])) : {}
   const e = jobRoomEntry({ ...a, ...previewFields })
+  const newKeys: string[] = newlyFilled(a.id, storedEntry)
   const missing = jobRoomMissing(storedEntry)
   // the card on screen is what Job-Room fill (on Job-Room) picks up
   // 2026-10-19 owner: auto fill is the paid tier (US$5 once), 1 free job as a trial; the fill window checks the trial on the server
@@ -189,8 +192,8 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
 
   // a text value: shown with Copy; empty -> an input right here (amber if Job-Room needs it)
   const Val = ({ k, label, field, value, required = false }: { k: string; label: string; field?: keyof Application; value: string; required?: boolean }) => (
-    <div className={'jr-row' + (!value && required ? ' jr-need' : '') + (field && looksWrong(field, value) ? ' jr-odd' : '')}>
-      <span className="jr-label">{label}{field && looksWrong(field, value) && <span className="jr-odd-tag">{t('jr.odd')}</span>}</span>
+    <div className={'jr-row' + (!value && required ? ' jr-need' : '') + (field && looksWrong(field, value) ? ' jr-odd' : '') + (value && field && newKeys.includes(field) ? ' jr-new' : '')}>
+      <span className="jr-label">{label}{value && field && newKeys.includes(field) && <span className="jr-new-tag">{t('jr.newTag')}</span>}{field && looksWrong(field, value) && <span className="jr-odd-tag">{t('jr.odd')}</span>}</span>
       {value && field && editKey === k
         ? <input className="jr-input" autoFocus defaultValue={value}
             onKeyDown={ev => { if (ev.key === 'Enter') (ev.target as HTMLInputElement).blur() }}
@@ -265,7 +268,10 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
         <span className="jr-leg"><span className="jr-lg todo" />{t('jr.leg.todo')}</span>
         <span className="jr-leg"><span className="jr-lg need" />{t('jr.leg.need')}</span>
         {/* 2026-11-19 owner (phone): the squares jumped down when this line appeared - its place is kept from the start, it only fades in */}
-        <span className={'jr-leg jr-leg-found' + (foundIds.length > 0 ? ' on' : '')} aria-hidden={foundIds.length === 0}><span className="jr-lg-found">✓</span>{t('jr.leg.found')}</span>
+        {/* 2026-11-19 owner: "How will the user know to open Batch search to tap Fill all?" - the found line is the button: it opens Batch search */}
+        {fillable.length > 0
+          ? <button type="button" className="jr-leg jr-leg-found on jr-leg-go jt-guidance-glow" onClick={() => window.dispatchEvent(new Event('jr-open-batch'))}><span className="jr-lg-found">✓</span>{t('jr.leg.foundGo').replace('{n}', String(fillable.length))}</button>
+          : <span className={'jr-leg jr-leg-found' + (foundIds.length > 0 ? ' on' : '')} aria-hidden={foundIds.length === 0}><span className="jr-lg-found">✓</span>{t('jr.leg.found')}</span>}
       </p>
       <div className="jr-dots" role="tablist">
         <svg className="jr-tapme" viewBox="0 0 24 24" width="26" height="26" role="img" aria-label={t('jr.flow2')}><path fill="#00ff41" d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.69-5.1c.01-.07.02-.13.02-.2 0-.62-.38-1.16-.91-1.38z" /></svg>

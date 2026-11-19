@@ -8,6 +8,7 @@ import { isApp } from '../lib/platform'
 import { PRO_KEY } from './job_track_pro'
 import { aiFind, quickFindCached, quickHit, quickPatch, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
 import { useHoverInfo } from '../lib/hover_info'
+import { newlyFilled } from '../lib/jr_seen'
 
 type AiState = 'idle' | 'busy' | 'result' | 'used' | 'cap' | 'none' | 'err'
 
@@ -24,7 +25,7 @@ const FIELDS: { k: string; label: string; needed?: boolean }[] = [
 ]
 
 // 2026-11-03 owner: under the 3.2 header, list what Job-Room insists on and this job still lacks - amber until found, then green with the answer
-const REQUIRED_LABEL: Record<string, string> = { date: 'Date', business: 'Business', postal: 'Postal code', city: 'City', jobTitle: 'Job title', email: 'Email or link' }
+const REQUIRED_LABEL: Record<string, string> = { date: 'Date', business: 'Business', postal: 'Postal code', city: 'City', jobTitle: 'Job title', email: 'Email or link (one is enough)' }   // 2026-11-19 owner: keep people from hunting for both
 // 2026-11-05 owner: the Firefox version in steps 1 and 2 is a link that shows how to find your version
 // 2026-11-06 owner: each step list sits behind three small buttons (Text, Screenshots, Video); the choice opens in a window over the page
 type GuideKind = 'images' | 'text' | 'video'
@@ -330,6 +331,12 @@ function cleanJobLink(url: string): string {
   try { const u = new URL(url); for (const k of [...u.searchParams.keys()]) if (/^utm_/i.test(k) || k === 'applySourceOverride') u.searchParams.delete(k); return u.toString() } catch { return url }
 }
 
+// 2026-11-19 owner: "My Leukerbad AG" found nothing in Proton - the emails say "Leukerbad". Mail search uses the name without
+// legal forms (AG, SA, GmbH...) and short filler words (My, de, la...): the distinctive words a mail header or signature carries.
+export const mailName = (company: string) => {
+  const w = company.replace(/\(.*?\)/g, ' ').replace(/\b(AG|SA|S\.A\.|Sàrl|SARL|Sarl|GmbH|Ltd|Inc|KG|Co|Cie|Holding|Group|Groupe)\b\.?/gi, ' ').split(/\s+/).filter(x => x.replace(/[^\p{L}\p{N}]/gu, '').length > 2)
+  return (w.join(' ') || company).trim()
+}
 const norm = (x: string) => x.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '')
 
 // 2026-11-04 owner: only the words "AI search failed" are amber, the reason and details stay grey
@@ -338,6 +345,7 @@ function amberLead(s: string) {
   return m ? <><span className="fd-failword">{m[1]}</span>{m[2]}</> : <>{s}</>
 }
 const addonClock = new Map<string | number, number>()   // 2026-11-19: the 8 s add-on picture per job survives the panel being rebuilt mid-search
+let batchAutoOpened = false   // Batch search opened by itself once per page visit
 let histLastPost = 0   // 2026-11-07 owner: two Allow tabs opened - automatic history searches (also from a second open job card) are sent at most once every 8 s
 function postHistoryOnce(msg: Record<string, unknown>): boolean {
   if (Date.now() - histLastPost < 8000) return false
@@ -352,6 +360,8 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   const buyLive = useBuyCreditsLive()
   const ev = e as unknown as Rec
   const twin = (allApps ?? []).find(o => o.id !== a.id && norm(o.company) === norm(a.company) && o.postal && o.city)
+  // 2026-11-19 owner: "a user may not remember the same company already has an email - will the page remember?" - offered, one tap, never filled by itself (departments differ)
+  const mailTwin = (allApps ?? []).find(o => o.id !== a.id && norm(o.company) === norm(a.company) && !!o.email)
   const adWorkLocation = a.adText ? parseAd(a.adText).address : ''
   const needAddr = !e.postal || !e.city || (!e.street && !a.addrUnknown)
   const [open, setOpen] = useState(true)
@@ -489,7 +499,21 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   }, [autoSearch, needsLink]) // eslint-disable-line react-hooks/exhaustive-deps
   const searchHistory = () => { startAddonShow(); setSiteFind(null); setSuggest(''); setHist({ state: 'busy', src: 'history', results: [] }); window.postMessage({ source: 'kworld-page', type: 'history', company: a.company, role: a.role, date: a.date }, window.location.origin) }
   const histBoxRef = useRef<HTMLDivElement>(null)
-  useEffect(() => { if (histPerm) { setOpenOpt('link'); setUserOpt(true) } }, [histPerm])   // 2026-11-07 owner: History search opens at the permission note
+  useEffect(() => { if (histPerm) { setOpenOpt('link'); setUserOpt(true) } }, [histPerm])
+  // 2026-11-19: the "N found by Batch search" button under the squares opens Batch search here, where Fill all sits on top
+  useEffect(() => {
+    const on = () => { setOpenOpt('batch'); setUserOpt(true); setTimeout(() => document.querySelector('.fd-opt.on')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80) }
+    window.addEventListener('jr-open-batch', on)
+    return () => window.removeEventListener('jr-open-batch', on)
+  }, [])
+  // 2026-11-19 owner: "take the user automatically to Batch search open, Fill all pulsing" - only while no square was tapped
+  // (a tapped square runs its own AI + add-on search; jumping away from it would lose the person). Once per visit.
+  useEffect(() => {
+    if (!batch?.done || !batch.count || autoSearch || userOpt || batchAutoOpened) return
+    batchAutoOpened = true
+    setOpenOpt('batch'); setUserOpt(true)
+    setTimeout(() => document.querySelector('.fd-opt.on')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300)
+  }, [batch?.done, batch?.count, autoSearch]) // eslint-disable-line react-hooks/exhaustive-deps   // 2026-11-07 owner: History search opens at the permission note
   // 2026-11-07 owner: closing the Allow tab opened another one. Now the add-on says 'granted' once the permission is really given, and only then the search reruns.
   useEffect(() => {
     const on = (ev: MessageEvent) => {
@@ -501,7 +525,10 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     window.addEventListener('message', on)
     return () => window.removeEventListener('message', on)
   }, [])
-  useEffect(() => { if (!hist.results.length && !hist.email) return; const id = window.setTimeout(() => (histBoxRef.current && !histBoxRef.current.closest('.fd-body')) && histBoxRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' }), 250); return () => window.clearTimeout(id) }, [hist.results.length, hist.email])   // 2026-11-07 owner: a found link collapses the option list and shows at the top of the window - scroll there once the layout has settled
+  useEffect(() => { if (!hist.results.length && !hist.email) return
+    // 2026-11-19 owner: "Use this job is hidden at the bottom, cut off flat" - the answer unfolds over 0.9 s: check again once it is full height
+    const go = () => (histBoxRef.current && !histBoxRef.current.closest('.fd-body')) && histBoxRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    const ids = [250, 1050].map(ms => window.setTimeout(go, ms)); return () => ids.forEach(x => window.clearTimeout(x)) }, [hist.results.length, hist.email])   // 2026-11-07 owner: a found link collapses the option list and shows at the top of the window - scroll there once the layout has settled
   const [reqKeys] = useState(() => jobRoomMissing(e))   // what was missing when this job was opened: stays listed (green) once found
   const [ad, setAd] = useState('')
   const [ad2, setAd2] = useState('')
@@ -531,6 +558,17 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   useEffect(() => { if (hist.results.length > 0 || hist.email) setShowOthers(true) }, [hist.results.length, hist.email])   // 2026-11-04 owner: a free-search answer can be wrong - the other searches stay visible under it
   useEffect(() => { if (aiFail && !hist.results.length && !hist.email && !histKeep.current.length) { setOpenOpt(o => o === '' ? 'mail' : o); if (mobile) setShowOthers(true) } }, [aiFail])   // a result is already on screen (e.g. from the browser history): the email search stays folded   // 2026-11-04 owner: AI failed -> next in order is the email search (least brain power), then browser bookmarks, then web search
   const [userOpt, setUserOpt] = useState(false)
+  // 2026-11-19 owner: "Email search is already open, but not scrolled up" - an option opened by itself (AI failed -> Email search)
+  // comes to the top once the add-on picture and search are over, so its paste box is in view. Once per opened option.
+  const autoScrolled = useRef('')
+  useEffect(() => {
+    if (!openOpt || addonShowing || (hist.state === 'busy' && hist.src === 'history') || autoScrolled.current === openOpt) return
+    autoScrolled.current = openOpt
+    // 2026-11-19 owner: square 29 - the add-on found the job link, then the jump to Email search hid "Use this job link". An answer stays in view.
+    if (hist.results.length || hist.email || siteFind) return
+    const go = () => document.querySelector('.fd-opt.on')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setTimeout(go, 120); setTimeout(go, 900)
+  }, [openOpt, addonShowing, hist.state]) // eslint-disable-line react-hooks/exhaustive-deps
   const toggle = (id: string) => {
     setUserOpt(true)
     if (id === 'ai' && (autoSearch || trialUsed || ai !== 'idle')) return
@@ -707,7 +745,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
         {hist.state === 'done' && !hist.results.length && !siteFind && suggest && <div className="fd-hslot fd-hslot-in">
           {/* 2026-11-19 owner: say that the ADD-ON found nothing, and point DOWN the list (easiest to hardest): Email search sits above and was already tried, so the next one is Web search */}
           {(() => { const next = addon && suggest === 'mail' ? 'webs' : suggest; return <>
-          <span className="fd-t fd-found">{t(addon ? (next === 'site' ? 'fd.addonNoneSite' : 'fd.addonNone') : 'fd.quickNone')}</span>
+          <span className="fd-t fd-found">{addon && openOpt && openOpt !== 'link' ? t('fd.addonNoneOpen').replace('{h}', t(openOpt === 'mail' ? 'fd.mailH' : openOpt === 'batch' ? 'fd.batchH' : openOpt === 'site' ? 'fd.siteH' : 'fd.mailH')) : t(addon ? (next === 'site' ? 'fd.addonNoneSite' : 'fd.addonNone') : 'fd.quickNone')}</span>
           {openOpt !== next && next !== 'webs' && <button type="button" className="btn btn-glow fd-btn jt-guidance-glow" onClick={() => { setOpenOpt(next); setUserOpt(true) }}>{t(next === 'site' ? 'fd.siteH' : 'fd.mailH')}</button>}
           </> })()}{/* 2026-11-19 owner: once tapped, the same search is open below - a second Email search button is noise */}
         </div>}
@@ -755,6 +793,19 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
 
 
       {needsLink && (hist.results.length > 0 || mobile) && !inOpt && <details className="fd-fold fd-others" open={showOthers} onToggle={x => { const d = x.currentTarget as HTMLDetailsElement; setShowOthers(d.open); if (!d.open) requestAnimationFrame(() => d.scrollIntoView({ block: 'nearest' })) }}><summary>{t('fd.othersShow')}</summary></details>}
+      {/* 2026-11-19 owner: "not reviewing the results, just accepting them" - every detail filled on this visit, at the top, one glance + Undo */}
+      {(() => { const nk = newlyFilled(a.id, e); return nk.length > 0 && <div className="fd-justfilled" role="status">
+        <b className="fd-justfilled-h">{t('fd.justFilled')}</b>
+        {nk.map(k => <div key={k} className="fd-justfilled-row">
+          <span className="fd-justfilled-k">{FIELDS.find(f => f.k === k)?.label ?? k}</span>
+          <span className="fd-justfilled-v">{String((e as unknown as Record<string, unknown>)[k] ?? '')}</span>
+          <button type="button" className="btn-secondary fd-justfilled-undo" onClick={() => onUpdate(a.id, (k === 'link' ? { link: '', linkFrom: undefined } : { [k]: '' }) as Patch)}>{t('fd.undo')}</button>
+        </div>)}
+      </div> })()}
+      {mailTwin && !e.email && jobRoomMissing(e).includes('email') && <div className="fd-mailtwin">
+        <span className="fd-t">{t('fd.mailTwin').replace('{date}', swissDate(mailTwin.date))}</span>
+        <button type="button" className="btn btn-glow fd-btn jt-guidance-glow fd-one-line" onClick={() => onUpdate(a.id, { email: mailTwin.email } as Patch)}>{t('fd.mailTwinUse')} {mailTwin.email}</button>
+      </div>}
       <ol className="fd-list" hidden={needsLink && (hist.results.length > 0 || mobile) && !showOthers && !inOpt}>
         <li hidden={emailOnly || (!!method && method !== 'ai')}>
           <div className="fd-ai-header">
@@ -801,7 +852,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
         <li className="fd-guidance fd-guidance-row" hidden={!!method}><span>{t('fd.scoreL2')}</span><TapCount n={TAPS.twin} label={t('fd.tapsAria')} /><TapCount n={TAPS.ad} label={t('fd.tapsAria')} /></li>
         {/* 2026-11-17 owner: the batch fill as a search option, above Email search - all red squares at once */}
         {batch && <li hidden={!!method}>
-          <div className={'fd-opt' + (isOpen('batch') ? ' on' : batch.done && batch.count ? ' fd-batch-ready' : '')} role="button" tabIndex={0} aria-expanded={isOpen('batch')} onClick={() => toggle('batch')} onKeyDown={x => { if (x.key === 'Enter' || x.key === ' ') { x.preventDefault(); toggle('batch') } }}>
+          <div className={'fd-opt' + (isOpen('batch') ? ' on' : batch.done && batch.count ? ' fd-batch-ready jt-guidance-glow' : '')} role="button" tabIndex={0} aria-expanded={isOpen('batch')} onClick={() => toggle('batch')} onKeyDown={x => { if (x.key === 'Enter' || x.key === ' ') { x.preventDefault(); toggle('batch') } }}>
             <span className="fd-chev" aria-hidden="true">{isOpen('batch') ? '▾' : '▸'}</span>
             <b><TapCount n={1} label={t('fd.tapsAria')} /><span className="fd-opt-txt">{t('fd.batchH')}<small>{!batch.done ? t('fd.batchBusy') : batch.count ? t('fd.batchHint').replace('{n}', String(batch.count)) : t('fd.batchNone')}</small></span></b>
           </div>
@@ -812,14 +863,25 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
             <span className="fd-chev" aria-hidden="true">{isOpen('mail') ? '▾' : '▸'}</span>
             <b><TapCount n={TAPS.mail} label={t('fd.tapsAria')} /><span className="fd-opt-txt">{t('fd.mailH')}<small>{t('fd.mailHint')}</small></span></b>
           </div>
-          {isOpen('mail') && <div className="fd-body">{!failNoteTop && noteSlot(shortFail)}{inOpt && (foundHere || openOpt !== 'link') && resultBox}
-          {phoneLike() ? <MailAppBtns company={a.company} t={t} /> : <div className="fd-mailrow">
-            <a className={'fd-lnk' + (aiFail ? ' jt-guidance-glow' : '')} href={`https://mail.proton.me/u/0/all-mail#keyword=${q(a.company)}`} {...ext}>{t('jr.mailProton')}</a>
-            <a className={'fd-lnk' + (aiFail ? ' jt-guidance-glow' : '')} href={`https://mail.google.com/mail/u/0/#search/${q(a.company)}`} {...ext}>{t('jr.mailGmail')}</a>
-            <CopyBtn text={a.company} label={t('fd.mailOther')} t={t} />
+          {/* 2026-11-19 owner: "the Ctrl+V here box is hidden below" - mail buttons, step, paste box first; the AI/add-on notes and the narrower search under it */}
+          {isOpen('mail') && <div className="fd-body">
+
+          {phoneLike() ? <MailAppBtns company={mailName(a.company)} t={t} /> : <div className="fd-mailrow">
+            <a className={'fd-lnk' + (aiFail ? ' jt-guidance-glow' : '')} href={`https://mail.proton.me/u/0/all-mail#keyword=${q(mailName(a.company))}`} {...ext}>{t('jr.mailProton')}</a>
+            <a className={'fd-lnk' + (aiFail ? ' jt-guidance-glow' : '')} href={`https://mail.google.com/mail/u/0/#search/${q(mailName(a.company))}`} {...ext}>{t('jr.mailGmail')}</a>
+            <CopyBtn text={mailName(a.company)} label={t('fd.mailOther')} t={t} />
           </div>}
           <p className="fd-flow">{flow(t('fd.flowMail'), { date: <b className="fd-data">{date}</b> })}</p>
           {pasteBox(ad, setAd)}
+          {/* 2026-11-19 owner: Swissquote gave lots of emails; narrowing needed the job title, found by scrolling to the form copy. Now one tap here. */}
+          {a.role && (phoneLike()
+            ? <div className="fd-mailrow fd-mailrole"><span className="fd-t">{t('fd.mailMany')} <b>{a.role}</b></span><CopyBtn text={a.role} label={t('fd.copyRole')} t={t} /></div>
+            : <div className="fd-mailrow fd-mailrole"><span className="fd-t">{t('fd.mailMany')}</span>
+              <a className="fd-lnk" href={`https://mail.proton.me/u/0/all-mail#keyword=${q(mailName(a.company) + ' ' + a.role)}`} {...ext}>{t('fd.mailProtonRole').replace('{role}', a.role)}</a>
+              <a className="fd-lnk" href={`https://mail.google.com/mail/u/0/#search/${q(mailName(a.company) + ' ' + a.role)}`} {...ext}>{t('fd.mailGmailRole').replace('{role}', a.role)}</a>
+              <CopyBtn text={a.role} label={t('fd.copyRole')} t={t} />
+            </div>)}
+          {!failNoteTop && noteSlot(shortFail)}{inOpt && (foundHere || openOpt !== 'link') && resultBox}
           {jobRoomMissing(e).includes('email') && <button type="button" className="btn-secondary fd-btn" onClick={() => setOpenOpt('link')}>{t('fd.mailNext')}</button>}
           </div>}
         </li>

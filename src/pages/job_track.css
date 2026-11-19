@@ -1682,7 +1682,7 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 @keyframes fd-hscan-row { 0%, 30%, 100% { fill: #1c1a33; } 8%, 18% { fill: #0f3d22; } }
 @media (prefers-reduced-motion: reduce) { .fd-hscan-lens, .fd-hscan-row rect:first-child { animation: none; } }
 /* 2026-11-17 owner: add-on searching picture and the found link use one slot of the same height and crossfade - no jump */
-.fd-hslot { height: 79px; display: flex; flex-direction: column; justify-content: flex-start; }   /* = found label + link button, so the swap moves nothing */
+.fd-hslot { min-height: 79px; padding-bottom: 6px; display: flex; flex-direction: column; justify-content: flex-start; }   /* = found label + link button, so the swap moves nothing */   /* 2026-11-19 owner screenshot: a 2-line job title cut the button flat - min-height, grows with the answer */
 .fd-hslot .fd-warm { margin: 0; }
 .fd-hslot-in { animation: fd-hslot-in .5s ease both; }
 @keyframes fd-hslot-in { from { opacity: 0; } to { opacity: 1; } }
@@ -1737,3 +1737,17 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 @media (prefers-reduced-motion: reduce) { .jobtrack-page .fd .fd-fill-ad.jt-guidance-glow { animation: none; box-shadow: 0 0 10px rgba(0,255,65,.6); } }
 .fd-count { color: #00ff41; font-variant-numeric: tabular-nums; font-weight: 700; }   /* 2026-11-19 seconds left of the 8 s add-on search */
 .jr-leg-found { visibility: hidden; opacity: 0; transition: opacity .6s ease; } .jr-leg-found.on { visibility: visible; opacity: 1; }   /* 2026-11-19 space kept from the start: the squares never jump */
+.jr-leg-go { cursor: pointer; border: 1px solid #00ff41; border-radius: 8px; padding: .2rem .55rem; background: #0b0b16; color: #f0eeff; font: inherit; }   /* 2026-11-19 found line = button to Batch search */
+.fd-mailtwin { display: flex; flex-direction: column; gap: .4rem; margin: .6rem 0 1rem; }   /* 2026-11-19 same-company email, offered at the top */
+/* 2026-11-19 just-filled check box + "new" rows in the Job-Room form copy */
+.fd-justfilled { margin: .6rem 0 1rem; padding: .6rem .8rem; border: 1px solid #00ff41; border-radius: 10px; background: #07150c; }
+.fd-justfilled-h { display: block; color: #00ff41; margin-bottom: .3rem; }
+.fd-justfilled-row { display: grid; grid-template-columns: minmax(6rem, auto) 1fr auto; gap: .6rem; align-items: center; padding: .25rem 0; border-top: 1px solid #1c3a26; }
+.fd-justfilled-row:first-of-type { border-top: 0; }
+.fd-justfilled-k { color: #a0a0b0; font-size: .85rem; }
+.fd-justfilled-v { color: #f0eeff; overflow-wrap: anywhere; }
+.fd-justfilled-undo { padding: .25rem .6rem; font-size: .85rem; }
+.jr-row.jr-new { box-shadow: inset 3px 0 0 #00ff41; background: rgba(0,255,65,.06); }
+.jr-new-tag { margin-left: .4rem; padding: 0 .35rem; border-radius: 6px; background: #00ff41; color: #03020a; font-size: .7rem; font-weight: 800; text-transform: uppercase; }
+.fd-mailrole { margin-top: .4rem; flex-wrap: wrap; align-items: center; }   /* 2026-11-19 narrow the email search with the job title */
+.fd-hist-box { scroll-margin: 12px 0 24px; }   /* 2026-11-19 room under the found answer when it scrolls into view */
