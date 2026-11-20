@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef, createContext, useContext, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { swissDate, jobRoomMissing, isJobLink, type Application, type JobRoomEntry } from '../lib/orp'
+import { swissDate, jobRoomMissing, jobRoomEntry, isJobLink, type Application, type JobRoomEntry } from '../lib/orp'
 import { parseAd } from '../lib/ad_parse'
 import { useProKey } from '../lib/pro'
 import { PackList, openPacks, readPackToken } from '../lib/credit_packs'
 import { isApp } from '../lib/platform'
 import { PRO_KEY } from './job_track_pro'
-import { aiFind, quickFindCached, quickHit, quickPatch, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
+import { quickLimitHit, aiFind, quickFindCached, quickHit, quickPatch, aiTrialUsed, freeFindsCount, rankLocations, saveSuggestion, type Loc, useBuyCreditsLive } from '../lib/ai_find'
 import { useHoverInfo } from '../lib/hover_info'
 import { newlyFilled } from '../lib/jr_seen'
 
@@ -133,8 +133,9 @@ function HandSteps({ id, t, company, onCopied, onStep }: { id: string; t: (k: st
   }
   return <DoneCtx.Provider value={{ done }}>
     <ol ref={box} className="fd-flow fd-phone-steps fd-guide fd-segbox" onClick={e => { tap(e.target) }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && tap(e.target)) e.preventDefault() }}>
-      <li className={done.includes('h1') ? 'fd-done' : ''}><CopyBtn text={company} label={t('fd.copyCompany')} t={t} glow={!allDone && next === 1} onCopied={() => { onCopied(); setDone(d => d.includes('h1') ? d : [...d, 'h1']) }} /></li>
-      {keys.map((k, i) => <li key={k} className={!allDone && next === i + 2 ? 'jt-guidance-glow' : ''}><Segs id={k} text={t(k)} />{k === 'fd.hand2' && <><br /><span className="fd-side"><Segs id="ph2b" text={t('fd.ph2b')} /></span></>}</li>)}   {/* 2026-11-18 owner: the Bookmarks line from the old Text guide, under step 2 */}
+      {/* 2026-11-20 owner: a dimmed button looks switched off - the copy button stays bright (it can be tapped again), a tick says it was done */}
+      <li><CopyBtn text={company} label={t('fd.copyCompany')} t={t} glow={!allDone && next === 1} onCopied={() => { onCopied(); setDone(d => d.includes('h1') ? d : [...d, 'h1']) }} />{done.includes('h1') && <span className="fd-copied-tick" aria-label={t('fd.copied')}> ✓</span>}</li>
+      {keys.map(k => <li key={k}><Segs id={k} text={t(k)} />{k === 'fd.hand2' && <><br /><span className="fd-side"><Segs id="ph2b" text={t('fd.ph2b')} /></span></>}</li>)}   {/* 2026-11-18 owner: the Bookmarks line from the old Text guide, under step 2 */}
     </ol>
   </DoneCtx.Provider>
 }
@@ -291,12 +292,26 @@ export function InfoI({ text, left, children }: { text?: string; left?: boolean;
 // 2026-11-17 owner: on the phone the Proton/Gmail web search needs a login and the search is lost -
 // copy the company name and open the mail APP instead (already logged in), the owner pastes it into the app's search
 export const phoneLike = (): boolean => typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches
-export function MailAppBtns({ company, t }: { company: string; t: (k: string) => string }) {
+// the 4 steps in the mail app, each with its picture: copy (done) -> magnifier -> clipboard -> return key
+const MAIL_STEPS: [string, ReactNode][] = [
+  ['fd.mailAppCopy', <><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" /><path d="M11 14l2 2 4-4" /></>],
+  ['fd.mailAppSearch', <><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 21 21" /></>],
+  ['fd.mailAppPaste', <><rect x="5" y="5" width="14" height="16" rx="2" /><path d="M9 5V3h6v2M9 12h6M9 16h4" /></>],
+  ['fd.mailAppGo', <><path d="M20 5v7a3 3 0 0 1-3 3H5" /><path d="M9 11l-4 4 4 4" /></>],
+  // 2026-11-20 owner: the way back is part of the same line: replies after <date> -> copy the sender's email or job link -> paste here
+  ['fd.mailAppReplies', <><rect x="4" y="5" width="16" height="16" rx="2" /><path d="M4 10h16M9 3v4M15 3v4" /></>],
+  ['fd.mailAppCopyBack', <><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" /></>],
+  ['fd.mailAppPasteHere', <><path d="M12 4v14M6 12l6 6 6-6" /></>],
+]
+export function MailAppBtns({ company, t, onBack, date = '', between, compact = false, big = false }: { company: string; t: (k: string) => string; onBack?: () => void; date?: string; between?: ReactNode; compact?: boolean; big?: boolean }) {
   const [msg, setMsg] = useState('')
   const open = (scheme: string) => {
     navigator.clipboard?.writeText(company).catch(() => {})
     setMsg(t('fd.mailAppCopied'))
     let left = false
+    // 2026-11-20 owner: back from the mail app without the job (EPFL: emails only back to May) - the next search must be obvious
+    const onBackVis = () => { if (document.visibilityState === 'visible' && left) { document.removeEventListener('visibilitychange', onBackVis); onBack?.() } }
+    document.addEventListener('visibilitychange', onBackVis)
     const onHide = () => { if (document.visibilityState === 'hidden') left = true }
     document.addEventListener('visibilitychange', onHide)
     setTimeout(() => { document.removeEventListener('visibilitychange', onHide); if (!left) setMsg(t('fd.mailAppMissing')) }, 1800)
@@ -304,14 +319,22 @@ export function MailAppBtns({ company, t }: { company: string; t: (k: string) =>
   }
   return <span className="fd-mailapp">
     {/* 2026-11-17 owner: "needs to be clearly informed the search is copied and to tap search and paste" - said BEFORE the tap, the app covers anything shown after */}
-    <span className="fd-mailapp-how" aria-label={t('fd.mailAppHow').replace('{name}', company)}>
-      <span className="fd-how-step"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" /><path d="M11 14l2 2 4-4" /></svg>{t('fd.mailAppCopy')}</span>
-      <span className="fd-how-rest"><span className="fd-how-step"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 21 21" /></svg></span>
-      <span className="fd-how-arrow" aria-hidden="true">→</span>
-      <span className="fd-how-step"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="16" rx="2" /><path d="M9 5V3h6v2M9 12h6M9 16h4" /></svg>{t('fd.mailAppPaste')}</span></span>
-    </span>
-    <button type="button" className="btn fd-btn" onClick={() => open('protonmail://')}>{t('fd.mailAppProton')}</button>
-    <button type="button" className="btn fd-btn" onClick={() => open('googlegmail://')}>{t('fd.mailAppGmail')}</button>
+    {/* 2026-11-20 owner: the two app buttons first, the steps under them */}
+    {/* 2026-11-20 owner: the buttons looked like plain "open the app" - say on the button that the search word comes with it */}
+    {([['protonmail://', 'fd.mailAppProton'], ['googlegmail://', 'fd.mailAppGmail']] as const).map(([scheme, k]) =>
+      <button key={k} type="button" className={'btn fd-btn fd-mailapp-btn' + (big ? ' fd-mailapp-big' : '')} onClick={() => open(scheme)}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 21 21" /></svg>
+        <span className="fd-mailapp-txt" aria-label={t('fd.mailAppSearchIn').replace('{app}', t(k)) + ' ' + company}>{big ? <><span>{t('fd.mailAppSearchIn').replace('{app}', t(k))}</span><q>{company}</q></> : <>{t(k)} <q>{company}</q></>}</span>   {/* 2026-11-20 owner: the magnifier says search - no word needed */}
+      </button>)}
+    {between}
+    {/* 2026-11-20 owner: "clear steps: Pre-copied -> tap search -> paste -> go", an arrow between every step */}
+    {/* 2026-11-20 owner: in the Batch search list only the two buttons - the steps are in Email search */}
+    {!compact && <span className="fd-mailapp-how" aria-label={t('fd.mailAppHow').replace('{name}', company)}>
+      {MAIL_STEPS.map(([k, icon], i) => <span key={k} className="fd-how-rest">
+        {i > 0 && <span className="fd-how-arrow" aria-hidden="true">→</span>}
+        <span className="fd-how-step"><svg viewBox="0 0 24 24" aria-hidden="true">{icon}</svg>{t(k).split('{date}').map((part, j) => j ? <span key={j}><b className="fd-how-date">{date}</b>{part}</span> : part)}</span>
+      </span>)}
+    </span>}
     {msg && <span className="fd-t fd-mailapp-msg">{msg}</span>}
   </span>
 }
@@ -487,7 +510,9 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
       // most complete first: Job-Room's ad for this exact job (email, address, contact), then the history link, then the company website
       if (histResults.length && !(q.jobroom && q.jobroom.url)) { setSiteFind(null); setSuggest(''); setHist({ state: 'done', src: 'history', results: histResults }); return }
       const jobs = q.jobs.filter(j => isJobLink(j.url))
-      const hit = quickHit(q, t)
+      const raw = quickHit(q, t)
+      // 2026-11-19 owner: EPFL showed "Company website: +41 21 693 3000" - only offered when it fills something Job-Room still needs
+      const hit = raw && jobRoomMissing(jobRoomEntry({ ...a, ...quickPatch(a, raw.fields) } as Application)).length < jobRoomMissing(jobRoomEntry(a)).length ? raw : null
       setSiteFind(hit)
       setSuggest(jobs.length || hit ? '' : q.site ? 'site' : 'mail')
       setHist({ state: 'done', src: 'history', via: jobs.length ? 'quick' : undefined, results: jobs })
@@ -551,12 +576,23 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   // 2026-11-03 owner: the AI looks for addresses. Only Email missing -> no AI, open the Email search (next best) instead.
   const reqAddr = jobRoomMissing(e).some(k => k === 'postal' || k === 'city')
   const emailOnly = !reqAddr && jobRoomMissing(e).includes('email')
+  const [mailGlow, setMailGlow] = useState(false)
+  const [mailBack, setMailBack] = useState(false)   // came back from the phone mail app
+  const [syncOn, setSyncOn] = useState(() => { try { return localStorage.getItem('jt-sync-on') === '1' } catch { return false } })
   const [openOpt, setOpenOpt] = useState('')   // 2026-11-03 owner: nothing found -> Email search opens first (most likely), then the job link
+  // 2026-11-20 owner (screenshot): Email search opened with the amber "Not in emails? Next search" just below the window edge - nudge it into view once the opening scroll has settled
+  const mailNextRef = useRef<HTMLParagraphElement>(null)
+  const mailOpen = method === 'mail' || openOpt === 'mail'
+  useEffect(() => {
+    if (!mailOpen || !phoneLike()) return
+    const id = setTimeout(() => mailNextRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 1400)
+    return () => clearTimeout(id)
+  }, [mailOpen])
   const autoStarted = useRef(false)
   const isOpen = (id: string) => id === 'ai' || method === id || openOpt === id || (id === 'ai' && (autoSearch || trialUsed || ai !== 'idle'))
   // 2026-11-04 owner: AI failed -> order is Pro offer, then e-mail search, then browser history/bookmarks, then the rest
   useEffect(() => { if (hist.results.length > 0 || hist.email) setShowOthers(true) }, [hist.results.length, hist.email])   // 2026-11-04 owner: a free-search answer can be wrong - the other searches stay visible under it
-  useEffect(() => { if (aiFail && !hist.results.length && !hist.email && !histKeep.current.length) { setOpenOpt(o => o === '' ? 'mail' : o); if (mobile) setShowOthers(true) } }, [aiFail])   // a result is already on screen (e.g. from the browser history): the email search stays folded   // 2026-11-04 owner: AI failed -> next in order is the email search (least brain power), then browser bookmarks, then web search
+  useEffect(() => { if (aiFail && !hist.results.length && !hist.email && !histKeep.current.length) { setMailGlow(true); if (mobile) setShowOthers(true) } }, [aiFail])   /* 2026-11-19 owner (phone): opening Email search by itself scrolled "AI search failed" and Batch search away - it stays folded and glows; a tap opens + scrolls it */   // a result is already on screen (e.g. from the browser history): the email search stays folded   // 2026-11-04 owner: AI failed -> next in order is the email search (least brain power), then browser bookmarks, then web search
   const [userOpt, setUserOpt] = useState(false)
   // 2026-11-19 owner: "Email search is already open, but not scrolled up" - an option opened by itself (AI failed -> Email search)
   // comes to the top once the add-on picture and search are over, so its paste box is in view. Once per opened option.
@@ -754,7 +790,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
         </>}
   </>)   // 2026-11-07 owner: no result must be told at the button itself, not only in a box above the list
   // 2026-11-08 owner: the AI-failed note must sit where the person is looking - inside the search option that is open, not at the top of the list
-  const failMsg = aiFail ? (aiFail.diag ? amberLead(t(/credit balance|insufficient|billing|\b402\b/i.test(aiFail.diag) ? 'fd.aiNoFunds' : /quota|\b429\b|exhausted/i.test(aiFail.diag) ? 'fd.aiQuota' : /overload|\b529\b|busy/i.test(aiFail.diag) ? 'fd.aiBusy' : 'fd.aiFailed') + ' (' + aiFail.diag + ')') : amberLead(t(pro ? 'fd.histProCap' : buyLive ? 'fd.histCapPay' : 'fd.histCap'))) : null   // 2026-11-09 owner: every search option shows the same AI-failed text
+  const failMsg = aiFail ? (aiFail.diag ? amberLead(t(/credit balance|insufficient|billing|\b402\b/i.test(aiFail.diag) ? 'fd.aiNoFunds' : /quota|\b429\b|exhausted/i.test(aiFail.diag) ? 'fd.aiQuota' : /overload|\b529\b|busy/i.test(aiFail.diag) ? 'fd.aiBusy' : 'fd.aiFailed') + (phoneLike() ? '' : ' (' + aiFail.diag + ')')) : amberLead(t(pro ? 'fd.histProCap' : buyLive ? 'fd.histCapPay' : 'fd.histCap'))) : null   // 2026-11-09 owner: every search option shows the same AI-failed text
   const failNote = needsLink && aiFail && ai !== 'busy' ? <div className="fd-hist-box fd-ai-fail fd-slide-in">
         <span className="fd-side" role="alert">{failMsg}</span>
         {buyLive && !pro && <button type="button" className="btn btn-glow fd-btn" onClick={() => openPacks()}>{t('fd.buyNow')}</button>}
@@ -854,35 +890,38 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
         {batch && <li hidden={!!method}>
           <div className={'fd-opt' + (isOpen('batch') ? ' on' : batch.done && batch.count ? ' fd-batch-ready jt-guidance-glow' : '')} role="button" tabIndex={0} aria-expanded={isOpen('batch')} onClick={() => toggle('batch')} onKeyDown={x => { if (x.key === 'Enter' || x.key === ' ') { x.preventDefault(); toggle('batch') } }}>
             <span className="fd-chev" aria-hidden="true">{isOpen('batch') ? '▾' : '▸'}</span>
-            <b><TapCount n={1} label={t('fd.tapsAria')} /><span className="fd-opt-txt">{t('fd.batchH')}<small>{!batch.done ? t('fd.batchBusy') : batch.count ? t('fd.batchHint').replace('{n}', String(batch.count)) : t('fd.batchNone')}</small></span></b>
+            <b><TapCount n={1} label={t('fd.tapsAria')} /><span className="fd-opt-txt">{t('fd.batchH')}<small>{!batch.done ? t('fd.batchBusy') : batch.count ? t('fd.batchHint').replace('{n}', String(batch.count)) : quickLimitHit ? t('fd.batchLimit') : t('fd.batchNone')}</small></span></b>
           </div>
           {isOpen('batch') && <div className="fd-body">{batch.done ? batch.node : <span className="fd-t">{t('fd.batchBusy')}</span>}</div>}
         </li>}
         <li hidden={!!method && method !== 'mail'}>
-          <div hidden={!!method} className={'fd-opt' + (isOpen('mail') ? ' on' : '')} role="button" tabIndex={0} aria-expanded={isOpen('mail')} onClick={() => toggle('mail')} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle('mail') } }}>
+          <div hidden={!!method} className={'fd-opt' + (isOpen('mail') ? ' on' : mailGlow ? ' jt-guidance-glow' : '')} role="button" tabIndex={0} aria-expanded={isOpen('mail')} onClick={() => toggle('mail')} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle('mail') } }}>
             <span className="fd-chev" aria-hidden="true">{isOpen('mail') ? '▾' : '▸'}</span>
             <b><TapCount n={TAPS.mail} label={t('fd.tapsAria')} /><span className="fd-opt-txt">{t('fd.mailH')}<small>{t('fd.mailHint')}</small></span></b>
           </div>
           {/* 2026-11-19 owner: "the Ctrl+V here box is hidden below" - mail buttons, step, paste box first; the AI/add-on notes and the narrower search under it */}
           {isOpen('mail') && <div className="fd-body">
 
-          {phoneLike() ? <MailAppBtns company={mailName(a.company)} t={t} /> : <div className="fd-mailrow">
+          {/* 2026-11-20 owner: "needs cleaning up" - one order for every option: AI note first, search, narrow it, paste, then the next search as a big button */}
+          {!failNoteTop && noteSlot(shortFail)}
+          {phoneLike() ? <MailAppBtns company={mailName(a.company)} t={t} onBack={() => setMailBack(true)} date={date} big={!shortFail}
+            between={a.role ? <div className="fd-mailrow fd-mailrole"><span className="fd-t">{t('fd.mailManyShort')}</span><CopyBtn text={a.role} label={t('fd.copyRole')} t={t} /></div> : null} /> : <div className="fd-mailrow">
             <a className={'fd-lnk' + (aiFail ? ' jt-guidance-glow' : '')} href={`https://mail.proton.me/u/0/all-mail#keyword=${q(mailName(a.company))}`} {...ext}>{t('jr.mailProton')}</a>
             <a className={'fd-lnk' + (aiFail ? ' jt-guidance-glow' : '')} href={`https://mail.google.com/mail/u/0/#search/${q(mailName(a.company))}`} {...ext}>{t('jr.mailGmail')}</a>
             <CopyBtn text={mailName(a.company)} label={t('fd.mailOther')} t={t} />
           </div>}
-          <p className="fd-flow">{flow(t('fd.flowMail'), { date: <b className="fd-data">{date}</b> })}</p>
-          {pasteBox(ad, setAd)}
           {/* 2026-11-19 owner: Swissquote gave lots of emails; narrowing needed the job title, found by scrolling to the form copy. Now one tap here. */}
-          {a.role && (phoneLike()
-            ? <div className="fd-mailrow fd-mailrole"><span className="fd-t">{t('fd.mailMany')} <b>{a.role}</b></span><CopyBtn text={a.role} label={t('fd.copyRole')} t={t} /></div>
-            : <div className="fd-mailrow fd-mailrole"><span className="fd-t">{t('fd.mailMany')}</span>
+          {a.role && !phoneLike() && (
+            <div className="fd-mailrow fd-mailrole"><span className="fd-t">{t('fd.mailMany')}</span>
               <a className="fd-lnk" href={`https://mail.proton.me/u/0/all-mail#keyword=${q(mailName(a.company) + ' ' + a.role)}`} {...ext}>{t('fd.mailProtonRole').replace('{role}', a.role)}</a>
               <a className="fd-lnk" href={`https://mail.google.com/mail/u/0/#search/${q(mailName(a.company) + ' ' + a.role)}`} {...ext}>{t('fd.mailGmailRole').replace('{role}', a.role)}</a>
               <CopyBtn text={a.role} label={t('fd.copyRole')} t={t} />
             </div>)}
-          {!failNoteTop && noteSlot(shortFail)}{inOpt && (foundHere || openOpt !== 'link') && resultBox}
-          {jobRoomMissing(e).includes('email') && <button type="button" className="btn-secondary fd-btn" onClick={() => setOpenOpt('link')}>{t('fd.mailNext')}</button>}
+          {!phoneLike() && <p className="fd-flow">{flow(t('fd.flowMail'), { date: <b className="fd-data">{date}</b> })}</p>}
+          {pasteBox(ad, setAd)}
+          {/* 2026-11-20 owner: amber hint, not a button - History and bookmarks search is the option right below, the arrow points to it */}
+          {jobRoomMissing(e).length > 0 && <p ref={mailNextRef} className={'fd-mailnext' + (mailBack ? ' fd-mailnext-pulse' : '')}>{t('fd.mailNext').replace('{date}', date)}<span className="fd-mailnext-arrow" aria-hidden="true">↓</span></p>}
+          {inOpt && (foundHere || openOpt !== 'link') && resultBox}
           </div>}
         </li>
 
@@ -893,13 +932,17 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
             <b><TapCount n={TAPS.link} label={t('fd.tapsAria')} /><span className="fd-opt-txt">{t('fd.linkH')}<small>{t('fd.linkHint')}</small></span></b>
           </div>
           {isOpen('link') && <div className="fd-body">
-            <details className="fd-fold"><summary>{t('fd.syncH')}</summary>
+            {!failNoteTop && noteSlot(shortFail)}   {/* 2026-11-20 owner: the AI note sits at the top of every option */}
+            {/* 2026-11-20 owner: "can this be auto detected or made easier?" - a web page cannot see the browser's sync setting;
+                one tap "It's on" hides this for good on this device */}
+            {!syncOn && <details className="fd-fold"><summary>{t('fd.syncH')}</summary>
               <SyncSteps t={t} />
-            </details>
+              <button type="button" className="btn-secondary fd-btn" onClick={() => { try { localStorage.setItem('jt-sync-on', '1') } catch { /* private mode */ } setSyncOn(true) }}>✓ {t('fd.syncIsOn')}</button>
+            </details>}
             {addon
               ? <>
                 <button type="button" className="btn btn-glow fd-btn" onClick={searchHistory} disabled={hist.state === 'busy'}>{t('fd.histBtn')}</button>
-                {!failNoteTop && noteSlot(shortFail)}{inOpt && foundHere && resultBox}
+                {inOpt && foundHere && resultBox}
                 {needsLink && statusBelow && (hist.state !== 'idle' || histPerm) && <div className="fd-hist-box">{histStatus}</div>}
               </>
               : <>
@@ -912,7 +955,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
                     : <button type="button" className="btn btn-glow fd-btn" onClick={() => window.location.reload()}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: '.4rem' }}><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>{t('fd.addonReload')}</button>}
                 </>}
-                {!failNoteTop && noteSlot(shortFail)}{inOpt && foundHere && resultBox}
+                {inOpt && foundHere && resultBox}
                 {mobile
                   ? <>
                   {/* 2026-11-18 owner: "No user will find that" - Copy company sat inside the Text window; now on screen as step 1, the guide buttons follow */}

@@ -1751,3 +1751,55 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jr-new-tag { margin-left: .4rem; padding: 0 .35rem; border-radius: 6px; background: #00ff41; color: #03020a; font-size: .7rem; font-weight: 800; text-transform: uppercase; }
 .fd-mailrole { margin-top: .4rem; flex-wrap: wrap; align-items: center; }   /* 2026-11-19 narrow the email search with the job title */
 .fd-hist-box { scroll-margin: 12px 0 24px; }   /* 2026-11-19 room under the found answer when it scrolls into view */
+/* 2026-11-19 owner (phone): "AI search failed, then 1.2. glows, but Email search not glowing" - the class had no style. The next search
+   pulses green; while it does, the 1.2 heading glow above it rests so only one thing calls. */
+.jobtrack-page .fd .fd-opt.jt-guidance-glow { border-color: #00ff41; animation: jr-glow-pulse 1.8s ease-in-out infinite; }
+.jobtrack-page .jr-step2.jt-guidance-glow:has(.fd-opt.jt-guidance-glow) { animation: none; box-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .jobtrack-page .fd .fd-opt.jt-guidance-glow { animation: none; box-shadow: 0 0 12px rgba(0,255,65,.7); } }
+/* 2026-11-19 sync reminder + links that point to another job */
+.jr-syncnote, .jr-wrongnote { display: block; width: 100%; margin: .4rem 0; padding: .5rem .7rem; border-radius: 8px; text-align: left; font: inherit; font-size: .9rem; cursor: pointer; background: #0b0b16; color: #f0eeff; }
+.jr-syncnote { border: 1px solid #00ff41; }
+.jr-wrongnote { border: 1px solid #ffb000; color: #ffb000; }
+.jr-dot { position: relative; }
+.jr-dot-wrong { position: absolute; top: -6px; left: -4px; min-width: 14px; height: 14px; border-radius: 7px; background: #ffb000; color: #03020a; font-size: 10px; font-weight: 800; line-height: 14px; text-align: center; }
+.jr-wrongrow { display: flex; flex-direction: column; align-items: flex-start; gap: .4rem; margin: .5rem 0 .8rem; padding: .6rem .8rem; border: 1px solid #ffb000; border-radius: 10px; background: #1a1406; color: #f0eeff; }
+
+/* 2026-11-20 owner: the next search after Email search must be prominent, not tiny */
+.fd-mailnext { display: flex; align-items: center; justify-content: center; gap: .5rem; margin: 0; color: #ffb000; line-height: 1.2; font-size: 1rem; font-weight: 700; white-space: nowrap; }   /* 2026-11-20 owner: one line */
+.fd-mailnext-arrow { font-size: 1.6rem; line-height: 1; animation: fd-next-bob 1.6s ease-in-out infinite; }
+@keyframes fd-next-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+.fd-mailnext-pulse { animation: fd-next-glow 1.4s ease-in-out 4; }
+@keyframes fd-next-glow { 50% { text-shadow: 0 0 10px rgba(255,176,0,.8); } }
+@media (prefers-reduced-motion: reduce) { .fd-mailnext-arrow, .fd-mailnext-pulse { animation: none; } }
+
+/* 2026-11-20 owner: one line per button - magnifier + Search Proton "EPFL" - so both fit on one row */
+.fd-mailapp-btn { display: flex; align-items: center; justify-content: center; gap: .3rem; min-width: 0; padding: .6rem .4rem; }
+.fd-mailapp-btn svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.fd-mailapp-txt { display: flex; gap: .25em; min-width: 0; white-space: nowrap; font-weight: 700; font-size: .88rem; }
+.fd-mailapp-txt q { quotes: "“" "”"; overflow: hidden; text-overflow: ellipsis; min-width: 2.5em; }   /* only the company name shortens */
+.fd-how-date { color: #00ff41; font-weight: 800; }   /* 2026-11-20 owner: the date in 'replies after <date>' stands out */
+
+/* 2026-11-20 owner: Batch search shows it is working - spinner while searching, a tick flashes for each find */
+.jr-leg-busy { gap: .4rem; }
+.jr-busy-spin { width: 14px; height: 14px; border: 2px solid #3a3a4e; border-top-color: #00ff41; border-radius: 50%; animation: jr-busy-spin .8s linear infinite; flex: none; }
+@keyframes jr-busy-spin { to { transform: rotate(360deg); } }
+.jr-lg-flash { animation: jr-lg-flash 1.2s ease-out; }
+@keyframes jr-lg-flash { 0% { transform: scale(.4); opacity: 0; } 30% { transform: scale(1.35); opacity: 1; } 100% { transform: scale(1); } }
+.jr-busy-n { color: #00ff41; margin-left: .2rem; }
+@media (prefers-reduced-motion: reduce) { .jr-busy-spin, .jr-lg-flash { animation: none; } }
+/* 2026-11-20 owner: "copy the sender's email or job link" ran over the card's right edge - long steps wrap */
+.fd-mailapp-how { white-space: normal; }
+.fd-how-rest, .fd-how-step { min-width: 0; }
+.fd-how-step { white-space: normal; }
+.fd-copied-tick { color: #00ff41; font-weight: 800; margin-left: .3rem; }
+/* 2026-11-20 owner: no AI note = room to spare - the buttons grow to 2 lines with the full name */
+.fd-mailapp-btn.fd-mailapp-big { padding: .5rem .5rem; }
+.fd-mailapp-big .fd-mailapp-txt { flex-direction: column; align-items: flex-start; gap: .1rem; white-space: normal; font-size: .95rem; text-align: left; }
+.fd-mailapp-big .fd-mailapp-txt q { overflow: visible; min-width: 0; word-break: break-word; font-size: .9rem; }
+.fd-mailapp-big svg { width: 22px; height: 22px; }
+/* 2026-11-20 owner (screenshot): ~30 px gap above the amber hint - the paste box sits tight on it */
+.jobtrack-page .fd textarea.jr-ad, .modal-content .fd textarea.jr-ad { display: block; margin-bottom: .25rem; }
+.fd-mailnext-arrow { font-size: 1.3rem; }
+/* 2026-11-20 owner: "Too many emails? [Copy job title]" vertically centred - .fd-t's bottom margin lifted the label */
+.fd-mailrole .fd-t { margin: 0; }
+.fd-mailrole .fd-copy { margin: 0; }

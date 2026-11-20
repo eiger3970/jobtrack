@@ -18,3 +18,18 @@ export default function PassphraseIcon({ className, size = 1 }: { className?: st
   )
 }
 
+
+/** 2026-11-20 owner: "a new image with the passphrase image and inside the green blocks have c o d e" -
+ *  the free code label: the same 4 blocks + 3 hyphens, filled green, one letter each, so no "Code:" text is needed. */
+export function CodeIcon({ className, size = 1 }: { className?: string; size?: number }) {
+  const xs = [0.5, 10.5, 20.5, 30.5]
+  return (
+    <svg className={className} viewBox="0 0 39 14" width={`${2.8 * size}em`} height={`${1 * size}em`} role="img" aria-label="code">
+      {xs.map((x, i) => <g key={x}>
+        <rect x={x} y="0.5" width="8" height="13" rx="2.2" fill="#00ff41" />
+        <text x={x + 4} y="10.6" textAnchor="middle" fontSize="10" fontWeight="800" fontFamily="system-ui, sans-serif" fill="#03020a">{'code'[i]}</text>
+      </g>)}
+      <path d="M8.9 7h1.2M18.9 7h1.2M28.9 7h1.2" stroke="#00ff41" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  )
+}

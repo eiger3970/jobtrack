@@ -1,6 +1,6 @@
 import FillRate from './fill_rate'
 import FindDetails, { MissingDetailsKey, MailAppBtns, phoneLike, mailName } from './find_details'
-import { prefetchQuick, quickResult, onQuickDone, quickHit, quickPatch } from '../lib/ai_find'
+import { prefetchQuick, quickResult, onQuickDone, quickHit, quickPatch, quickProgress } from '../lib/ai_find'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { swissDate, type Application, JR_METHOD, jobRoomEntry, jobRoomMissing, looksWrong } from '../lib/orp'
 import { fillPayload, FILL_KEY } from '../lib/jobroom_fill'
@@ -8,6 +8,8 @@ import { rememberSeen, newlyFilled } from '../lib/jr_seen'
 import { useProKey, buyPro } from '../lib/pro'
 import { isApp } from '../lib/platform'
 import { PRO_KEY, PRO_USD, PRO_SCOPE } from './job_track_pro'
+import { useWrongJobLinks } from '../lib/jr_check'
+import { lastSyncAt } from './job_track_sync'
 
 // 2026-10-14: the date Job-Room's ENTER form was last checked against these fields
 const FORM_CHECKED = '14.10.2026'
@@ -84,11 +86,24 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
   const finds = rows.map((r, n) => ({ r, n, miss: !r.jobroomDone && jobRoomMissing(jobRoomEntry(r)).length > 0 })).filter(x => x.miss).map(x => {
     const q = quickResult(x.r.company, x.r.role); const hit = quickHit(q, t)
     const patch = hit ? quickPatch(x.r, hit.fields) : {}
-    return { ...x, q, hit: hit && Object.keys(patch).some(k => k !== 'linkFrom') ? hit : null, patch }
+    // 2026-11-19 owner: square 8 (EPFL) listed as found with only the main phone number - a find counts only when it fills something Job-Room still needs
+    const helps = hit && jobRoomMissing(jobRoomEntry({ ...x.r, ...patch } as Application)).length < jobRoomMissing(jobRoomEntry(x.r)).length
+    return { ...x, q, hit: helps ? hit : null, patch }
   }).filter(x => x.q)
   const fillable = finds.filter(f => f.hit && !skip.includes(f.r.id))
   // 2026-11-17 owner: "scrolling down 35 long list to see what has a tick ... perhaps a tick in the top 35 boxes" - squares with a Batch find carry a green tick
   const foundIds = fillable.map(f => f.r.id)
+  // 2026-11-20 owner: show the Batch search working - spinner + count while it runs, a tick flashes for each new find
+  const prog = quickProgress()
+  const [flash, setFlash] = useState(false)
+  const lastFound = useRef(fillable.length)
+  useEffect(() => {
+    if (fillable.length > lastFound.current) { setFlash(true); const id = setTimeout(() => setFlash(false), 1200); lastFound.current = fillable.length; return () => clearTimeout(id) }
+    lastFound.current = fillable.length
+  }, [fillable.length])
+  const wrongLinks = useWrongJobLinks(rows.filter(r => !r.jobroomDone))   // 2026-11-19: filled Job-Room links that belong to another job
+  const wrongN = rows.map((r, n) => wrongLinks.has(r.id) ? n : -1).filter(n => n >= 0)
+  const syncedToday = new Date(lastSyncAt()).toDateString() === new Date().toDateString()
   // 2026-11-17 owner: the option popping in a second later distracted from 3.1 - it is there from the start, "searching" until every red square has its answer
   const redCount = rows.filter(r => !r.jobroomDone && jobRoomMissing(jobRoomEntry(r)).length > 0).length
   // a pasted email goes into Email, a pasted address starting with http into the job link; anything else is left alone
@@ -111,7 +126,7 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
               : <>
                 {/* 2026-11-17 owner: email stays manual - but from this one list: search links per job + paste the found email or link here */}
                 <span className="jr-fillall-none">{t('jr.fillAllNone')}</span>
-                {phoneLike() ? <MailAppBtns company={mailName(f.r.company)} t={t} /> : <span className="jr-fillall-mail">
+                {phoneLike() ? <MailAppBtns company={mailName(f.r.company)} t={t} compact /> : <span className="jr-fillall-mail">
                   <a className="fd-lnk" href={`https://mail.proton.me/u/0/all-mail#keyword=${encodeURIComponent(mailName(f.r.company))}`} target="_blank" rel="noopener noreferrer">{t('jr.mailProton')}</a>
                   <a className="fd-lnk" href={`https://mail.google.com/mail/u/0/#search/${encodeURIComponent(mailName(f.r.company))}`} target="_blank" rel="noopener noreferrer">{t('jr.mailGmail')}</a>
                 </span>}
@@ -263,26 +278,35 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
       <div className="jr-head">
       <p className="jr-step"><b className="jts-num">{mobile ? '1.1.' : cleanupOnly ? '1.' : '3.1.'}</b> <b>{t(mobile ? 'jr.phoneChoose' : 'jr.here')}</b></p>
       </div>
+      {/* 2026-11-19 owner: "the code should take care of most of it" - a device that has not synced today says so; one tap opens sync */}
+      {!syncedToday && <button type="button" className="jr-syncnote jt-guidance-glow" onClick={() => window.dispatchEvent(new Event('jt-open-sync'))}>{t('jr.syncFirst')}</button>}
+      {wrongN.length > 0 && <button type="button" className="jr-wrongnote" onClick={() => chooseJob(wrongN[0])}>{t('jr.wrongLinks').replace('{list}', wrongN.map(n => n + 1).join(', '))}</button>}
       <p className="jr-legend">
         <span className="jr-leg"><span className="jr-lg done" />{t('jr.leg.done')}</span>
         <span className="jr-leg"><span className="jr-lg todo" />{t('jr.leg.todo')}</span>
         <span className="jr-leg"><span className="jr-lg need" />{t('jr.leg.need')}</span>
         {/* 2026-11-19 owner (phone): the squares jumped down when this line appeared - its place is kept from the start, it only fades in */}
         {/* 2026-11-19 owner: "How will the user know to open Batch search to tap Fill all?" - the found line is the button: it opens Batch search */}
-        {fillable.length > 0
+        {prog.running && prog.total > 0
+          ? <span className="jr-leg jr-leg-found on jr-leg-busy" role="status">{flash ? <span key="tick" className="jr-lg-found jr-lg-flash">✓</span> : <span className="jr-busy-spin" aria-hidden="true" />}{t('jr.leg.searching').replace('{done}', String(prog.done)).replace('{total}', String(prog.total))}{fillable.length > 0 && <b className="jr-busy-n">{t('jr.leg.soFar').replace('{n}', String(fillable.length))}</b>}</span>
+          : <>{fillable.length > 0
           ? <button type="button" className="jr-leg jr-leg-found on jr-leg-go jt-guidance-glow" onClick={() => window.dispatchEvent(new Event('jr-open-batch'))}><span className="jr-lg-found">✓</span>{t('jr.leg.foundGo').replace('{n}', String(fillable.length))}</button>
-          : <span className={'jr-leg jr-leg-found' + (foundIds.length > 0 ? ' on' : '')} aria-hidden={foundIds.length === 0}><span className="jr-lg-found">✓</span>{t('jr.leg.found')}</span>}
+          : <span className={'jr-leg jr-leg-found' + (foundIds.length > 0 ? ' on' : '')} aria-hidden={foundIds.length === 0}><span className="jr-lg-found">✓</span>{t('jr.leg.found')}</span>}</>}
       </p>
       <div className="jr-dots" role="tablist">
         <svg className="jr-tapme" viewBox="0 0 24 24" width="26" height="26" role="img" aria-label={t('jr.flow2')}><path fill="#00ff41" d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.69-5.1c.01-.07.02-.13.02-.2 0-.62-.38-1.16-.91-1.38z" /></svg>
         {rows.map((r, n) => (
           <button key={r.id} type="button" role="tab" aria-selected={n === idx} aria-label={`${n + 1}. ${r.company}`} title={`${n + 1}. ${r.company} - ${swissDate(r.date)}`}
             className={'jr-dot' + (!picked && nextSquare >= 0 && n === nextSquare ? ' glow jt-guidance-glow' : '') + (r.jobroomDone ? ' done' : '') + (jobRoomMissing(jobRoomEntry(r)).length ? ' need' : '')}
-            onClick={() => chooseJob(n)}>{n + 1}{foundIds.includes(r.id) && <span className="jr-dot-found" aria-label={t('jr.leg.found')}>✓</span>}</button>
+            onClick={() => chooseJob(n)}>{n + 1}{wrongLinks.has(r.id) && <span className="jr-dot-wrong" aria-label={t('jr.wrongTag')}>!</span>}{foundIds.includes(r.id) && <span className="jr-dot-found" aria-label={t('jr.leg.found')}>✓</span>}</button>
         ))}
       </div>
 
       <div key={`${a.id}-${idx}`} id="jr-step2" hidden={allEntered} className={'jr-step2' + (glow32 ? ' jr-glow jt-guidance-glow' : '')} onClick={() => { tappedIn32.current = true; setS32Seen(true) }}><b className="jts-num">{mobile ? '1.2.' : cleanupOnly ? '2.' : '3.2.'}</b> <b>{t('jr.appliedTo')}</b> {a.company}{a.role ? ' - ' + a.role : ''}{a.jobroomDone && <span className="jr-done-tag">{ICON_CHECK}{t('jr.doneTag')}</span>}
+        {/* 2026-11-19: a filled Job-Room link that is another job's ad - said here at 3.2, never inside the folded form copy */}
+        {wrongLinks.has(a.id) && <div className="jr-wrongrow" role="alert"><span className="jr-odd-tag">{t('jr.wrongTag')}</span>
+          <span>{t('jr.wrongAd')} <b>{wrongLinks.get(a.id)}</b></span>
+          <button type="button" className="btn btn-glow fd-btn" onClick={() => save('link', '')}>{t('jr.wrongRemove')}</button></div>}
         {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}
         {hasMissingDetails
           ? <FindDetails batch={redCount ? { count: finds.filter(f => f.hit).length, done: finds.length >= redCount, node: fillAllBox } : undefined} mobile={mobile} autoSearch={picked && !a.jobroomDone && !allEntered} key={`${a.id}-${idx}`} a={a} e={storedEntry} live={e} onPreview={showAiPreview} allApps={allApps} onUpdate={onUpdate} t={t} requiredMissing={missing.length > 0} />

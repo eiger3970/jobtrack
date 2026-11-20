@@ -126,12 +126,15 @@ export async function aiFind(o: { want?: 'joblink' | 'sender'; date?: string; co
 // same 8 seconds. Only the company name, job title and place are sent, to kworld's own worker.
 type QuickFields = { email?: string; phone?: string; street?: string; streetNo?: string; postal?: string; city?: string; contactPerson?: string }
 export type QuickFind = { jobs: { url: string; title: string }[]; site: ({ site: string } & QuickFields) | null; jobroom: ({ url: string; title: string; formUrl?: string } & QuickFields) | null }
+// 2026-11-19 owner: Batch search said "Nothing found" when the worker's daily limit had answered 429 - say so instead
+export let quickLimitHit = false
 export async function quickFind(company: string, role: string, place: string, app: boolean): Promise<QuickFind> {
   try {
     // 2026-11-19 owner: the app found 7, the website 1 - kworld.space's /api/ rate limit (3 per 10 s) blocked the batch with 1015. Direct, like the app (CORS allows kworld.space).
     void app
     const r = await fetch(APP_FIND_URL.replace('/find-details', '/quick-find'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ company, role, place }), signal: AbortSignal.timeout(7500) })
+    if (r.status === 429) quickLimitHit = true
     const j = await r.json()
     return { jobs: Array.isArray(j?.jobs) ? j.jobs : [], site: j?.site && typeof j.site.site === 'string' ? j.site : null, jobroom: j?.jobroom && typeof j.jobroom.url === 'string' ? j.jobroom : null }
   } catch { return { jobs: [], site: null, jobroom: null } }
@@ -170,12 +173,17 @@ export function quickPatch(a: object, fields: Record<string, string>): Record<st
   return patch
 }
 let prefetchRunning = false
+// 2026-11-20 owner: "a progress circle when working" - how far the background Batch search is, for the line above the squares
+let prefetchTotal = 0, prefetchDone = 0
+export function quickProgress(): { running: boolean; done: number; total: number } { return { running: prefetchRunning, done: prefetchDone, total: prefetchTotal } }
 export async function prefetchQuick(list: { company: string; role: string; place: string }[], app: boolean) {
   if (prefetchRunning) return
   prefetchRunning = true
   try {
     const queue = list.filter(x => x.company && !quickCache.has((x.company + '|' + x.role).toLowerCase()))
-    const worker = async () => { for (let x = queue.shift(); x; x = queue.shift()) await quickFindCached(x.company, x.role, x.place, app) }
+    prefetchTotal = queue.length; prefetchDone = 0
+    quickListeners.forEach(f => f())
+    const worker = async () => { for (let x = queue.shift(); x; x = queue.shift()) { await quickFindCached(x.company, x.role, x.place, app); prefetchDone++; quickListeners.forEach(f => f()) } }
     await Promise.all([worker(), worker()])
-  } finally { prefetchRunning = false }
+  } finally { prefetchRunning = false; quickListeners.forEach(f => f()) }
 }

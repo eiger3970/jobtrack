@@ -23,7 +23,10 @@ interface Props {
 // the list as it was right after this device's last sync (see merge rules)
 const BASE = 'kworld_jobtrack_sync_base'
 export function loadBase(): Base { try { return JSON.parse(localStorage.getItem(BASE) || '{}') } catch { return {} } }
-function keepBase(apps: Application[]) { try { localStorage.setItem(BASE, JSON.stringify(baseOf(apps))) } catch { /* private mode */ } }
+function keepBase(apps: Application[]) { try { localStorage.setItem(BASE, JSON.stringify(baseOf(apps))); localStorage.setItem(SYNC_AT, String(Date.now())) } catch { /* private mode */ } }
+// 2026-11-19 owner: a device that has not synced today reminds you before the Job-Room squares
+export const SYNC_AT = 'kworld_jobtrack_sync_at'
+export function lastSyncAt(): number { try { return Number(localStorage.getItem(SYNC_AT)) || 0 } catch { return 0 } }
 // the ORP form details (name, AVS...) travel too, so clearing a library computer loses nothing;
 // a device that already has its own keeps them
 const ORP_PROFILE = 'kworld_jobtrack_orp_profile'
