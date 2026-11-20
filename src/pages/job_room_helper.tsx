@@ -134,7 +134,7 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
                   onPaste={x => { const v = x.clipboardData.getData('text').trim(); if (v) { x.preventDefault(); x.currentTarget.value = v; pasteFound(f.r, v) } }}
                   onKeyDown={x => { if (x.key === 'Enter') pasteFound(f.r, x.currentTarget.value.trim()) }} />
               </>}</span>
-          {f.hit && <input type="checkbox" className="jr-fillall-cb" aria-label={f.r.company} checked={!skip.includes(f.r.id)} onChange={x => setSkip(s => x.target.checked ? s.filter(id => id !== f.r.id) : [...s, f.r.id])} />}
+          {/* 2026-11-20 owner: the key's circled tick; iPhone kept a square checkbox, so the box is hidden and a circle drawn */}{f.hit && <label className="jr-tickwrap"><input type="checkbox" className="jr-fillall-cb" aria-label={f.r.company} checked={!skip.includes(f.r.id)} onChange={x => setSkip(s => x.target.checked ? s.filter(id => id !== f.r.id) : [...s, f.r.id])} /><span className="jr-tickdot" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span></label>}
         </div>)}
       </div>
   // 2026-11-17 owner: search every red square in the background (Job-Room + company website, free) when the panel opens

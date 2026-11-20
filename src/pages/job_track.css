@@ -1811,3 +1811,21 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jr-dot.wrong .jr-dot-wrong { background: #ff4d4d; color: #03020a; }
 .jr-wrongbtns { display: flex; flex-wrap: wrap; gap: .5rem; }
 .jr-wrongrow .btn.fd-btn.jr-rightjob { border: 1px solid #00ff41; color: #00ff41; background: transparent; box-shadow: none; animation: none; }
+/* 2026-11-20 owner (phone): Batch results checkbox = iPhone green box + small white tick, hard to see.
+   Own drawing like the key: dark box, green border, bold green tick */
+.jr-fillall-cb { -webkit-appearance: none; appearance: none; flex: none; width: 24px; height: 24px; margin: 0; border: 2px solid #00ff41; border-radius: 6px; background: #03020a center / 18px 18px no-repeat; cursor: pointer; }
+.jr-fillall-cb:checked { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%2300ff41' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.jr-fillall-cb:focus-visible { outline: 2px solid #f0eeff; outline-offset: 2px; }
+/* 2026-11-20 owner: Batch list ticks = the key's circled tick (green circle, black tick); unticked = empty green ring */
+.jr-fillall-cb { border-radius: 50%; width: 22px; height: 22px; background-size: 15px 15px; }
+.jr-fillall-cb:checked { background-color: #00ff41; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23000' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+/* 2026-11-20 owner: unticked shows nothing (the spot stays tappable to tick again) */
+.jr-fillall-cb:not(:checked) { border-color: transparent; background-color: transparent; }
+/* 2026-11-20 owner (phone screenshot): still a square - iPhone keeps its checkbox shape. Real box hidden, circle drawn:
+   ticked = green circle + black tick (the key's), unticked = nothing (spot still tappable) */
+.jr-tickwrap { position: relative; flex: none; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.jr-tickwrap .jr-fillall-cb { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; border: 0; background: none; }
+.jr-tickdot { width: 22px; height: 22px; border-radius: 50%; background: #00ff41; display: inline-flex; align-items: center; justify-content: center; pointer-events: none; }
+.jr-tickdot svg { width: 15px; height: 15px; fill: none; stroke: #000; stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; }
+.jr-fillall-cb:not(:checked) + .jr-tickdot { visibility: hidden; }
+.jr-fillall-cb:focus-visible + .jr-tickdot { outline: 2px solid #f0eeff; outline-offset: 2px; }
