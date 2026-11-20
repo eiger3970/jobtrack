@@ -65,9 +65,9 @@ function GuideVideo({ t, group }: { t: (k: string) => string; group: string }) {
   const shown = clips.filter(c => !bad.includes(c.file))
   if (!shown.length) return <p className="fd-flow">{t('fd.g.soon')}</p>
   const fail = (f: string) => setBad(b => b.includes(f) ? b : [...b, f])
-  return <>{shown.map(c => <div key={c.file}>
+  return <>{shown.map((c, ci) => <div key={c.file}>
     {c.label && <p className="fd-gvlabel">{t(c.label)}</p>}
-    <video className="fd-gvideo" controls playsInline preload="none" onError={() => fail(c.file)}><source src={`${videoDir()}${c.file}.mp4?v=10`} type="video/mp4" onError={() => fail(c.file)} /></video>
+    <video className="fd-gvideo" controls playsInline muted autoPlay={ci === 0} preload={ci === 0 ? 'auto' : 'none'} onError={() => fail(c.file)}><source src={`${videoDir()}${c.file}.mp4?v=10`} type="video/mp4" onError={() => fail(c.file)} /></video>
   </div>)}</>
 }
 // 2026-11-06 owner: tapping one part of a step (the text between the arrows) dims it, so the user sees where they are up to
@@ -154,6 +154,13 @@ function useHasVideo(group: string): boolean {
   }, [group])
   return has
 }
+// 2026-11-20 owner: the tutorial buttons show only a picture, no words (Material image / article / play_circle); the word stays for screen readers
+const GUIDE_IC: Record<GuideKind, string> = {
+  images: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
+  text: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z',
+  video: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z',
+}
+
 function GuideRow({ t, title, group, vars, children, noText = false }: { t: (k: string) => string; title: string; group: string; vars?: Record<string, string>; children?: ReactNode; noText?: boolean }) {
   const [open, setOpen] = useState<GuideKind | null>(null)
   const hasVideo = useHasVideo(group)
@@ -178,7 +185,8 @@ function GuideRow({ t, title, group, vars, children, noText = false }: { t: (k: 
   const tapPart = (i: number) => setDone(segTap(done, parts().map(el => el.dataset.sid as string), i))
   const partAt = (el: Element | null) => { const p = el?.closest('[data-sid]') as HTMLElement | null; return p ? parts().indexOf(p) : -1 }
   return <div className="fd-guide">
-    <div className="fd-guide-btns">{kinds.map(k => <button key={k} type="button" className="fd-guide-btn" onClick={() => setOpen(k)}>{t('fd.g.' + k)}</button>)}</div>
+    {/* 2026-11-20 owner: a mini tutorial picture (graduation cap, Material 'school') at the top left of EVERY Images / Text / Video button, so they read as a tutorial */}
+    <div className="fd-guide-btns">{kinds.map(k => <button key={k} type="button" className="fd-guide-btn fd-guide-btn-ic" aria-label={t('fd.tutorial') + ': ' + t('fd.g.' + k)} title={t('fd.tutorial') + ': ' + t('fd.g.' + k)} onClick={() => setOpen(k)}><svg className="fd-guide-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3 1 9l11 6 9-4.91V17h2V9L12 3z" /></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d={GUIDE_IC[k]} /></svg></button>)}</div>
     {open && createPortal(<div className="modal fd-gmodal fd-guide" onClick={closeWin}>
       <div className="modal-content" role="dialog" aria-label={title} onClick={e => e.stopPropagation()}>
         <div className="fd-ghead"><h3>{title}: {t('fd.g.' + open)}</h3><button type="button" className="btn-secondary fd-gclose" onClick={closeWin}>{t('fd.g.close')}</button></div>
@@ -611,6 +619,14 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
     // 2026-11-05 owner: tapping a search type scrolls smoothly so it sits at the top of the screen
     // 2026-11-08 owner: the view must follow the tapped search - scroll again once the layout has settled (fail note, fade, folded options move things)
     if (openOpt !== id) for (const ms of [60, 700, 1500]) setTimeout(() => document.querySelector('.fd-opt.on')?.scrollIntoView({ behavior: ms === 60 ? 'smooth' : 'auto', block: 'start' }), ms)
+    // 2026-11-20 owner (phone): closing the auto Batch search folded up onto the Job-Room form replica - the next thing needed is
+    // the other searches, so the view goes to 'Other ways to find it' instead
+    // 2026-11-20 owner: fold not there (job needs no email, all searches listed) -> the closed Batch search header goes to the top, the other searches right under it
+    if (openOpt === id && id === 'batch') for (const ms of [80, 600]) setTimeout(() => {
+      const fold = document.querySelector('.fd-others'), head = document.querySelector('.fd-opt-batch')
+      if (fold) fold.scrollIntoView({ behavior: ms === 80 ? 'smooth' : 'auto', block: 'start' })   // 2026-11-20 owner: centred left the squares filling the top half - the fold goes to the top
+      else head?.scrollIntoView({ behavior: ms === 80 ? 'smooth' : 'auto', block: 'start' })
+    }, ms)
     setOpenOpt(o => (o === id ? '' : id))
   }
 
@@ -888,7 +904,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
         <li className="fd-guidance fd-guidance-row" hidden={!!method}><span>{t('fd.scoreL2')}</span><TapCount n={TAPS.twin} label={t('fd.tapsAria')} /><TapCount n={TAPS.ad} label={t('fd.tapsAria')} /></li>
         {/* 2026-11-17 owner: the batch fill as a search option, above Email search - all red squares at once */}
         {batch && <li hidden={!!method}>
-          <div className={'fd-opt' + (isOpen('batch') ? ' on' : batch.done && batch.count ? ' fd-batch-ready jt-guidance-glow' : '')} role="button" tabIndex={0} aria-expanded={isOpen('batch')} onClick={() => toggle('batch')} onKeyDown={x => { if (x.key === 'Enter' || x.key === ' ') { x.preventDefault(); toggle('batch') } }}>
+          <div className={'fd-opt fd-opt-batch' + (isOpen('batch') ? ' on' : batch.done && batch.count ? ' fd-batch-ready jt-guidance-glow' : '')} role="button" tabIndex={0} aria-expanded={isOpen('batch')} onClick={() => toggle('batch')} onKeyDown={x => { if (x.key === 'Enter' || x.key === ' ') { x.preventDefault(); toggle('batch') } }}>
             <span className="fd-chev" aria-hidden="true">{isOpen('batch') ? '▾' : '▸'}</span>
             <b><TapCount n={1} label={t('fd.tapsAria')} /><span className="fd-opt-txt">{t('fd.batchH')}<small>{!batch.done ? t('fd.batchBusy') : batch.count ? t('fd.batchHint').replace('{n}', String(batch.count)) : quickLimitHit ? t('fd.batchLimit') : t('fd.batchNone')}</small></span></b>
           </div>
@@ -935,9 +951,11 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
             {!failNoteTop && noteSlot(shortFail)}   {/* 2026-11-20 owner: the AI note sits at the top of every option */}
             {/* 2026-11-20 owner: "can this be auto detected or made easier?" - a web page cannot see the browser's sync setting;
                 one tap "It's on" hides this for good on this device */}
+            {/* 2026-11-20 owner: after 'hide this' there was no way back - one small link brings the steps back */}
+            {syncOn && <button type="button" className="fd-sync-back" onClick={() => { try { localStorage.removeItem('jt-sync-on') } catch { /* private mode */ } setSyncOn(false) }}>{t('fd.syncBack')}</button>}
             {!syncOn && <details className="fd-fold"><summary>{t('fd.syncH')}</summary>
               <SyncSteps t={t} />
-              <button type="button" className="btn-secondary fd-btn" onClick={() => { try { localStorage.setItem('jt-sync-on', '1') } catch { /* private mode */ } setSyncOn(true) }}>✓ {t('fd.syncIsOn')}</button>
+              <button type="button" className="btn-secondary fd-btn" onClick={() => { try { localStorage.setItem('jt-sync-on', '1') } catch { /* private mode */ } setSyncOn(true) }}>{t('fd.syncIsOn')}</button>{/* 2026-11-20 owner: the ✓ on the button looked like the page had checked Firefox - it can't, the person says so */}
             </details>}
             {addon
               ? <>

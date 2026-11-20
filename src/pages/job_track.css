@@ -1829,3 +1829,8 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 .jr-tickdot svg { width: 15px; height: 15px; fill: none; stroke: #000; stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; }
 .jr-fillall-cb:not(:checked) + .jr-tickdot { visibility: hidden; }
 .jr-fillall-cb:focus-visible + .jr-tickdot { outline: 2px solid #f0eeff; outline-offset: 2px; }
+/* 2026-11-20 owner: mini tutorial picture at the top left of the guide buttons */
+.fd-guide-btn-ic { position: relative; }
+.fd-guide-btn-ic svg.fd-guide-ic { position: absolute; top: -9px; left: -9px; width: 20px; height: 20px; padding: 2px; border-radius: 50%; background: #03020a; fill: #00ff41; z-index: 1; pointer-events: none; }
+.fd-guide-btn-ic svg:not(.fd-guide-ic) { width: 26px; height: 26px; fill: #f0eeff; display: block; margin: 0 auto; }   /* 2026-11-20 owner: picture only, no words */
+.fd-sync-back { background: none; border: 0; padding: .3rem 0; color: #9a96b8; font-size: .85rem; text-decoration: underline; cursor: pointer; }   /* 2026-11-20 owner: way back after 'hide this' */
