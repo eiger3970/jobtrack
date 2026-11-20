@@ -32,7 +32,7 @@ async function load(ids: string[]) {
 }
 
 /** job id -> the ad's title when the filled Job-Room link points to a different job */
-export function useWrongJobLinks(rows: { id: number; role: string; link?: string }[]): Map<number, string> {
+export function useWrongJobLinks(rows: { id: number; role: string; link?: string; linkOk?: string }[]): Map<number, string> {
   const [, tick] = useState(0)
   const ids = [...new Set(rows.map(r => jrAdId(r.link)).filter(Boolean))]
   const key = ids.join(',')
@@ -41,6 +41,7 @@ export function useWrongJobLinks(rows: { id: number; role: string; link?: string
   const out = new Map<number, string>()
   for (const r of rows) {
     const ad = cache.get(jrAdId(r.link))
+    if (r.linkOk && r.linkOk === jrAdId(r.link)) continue   // owner said: it's the right job
     if (ad && ad.title && !sameJob(r.role, ad.title)) out.set(r.id, ad.title)
   }
   return out

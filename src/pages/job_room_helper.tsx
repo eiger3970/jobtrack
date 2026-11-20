@@ -8,7 +8,7 @@ import { rememberSeen, newlyFilled } from '../lib/jr_seen'
 import { useProKey, buyPro } from '../lib/pro'
 import { isApp } from '../lib/platform'
 import { PRO_KEY, PRO_USD, PRO_SCOPE } from './job_track_pro'
-import { useWrongJobLinks } from '../lib/jr_check'
+import { useWrongJobLinks, jrAdId } from '../lib/jr_check'
 import { lastSyncAt } from './job_track_sync'
 
 // 2026-10-14: the date Job-Room's ENTER form was last checked against these fields
@@ -297,7 +297,7 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
         <svg className="jr-tapme" viewBox="0 0 24 24" width="26" height="26" role="img" aria-label={t('jr.flow2')}><path fill="#00ff41" d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.69-5.1c.01-.07.02-.13.02-.2 0-.62-.38-1.16-.91-1.38z" /></svg>
         {rows.map((r, n) => (
           <button key={r.id} type="button" role="tab" aria-selected={n === idx} aria-label={`${n + 1}. ${r.company}`} title={`${n + 1}. ${r.company} - ${swissDate(r.date)}`}
-            className={'jr-dot' + (!picked && nextSquare >= 0 && n === nextSquare ? ' glow jt-guidance-glow' : '') + (r.jobroomDone ? ' done' : '') + (jobRoomMissing(jobRoomEntry(r)).length ? ' need' : '')}
+            className={'jr-dot' + (!picked && nextSquare >= 0 && n === nextSquare ? ' glow jt-guidance-glow' : '') + (r.jobroomDone ? ' done' : '') + (jobRoomMissing(jobRoomEntry(r)).length ? ' need' : '') + (wrongLinks.has(r.id) ? ' wrong' : '')}
             onClick={() => chooseJob(n)}>{n + 1}{wrongLinks.has(r.id) && <span className="jr-dot-wrong" aria-label={t('jr.wrongTag')}>!</span>}{foundIds.includes(r.id) && <span className="jr-dot-found" aria-label={t('jr.leg.found')}>✓</span>}</button>
         ))}
       </div>
@@ -306,7 +306,9 @@ function JobRoomHelperContent({ rows, allApps, monthLabel, onUpdate, t, onSetup,
         {/* 2026-11-19: a filled Job-Room link that is another job's ad - said here at 3.2, never inside the folded form copy */}
         {wrongLinks.has(a.id) && <div className="jr-wrongrow" role="alert"><span className="jr-odd-tag">{t('jr.wrongTag')}</span>
           <span>{t('jr.wrongAd')} <b>{wrongLinks.get(a.id)}</b></span>
-          <button type="button" className="btn btn-glow fd-btn" onClick={() => save('link', '')}>{t('jr.wrongRemove')}</button></div>}
+          {/* 2026-11-20 owner: wrong-link squares red + 'It's the right job' when the title check is wrong */}
+          <span className="jr-wrongbtns"><button type="button" className="btn btn-glow fd-btn" onClick={() => save('link', '')}>{t('jr.wrongRemove')}</button>
+          <button type="button" className="btn fd-btn jr-rightjob" onClick={() => save('linkOk', jrAdId(a.link))}>{t('jr.rightJob')}</button></span></div>}
         {/* 2026-10-14 owner: "there shouldn't be any empty fields" - fill gaps from the ad, or look them up in one tap */}
         {hasMissingDetails
           ? <FindDetails batch={redCount ? { count: finds.filter(f => f.hit).length, done: finds.length >= redCount, node: fillAllBox } : undefined} mobile={mobile} autoSearch={picked && !a.jobroomDone && !allEntered} key={`${a.id}-${idx}`} a={a} e={storedEntry} live={e} onPreview={showAiPreview} allApps={allApps} onUpdate={onUpdate} t={t} requiredMissing={missing.length > 0} />

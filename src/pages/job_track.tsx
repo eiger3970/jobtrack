@@ -75,7 +75,7 @@ function loadApps(): App[] {
   // DEV preview of the Job-Room helper
   if (JOBROOM_PREVIEW) return [
     { id: 11, company: 'Téléverbier S.A.', role: 'Cuisinier (H/F)', date: '2026-10-03', status: 'applied', cv: '', cover: '', nextDate: '', notes: '', method: 'electronic', rate: 100, postal: '1936', city: 'Verbier', email: 'jobs@example.ch' },
-    { id: 12, company: 'First Track SA', role: 'Opérateur de Production de Skis', date: '2026-10-05', status: 'rejected', cv: '', cover: '', nextDate: '', notes: '', method: 'electronic', rate: 100 },
+    { id: 12, company: 'First Track SA', role: 'Opérateur de Production de Skis', date: '2026-10-05', status: 'rejected', cv: '', cover: '', nextDate: '', notes: '', method: 'electronic', rate: 100, link: 'https://www.job-room.ch/job-search/00000000-0000-4000-8000-000000000012' },
     { id: 13, company: 'Bergbahnen Rinerhorn AG', role: 'Ski Lift Operator', date: '2026-10-13', status: 'applied', cv: '', cover: '', nextDate: '', notes: '', address: '7277 Davos Glaris (GR)', jobroomDone: '2026-10-14' },
   ] as App[]
   // DEV preview of the not-backed-up bar

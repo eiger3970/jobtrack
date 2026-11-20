@@ -2176,6 +2176,7 @@
     "jr.wrongLinks": {"en": "Job-Room link for another job? Check square {list}", "de": "Job-Room-Link einer anderen Stelle? Feld {list} prüfen", "fr": "Lien Job-Room d'un autre poste ? Vérifiez la case {list}"},
     "jr.wrongTag": {"en": "Different job?", "de": "Andere Stelle?", "fr": "Autre poste ?"},
     "jr.wrongAd": {"en": "This link is the Job-Room ad for:", "de": "Dieser Link ist das Job-Room-Inserat für:", "fr": "Ce lien est l'annonce Job-Room pour :"},
+    "jr.rightJob": {"en": "It's the right job", "de": "Es ist die richtige Stelle", "fr": "C'est le bon poste"},
     "jr.wrongRemove": {"en": "Remove link", "de": "Link entfernen", "fr": "Retirer le lien"},
     "jr.leg.found": {"en": "found by Batch search", "de": "von der Sammelsuche gefunden", "fr": "trouvé par la recherche groupée"},
     "fd.mailAppProton": {"en": "Proton", "de": "Proton-Mail-App", "fr": "App Proton Mail"},

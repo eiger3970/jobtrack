@@ -1803,3 +1803,11 @@ textarea.jr-ad { scroll-margin-top: 1rem; }
 /* 2026-11-20 owner: "Too many emails? [Copy job title]" vertically centred - .fd-t's bottom margin lifted the label */
 .fd-mailrole .fd-t { margin: 0; }
 .fd-mailrole .fd-copy { margin: 0; }
+/* 2026-11-20 owner: Copy job title lines up under the Gmail button - same two columns and gap as the mail buttons */
+.fd-mailapp .fd-mailrole { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; width: 100%; align-items: center; }
+.fd-mailapp .fd-mailrole .fd-copy { width: 100%; justify-content: center; }
+/* 2026-11-20 owner: a square whose Job-Room link looks like another job is red, not just a small ! */
+.jr-dot.wrong { background: rgba(255,77,77,.22); border-color: #ff4d4d; color: #ff4d4d; position: relative; }
+.jr-dot.wrong .jr-dot-wrong { background: #ff4d4d; color: #03020a; }
+.jr-wrongbtns { display: flex; flex-wrap: wrap; gap: .5rem; }
+.jr-wrongrow .btn.fd-btn.jr-rightjob { border: 1px solid #00ff41; color: #00ff41; background: transparent; box-shadow: none; animation: none; }

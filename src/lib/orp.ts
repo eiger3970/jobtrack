@@ -7,6 +7,7 @@ export type OrpMethod = 'electronic' | 'letter' | 'visit' | 'phone'
 export type OrpResult = 'en suspens' | 'entretien' | 'engagement' | 'négatif'
 
 export interface OrpFields {
+  linkOk?: string      // 2026-11-20 owner: Job-Room ad id confirmed 'It's the right job' - the title check stays quiet for it (synced with the job)
   address?: string     // Entreprise, adresse
   contact?: string     // Personne contactée, numéro de tél.
   rate?: number        // 100 = à plein temps, else à temps partiel (%)
