@@ -400,6 +400,9 @@ export const mailName = (company: string) => {
   const w = company.replace(/\(.*?\)/g, ' ').replace(/\b(AG|SA|S\.A\.|Sàrl|SARL|Sarl|GmbH|Ltd|Inc|KG|Co|Cie|Holding|Group|Groupe)\b\.?/gi, ' ').split(/\s+/).filter(x => x.replace(/[^\p{L}\p{N}]/gu, '').length > 2)
   return (w.join(' ') || company).trim()
 }
+// 2026-11-21 owner: "EPFL - Venture Program Leader" found nothing in Firefox History - company fields often carry the job
+// title after " - " / " | " / " – ". Step 1 copies only the company part, which a History title/address contains.
+export const histName = (company: string) => mailName(company.split(/\s+[-|–—]\s+/)[0] || company)
 const norm = (x: string) => x.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '')
 
 // 2026-11-04 owner: only the words "AI search failed" are amber, the reason and details stay grey
@@ -1016,7 +1019,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
                   {/* 2026-11-18 owner: the on-screen steps 1-4 replace the Text guide; Images and Video sit between the heading and step 1 */}
                   <div className="fd-hand">{/* 2026-11-21 owner: 'Search Firefox History by hand:' line removed */}
                     <GuideRow t={t} title={t('fd.linkH')} group="phone" noText />
-                    <HandSteps id={String(a.id)} t={t} company={a.company} onCopied={() => setCoCopied(true)} onStep={setHandStep} />
+                    <HandSteps id={String(a.id)} t={t} company={histName(a.company)} onCopied={() => setCoCopied(true)} onStep={setHandStep} />
                   </div></>
                   /* 2026-11-20 owner: desktop showed only a Text button while the phone shows numbered steps - the install steps are on screen as 1. 2. 3. like the phone, Images and Video above them */
                   : <div className="fd-hand"><b>{t('fd.instH')}</b>
