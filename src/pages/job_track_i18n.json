@@ -2114,6 +2114,10 @@
     "fd.g.video": {"en": "Video", "de": "Video", "fr": "Vidéo"},
     "fd.g.soon": {"en": "Coming soon. Use Text for now.", "de": "Kommt bald. Vorerst Text verwenden.", "fr": "Bientôt disponible. Utilisez Texte en attendant."},
     "fd.g.close": {"en": "Close", "de": "Schliessen", "fr": "Fermer"},
+    "fd.sync1a": {"en": "Computer -> Firefox 142 -> tap hamburger icon (top right) -> tap Settings", "de": "Computer -> Firefox 142 -> Hamburger-Symbol (oben rechts) antippen -> Einstellungen antippen", "fr": "Ordinateur -> Firefox 142 -> touchez l'icône hamburger (en haut à droite) -> touchez Réglages"},
+    "fd.sync1b": {"en": "Computer -> Firefox -> tap Sync -> tap Manage sync… -> tick History -> tap Save", "de": "Computer -> Firefox -> Sync antippen -> Synchronisierung verwalten… antippen -> Chronik ankreuzen -> Speichern antippen", "fr": "Ordinateur -> Firefox -> touchez Sync -> touchez Gérer la synchronisation… -> cochez Historique -> touchez Enregistrer"},
+    "fd.sync2a": {"en": "Phone -> Firefox 157 -> tap ellipse (3 dots) -> tap your email (Manage what you back up and synchronise)", "de": "Handy -> Firefox 157 -> Ellipse (3 Punkte) antippen -> Ihre E-Mail (Manage what you back up and synchronise) antippen", "fr": "Téléphone -> Firefox 157 -> touchez l'ellipse (3 points) -> touchez votre e-mail (Manage what you back up and synchronise)"},
+    "fd.sync2b": {"en": "Phone -> Firefox -> Account -> turn History on", "de": "Handy -> Firefox -> Konto -> Verlauf einschalten", "fr": "Téléphone -> Firefox -> Compte -> activez Historique"},
     "fd.sync3": {"en": "Phone -> Firefox -> wait a minute for History to arrive.", "de": "Handy -> Firefox -> eine Minute warten, bis der Verlauf ankommt.", "fr": "Téléphone -> Firefox -> patientez une minute, l'historique arrive."},
     "fd.twinHint": {"en": "Reuse the address from another job here", "de": "Adresse einer anderen Stelle hier übernehmen", "fr": "Reprendre l'adresse d'un autre poste ici"},
     "fd.mailHint": {"en": "Your mailbox, the confirmation email", "de": "Ihr Postfach, die Bestätigungs-E-Mail", "fr": "Votre boîte mail, l'e-mail de confirmation"},
@@ -2130,11 +2134,14 @@
     "fd.ph2c": {"en": "Turn phone sideways -> scroll to the job ad result -> press and hold the result -> tap Share -> tap Copy -> turn phone upright -> tap Done -> tap Done (closes History).", "de": "Handy quer halten -> zur Stellenanzeige scrollen -> Ergebnis gedrückt halten -> Teilen antippen -> Kopieren antippen -> Handy hochkant halten -> Fertig antippen -> Fertig antippen (schliesst den Verlauf).", "fr": "Tournez le téléphone en paysage -> défilez jusqu'à l'offre -> maintenez le résultat -> touchez Partager -> touchez Copier -> tournez le téléphone à la verticale -> touchez OK -> touchez OK (ferme l'historique)."},
     "fd.ph2b": {"en": "Not in History? Phone -> Firefox -> tap ellipse (3 dots) -> tap Bookmarks -> tap the folder.", "de": "Nicht im Verlauf? Handy -> Firefox -> Ellipse (3 Punkte) antippen -> Lesezeichen antippen -> Ordner antippen.", "fr": "Pas dans l'historique ? Téléphone -> Firefox -> touchez l'ellipse (3 points) -> touchez Favoris -> touchez le dossier."},
     "fd.ph3": {"en": "Phone, Firefox: on the job page, tap the address bar and copy the address.", "de": "Handy, Firefox: auf der Stellenseite die Adressleiste antippen und die Adresse kopieren.", "fr": "Téléphone, Firefox : sur la page de l'offre, touchez la barre d'adresse et copiez l'adresse."},
-    "fd.ph4": {"en": "Phone -> JobTrack -> tap Close -> tap the Ctrl+V here box -> tap Paste -> tap Fill from pasted text.", "de": "Handy -> JobTrack -> Schliessen antippen -> Feld Strg+V hier antippen -> Einfügen antippen -> Aus eingefügtem Text füllen antippen.", "fr": "Téléphone -> JobTrack -> touchez Fermer -> touchez le champ Ctrl+V ici -> touchez Coller -> touchez Remplir depuis l'annonce."},
+    "fd.ph4": {"en": "Phone -> JobTrack -> tap Close -> tap the Paste here (Ctrl+V) box -> tap Paste -> tap Fill from pasted text.", "de": "Handy -> JobTrack -> Schliessen antippen -> Feld Hier einfügen (Strg+V) antippen -> Einfügen antippen -> Aus eingefügtem Text füllen antippen.", "fr": "Téléphone -> JobTrack -> touchez Fermer -> touchez le champ Coller ici (Ctrl+V) -> touchez Coller -> touchez Remplir depuis l'annonce."},
     "fd.linkPortal": {"en": "Or log in to the company portal (the sender of the email shows which) and open My applications.", "de": "Oder im Firmenportal anmelden (der Absender der E-Mail zeigt es) und Meine Bewerbungen öffnen.", "fr": "Ou se connecter au portail de l'entreprise (l'expéditeur de l'e-mail l'indique) et ouvrir Mes candidatures."},
     "fd.inst1": {"en": "Computer -> JobTrack -> tap Install Firefox add-on -> Firefox -> tap Continue to Installation.", "de": "Computer -> JobTrack -> Firefox-Add-on installieren antippen -> Firefox -> Weiter zur Installation antippen.", "fr": "Ordinateur -> JobTrack -> touchez Installer le module Firefox -> Firefox -> touchez Poursuivre l'installation."},
+    "fd.inst1b": {"en": "Firefox -> tap Continue to Installation", "de": "Firefox -> Weiter zur Installation antippen", "fr": "Firefox -> touchez Poursuivre l'installation"},
+    "fd.pasteOwn": {"en": "Found the ad yourself? Copy it and paste it here.", "de": "Inserat selbst gefunden? Kopieren und hier einfügen.", "fr": "Vous avez trouvé l'annonce vous-même ? Copiez-la et collez-la ici."},
     "fd.inst2": {"en": "Computer -> Firefox -> tap Add.", "de": "Computer -> Firefox -> Hinzufügen antippen.", "fr": "Ordinateur -> Firefox -> touchez Ajouter."},
     "fd.inst3": {"en": "Computer -> Firefox -> tick Pin extension to toolbar -> tap OK -> JobTrack -> the job link is found for you.", "de": "Computer -> Firefox -> Erweiterung an Symbolleiste anheften ankreuzen -> OK antippen -> JobTrack -> der Link zur Stelle wird für Sie gefunden.", "fr": "Ordinateur -> Firefox -> cochez Épingler l'extension à la barre d'outils -> touchez OK -> JobTrack -> le lien de l'offre est trouvé pour vous."},
+    "fd.instH": {"en": "Install the Firefox add-on:", "de": "Firefox-Add-on installieren:", "fr": "Installer le module Firefox :"},
     "fd.addonInstall": {"en": "Install Firefox add-on", "de": "Firefox-Add-on installieren", "fr": "Installer le module Firefox"},
     "fd.addonReload": {"en": "Installed? Reload the page", "de": "Installiert? Seite neu laden", "fr": "Installé ? Recharger la page"},
     "fd.addonThen": {"en": "After installing: press F5 to reload this page. The add-on starts only after a reload.", "de": "Nach der Installation: F5 drücken, um diese Seite neu zu laden. Das Add-on startet erst nach dem Neuladen.", "fr": "Après l'installation : appuyez sur F5 pour recharger cette page. Le module ne démarre qu'après le rechargement."},
@@ -2248,7 +2255,7 @@
     "fd.handH": {"en": "Search Firefox History by hand:", "de": "Firefox-Verlauf von Hand durchsuchen:", "fr": "Chercher à la main dans l'historique de Firefox :"},
     "fd.hand2": {"en": "Firefox -> ⋯ (3 dots) -> History -> search icon -> paste into Firefox's search box -> tap X or the keyboard's blue arrow (the keyboard closes) -> long titles: turn the phone sideways", "de": "Firefox -> ⋯ (3 Punkte) -> Verlauf -> Suchsymbol -> in das Firefox-Suchfeld einfügen -> X oder blauen Pfeil der Tastatur antippen (Tastatur schliesst) -> lange Titel: Handy quer drehen", "fr": "Firefox -> ⋯ (3 points) -> Historique -> icône de recherche -> collez dans le champ de recherche de Firefox -> touchez X ou la flèche bleue du clavier (le clavier se ferme) -> titres longs : tournez le téléphone"},
     "fd.hand3": {"en": "Press and hold the job ad -> Share -> Copy", "de": "Stelleninserat gedrückt halten -> Teilen -> Kopieren", "fr": "Appuyez longuement sur l'annonce -> Partager -> Copier"},
-    "fd.hand4": {"en": "Back in JobTrack, paste into the Ctrl+V here box below", "de": "Zurück in JobTrack, unten in das Feld Ctrl+V hier einfügen", "fr": "De retour dans JobTrack, collez dans le champ Ctrl+V ici ci-dessous"},
+    "fd.hand4": {"en": "Back in JobTrack, paste into the Paste here (Ctrl+V) box below", "de": "Zurück in JobTrack, unten in das Feld Hier einfügen (Strg+V) einfügen", "fr": "De retour dans JobTrack, collez dans le champ Coller ici (Ctrl+V) ci-dessous"},
     "fd.copyCompany": {
       "en": "Copy company name",
       "de": "Firmennamen kopieren",
@@ -2260,9 +2267,9 @@
       "fr": "Copier le titre et l'entreprise"
     },
     "fd.pasteHere": {
-      "en": "Ctrl+V here",
-      "de": "Strg+V hier",
-      "fr": "Ctrl+V ici"
+      "en": "Paste here (Ctrl+V)",
+      "de": "Hier einfügen (Strg+V)",
+      "fr": "Coller ici (Ctrl+V)"
     },
     "jr.ready": {
       "en": "Green = good to submit",

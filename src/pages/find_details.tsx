@@ -33,19 +33,22 @@ type GuideKind = 'images' | 'text' | 'video'
 // Files go in public/assets/jobtrack/ as history_search_<group>_1.jpg (plus _1b, _1c for more shots of the same step), _2.jpg ... and history_search_<group>.mp4; a missing file just hides itself.
 const GUIDE_DIR = '/assets/jobtrack/history_search_'
 // 2026-11-18 owner: the app had no Video button - the clips are not bundled, so the app streams them from the website (online only)
+// 2026-11-18 owner: tap Video and it plays - the first clip starts by itself (muted: iPhone only autoplays silent video; the guide clips have no sound)
 const videoDir = () => (isApp() ? 'https://kworld.space' : '') + GUIDE_DIR
 const GUIDE_STEPS: Record<string, string[]> = {
-  sync: ['fd.sync1', 'fd.sync2'],
-  phone: ['fd.ph1', 'fd.ph2', 'fd.ph2c', 'fd.ph4'],
+  sync: ['fd.sync1a', 'fd.sync1b', 'fd.sync2a', 'fd.sync2b'],   // 2026-11-21 owner: 4 numbered steps on screen, one picture each (GUIDE_FILES)
+  phone: ['fd.copyCompany', 'fd.hand2', 'fd.hand3', 'fd.hand4'],   // 2026-11-18 owner: images follow the on-screen steps 1-4
   computer: ['fd.inst1', 'fd.inst2', 'fd.inst3'],   // install the add-on (the computer user runs the add-on, not manual History steps)
 }
+// 2026-11-21 owner: History sync split from 2 steps into 4 - the existing pictures 1, 1b, 2, 2b are one per step, in that order
+const GUIDE_FILES: Record<string, string[][]> = { sync: [['1'], ['1b'], ['2'], ['2b']] }
 function GuideImages({ t, group, vars }: { t: (k: string) => string; group: string; vars?: Record<string, string> }) {
   const [bad, setBad] = useState<string[]>([])
   const [big, setBig] = useState<string | null>(null)
   const [wide, setWide] = useState<string[]>([])   // landscape (computer) shots show full width, tall phone shots stay narrow
   const keys = GUIDE_STEPS[group] || []
   // each step may have up to three images: <group>_<n>.jpg, <group>_<n>b.jpg, <group>_<n>c.jpg; a missing file just hides itself
-  const files = keys.map((k, i) => ({ k, list: ['', 'b', 'c'].map(x => `${GUIDE_DIR}${group}_${i + 1}${x}.jpg?v=7`) }))
+  const files = keys.map((k, i) => ({ k, list: (GUIDE_FILES[group]?.[i] ?? ['', 'b', 'c'].map(x => `${i + 1}${x}`)).map(n => `${GUIDE_DIR}${group}_${n}.jpg?v=9`) }))
   if (files.every(f => f.list.every(u => bad.includes(u)))) return <p className="fd-flow">{t('fd.g.soon')}</p>
   const caption = (k: string) => { let x = t(k) + (k === 'fd.ph1' ? ' ' + t('fd.copyCompany') : '');   // the step's button name, which the Text window shows as a button
     for (const v in vars || {}) x = x.replace('{' + v + '}', (vars as Record<string, string>)[v]); return x }
@@ -67,7 +70,7 @@ function GuideVideo({ t, group }: { t: (k: string) => string; group: string }) {
   const fail = (f: string) => setBad(b => b.includes(f) ? b : [...b, f])
   return <>{shown.map((c, ci) => <div key={c.file}>
     {c.label && <p className="fd-gvlabel">{t(c.label)}</p>}
-    <video className="fd-gvideo" controls playsInline muted autoPlay={ci === 0} preload={ci === 0 ? 'auto' : 'none'} onError={() => fail(c.file)}><source src={`${videoDir()}${c.file}.mp4?v=10`} type="video/mp4" onError={() => fail(c.file)} /></video>
+    <video className="fd-gvideo" controls playsInline muted autoPlay={ci === 0} preload={ci === 0 ? 'auto' : 'none'} onError={() => fail(c.file)}><source src={`${videoDir()}${c.file}.mp4?v=18`} type="video/mp4" onError={() => fail(c.file)} /></video>
   </div>)}</>
 }
 // 2026-11-06 owner: tapping one part of a step (the text between the arrows) dims it, so the user sees where they are up to
@@ -113,6 +116,33 @@ export function SegSteps({ id, text, map }: { id: string; text: string; map?: Re
 
 // 2026-11-18 owner: the phone hand search steps must remember where the user is when they go to Firefox History and come back -
 // tap a part to dim it (as in the guide window), kept per job on this device; the next unfinished step pulses
+// 2026-11-20 owner: the desktop install steps on screen get the same tappable strikethrough as the phone hand steps (tap a part: it and everything before it dim; tap a dimmed part: it and everything after undim)
+// 2026-11-21 owner: the Install button IS step 1 (like the phone's Copy company name button), not a separate button above the heading
+function InstallSteps({ t, button }: { t: (k: string) => string; button?: ReactNode }) {
+  return <StepList t={t} keys={button ? ['fd.inst1b', 'fd.inst2', 'fd.inst3'] : ['fd.inst1', 'fd.inst2', 'fd.inst3']} store="jt-inst-done" first={button} />
+}
+// 2026-11-21 owner: desktop, phone and app show the same thing - numbered steps on screen with the tappable strikethrough (install steps, History sync steps)
+function StepList({ t, keys, store, versionBtn, first }: { t: (k: string) => string; keys: string[]; store: string; versionBtn?: (k: string) => ((v: string) => ReactNode) | undefined; first?: ReactNode }) {
+  const key = store
+  const [done, setDone] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem(key) || '[]') } catch { return [] } })
+  useEffect(() => { try { localStorage.setItem(key, JSON.stringify(done)) } catch { /* private mode */ } }, [done])
+  const box = useRef<HTMLOListElement>(null)
+  const tap = (target: EventTarget) => {
+    const el = (target as Element).closest('[data-sid]') as HTMLElement | null; if (!el) return false
+    const all = Array.from(box.current?.querySelectorAll<HTMLElement>('[data-sid]') ?? []).map(x => x.dataset.sid as string)
+    const i = all.indexOf(el.dataset.sid as string)
+    setDone(d => d.includes(all[i]) ? all.slice(0, i) : all.slice(0, i + 1)); return true
+  }
+  return <DoneCtx.Provider value={{ done }}>
+    <ol ref={box} className="fd-flow fd-phone-steps fd-guide fd-segbox" onClick={e => { tap(e.target) }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && tap(e.target)) e.preventDefault() }}>
+      {/* 2026-11-21 owner: the button and its next part are one step - same line, joined by an arrow, no gap */}
+      {keys.map((k, i) => i === 0 && first
+        ? <li key={k} className="fd-step-btn">{first}<span className={done.includes(k + ':0') ? 'fd-done' : undefined}>{' -> '}</span><Segs id={k} text={t(k)} versionBtn={versionBtn?.(k)} /></li>
+        : <li key={k}><Segs id={k} text={t(k)} versionBtn={versionBtn?.(k)} /></li>)}
+    </ol>
+  </DoneCtx.Provider>
+}
+
 function HandSteps({ id, t, company, onCopied, onStep }: { id: string; t: (k: string) => string; company: string; onCopied: () => void; onStep: (n: number) => void }) {
   const key = 'jt-hand-' + id
   const [done, setDone] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem(key) || '[]') } catch { return [] } })
@@ -202,11 +232,13 @@ function GuideRow({ t, title, group, vars, children, noText = false }: { t: (k: 
 
 function SyncSteps({ t }: { t: (k: string) => string }) {
   const [ver, setVer] = useState<'pc' | 'ph' | null>(null)
-  const line = (key: string, which: 'pc' | 'ph') => {
-    return <li><Segs id={key} text={t(key)} versionBtn={x => <button type="button" className="jr-bm-again" onClick={() => setVer(v => v === which ? null : which)}>{x}</button>} />
-      {ver === which && <span className="fd-side" style={{ display: 'block' }}>{t(which === 'pc' ? 'fd.verPc' : 'fd.verPh')}</span>}</li>
-  }
-  return <GuideRow t={t} title={t('fd.syncH')} group="sync"><ol className="fd-flow fd-phone-steps">{line('fd.sync1', 'pc')}{line('fd.sync2', 'ph')}</ol></GuideRow>
+  // 2026-11-21 owner: the steps were hidden behind the Text button - now on screen as 1. 2. 3. 4. under the Images and Video buttons, like the phone hand steps
+  const which = (k: string): 'pc' | 'ph' | null => k === 'fd.sync1a' ? 'pc' : k === 'fd.sync2a' ? 'ph' : null
+  return <>
+    <GuideRow t={t} title={t('fd.syncH')} group="sync" noText />
+    <StepList t={t} keys={GUIDE_STEPS.sync} store="jt-sync-done" versionBtn={k => { const w = which(k); return w ? (x => <button type="button" className="jr-bm-again" onClick={() => setVer(v => v === w ? null : w)}>{x}</button>) : undefined }} />
+    {ver && <p className="fd-side" style={{ display: 'block' }}>{t(ver === 'pc' ? 'fd.verPc' : 'fd.verPh')}</p>}
+  </>
 }
 
 function RequiredChecklist({ keys, live, t }: { keys: string[]; live: JobRoomEntry; t: (key: string) => string }) {
@@ -758,6 +790,17 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
   // 2026-11-18 owner: History and bookmarks open on the phone -> Copy company name pulses; once tapped, the Ctrl+V here box pulses until something is pasted
   const [, setCoCopied] = useState(false)   // kept for the copy callback; the paste box now follows handStep
   const [handStep, setHandStep] = useState(0)   // phone hand search: the step the user is on (4 = paste the job ad)
+  const installBtn = canAddon ? <>
+                  {/* 2026-11-19 owner: after installing, the button stayed - Firefox gives the add-on's page script only to pages
+                      loaded AFTER the install, so this open page can't hear it. After the click: one button that reloads. */}
+                  {!installClicked
+                    ? <a className="btn btn-glow fd-btn" href="/free/bookmarks_search.xpi" onClick={() => {
+                      // 2026-11-21 owner recording: the .xpi link fired the browser's "Leave page?" (the not-backed-up net) - the page stays, so skip it for this click
+                      const w = window as unknown as { kworldLeaving?: boolean }; w.kworldLeaving = true; setTimeout(() => { w.kworldLeaving = false }, 3000)
+                      setTimeout(() => setInstallClicked(true), 15000) }}>{t('fd.addonInstall')}</a>
+                    : <button type="button" className="btn btn-glow fd-btn" onClick={() => window.location.reload()}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: '.4rem' }}><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>{t('fd.addonReload')}</button>}
+  </> : undefined
   const pasteBox = (val: string, set: (v: string) => void) => <>
     <textarea className={'jr-ad' + (handStep === 4 && !val.trim() ? ' jt-guidance-glow' : '')} rows={2} onFocus={x => { const el = x.currentTarget; setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400) }} placeholder={t('fd.pasteHere')} value={val} onChange={x => set(x.target.value)}
       onPaste={x => { const v = x.clipboardData.getData('text'); if (v.trim().length >= 12) { x.preventDefault(); fill(v) } }} />
@@ -965,26 +1008,24 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
               </>
               : <>
                 {app && <p className="fd-flow">{t('fd.addonWeb')}</p>}
-                {canAddon && <>
-                  {/* 2026-11-19 owner: after installing, the button stayed - Firefox gives the add-on's page script only to pages
-                      loaded AFTER the install, so this open page can't hear it. After the click: one button that reloads. */}
-                  {!installClicked
-                    ? <a className="btn btn-glow fd-btn" href="/free/bookmarks_search.xpi" onClick={() => setTimeout(() => setInstallClicked(true), 15000)}>{t('fd.addonInstall')}</a>
-                    : <button type="button" className="btn btn-glow fd-btn" onClick={() => window.location.reload()}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: '.4rem' }}><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>{t('fd.addonReload')}</button>}
-                </>}
                 {inOpt && foundHere && resultBox}
                 {mobile
                   ? <>
                   {/* 2026-11-18 owner: "No user will find that" - Copy company sat inside the Text window; now on screen as step 1, the guide buttons follow */}
                   {/* 2026-11-18 owner: "If I have to search by hand, show the user how" - the hand search as 4 numbered steps on screen; Copy pulses first, then step 2 and the paste box */}
                   {/* 2026-11-18 owner: the on-screen steps 1-4 replace the Text guide; Images and Video sit between the heading and step 1 */}
-                  <div className="fd-hand"><b>{t('fd.handH')}</b>
+                  <div className="fd-hand">{/* 2026-11-21 owner: 'Search Firefox History by hand:' line removed */}
                     <GuideRow t={t} title={t('fd.linkH')} group="phone" noText />
                     <HandSteps id={String(a.id)} t={t} company={a.company} onCopied={() => setCoCopied(true)} onStep={setHandStep} />
                   </div></>
-                  : <GuideRow t={t} title={t('fd.addonInstall')} group="computer"><ol className="fd-flow fd-phone-steps"><li><Segs id="fd.inst1" text={t('fd.inst1')} /></li><li><Segs id="fd.inst2" text={t('fd.inst2')} /></li><li><Segs id="fd.inst3" text={t('fd.inst3')} /></li></ol></GuideRow>}
+                  /* 2026-11-20 owner: desktop showed only a Text button while the phone shows numbered steps - the install steps are on screen as 1. 2. 3. like the phone, Images and Video above them */
+                  : <div className="fd-hand"><b>{t('fd.instH')}</b>
+                    <GuideRow t={t} title={t('fd.addonInstall')} group="computer" noText />
+                    <InstallSteps t={t} button={installBtn} />
+                  </div>}
               </>}
+            {/* 2026-11-21 owner: "what is this box for?" - one line says it: the by-hand route */}
+            {!addon && <p className="fd-flow fd-paste-own">{t('fd.pasteOwn')}</p>}
             {pasteBox(ad, setAd)}
           </div>}
         </li>}
