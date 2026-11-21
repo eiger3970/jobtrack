@@ -70,7 +70,7 @@ function GuideVideo({ t, group }: { t: (k: string) => string; group: string }) {
   const fail = (f: string) => setBad(b => b.includes(f) ? b : [...b, f])
   return <>{shown.map((c, ci) => <div key={c.file}>
     {c.label && <p className="fd-gvlabel">{t(c.label)}</p>}
-    <video className="fd-gvideo" controls playsInline muted autoPlay={ci === 0} preload={ci === 0 ? 'auto' : 'none'} onError={() => fail(c.file)}><source src={`${videoDir()}${c.file}.mp4?v=18`} type="video/mp4" onError={() => fail(c.file)} /></video>
+    <video className="fd-gvideo" controls playsInline muted autoPlay={ci === 0} preload={ci === 0 ? 'auto' : 'none'} onError={() => fail(c.file)}><source src={`${videoDir()}${c.file}.mp4?v=19`} type="video/mp4" onError={() => fail(c.file)} /></video>
   </div>)}</>
 }
 // 2026-11-06 owner: tapping one part of a step (the text between the arrows) dims it, so the user sees where they are up to
