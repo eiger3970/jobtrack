@@ -1025,7 +1025,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
                   </div>}
               </>}
             {/* 2026-11-21 owner: "what is this box for?" - one line says it: the by-hand route */}
-            {!addon && <p className="fd-flow fd-paste-own">{t('fd.pasteOwn')}</p>}
+            {!addon && !phoneLike() && !isApp() && <p className="fd-flow fd-paste-own">{t('fd.pasteOwn')}</p>}
             {pasteBox(ad, setAd)}
           </div>}
         </li>}
