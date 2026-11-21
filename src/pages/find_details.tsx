@@ -991,7 +991,7 @@ export default function FindDetails({ a, e, live, allApps, onUpdate, t, required
             <b><TapCount n={TAPS.link} label={t('fd.tapsAria')} /><span className="fd-opt-txt">{t('fd.linkH')}<small>{t('fd.linkHint')}</small></span></b>
           </div>
           {isOpen('link') && <div className="fd-body">
-            {!failNoteTop && noteSlot(shortFail)}   {/* 2026-11-20 owner: the AI note sits at the top of every option */}
+            {!failNoteTop && !phoneLike() && !isApp() && noteSlot(shortFail)}   {/* 2026-11-20 owner: the AI note sits at the top of every option. 2026-11-21 owner: not in History search on phone/app - it pushed step 4 off screen; the by-hand steps use no AI */}
             {/* 2026-11-20 owner: "can this be auto detected or made easier?" - a web page cannot see the browser's sync setting;
                 one tap "It's on" hides this for good on this device */}
             {/* 2026-11-20 owner: after 'hide this' there was no way back - one small link brings the steps back */}
