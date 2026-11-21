@@ -164,7 +164,7 @@ function HandSteps({ id, t, company, onCopied, onStep }: { id: string; t: (k: st
   return <DoneCtx.Provider value={{ done }}>
     <ol ref={box} className="fd-flow fd-phone-steps fd-guide fd-segbox" onClick={e => { tap(e.target) }} onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && tap(e.target)) e.preventDefault() }}>
       {/* 2026-11-20 owner: a dimmed button looks switched off - the copy button stays bright (it can be tapped again), a tick says it was done */}
-      <li><CopyBtn text={company} label={t('fd.copyCompany')} t={t} glow={!allDone && next === 1} onCopied={() => { onCopied(); setDone(d => d.includes('h1') ? d : [...d, 'h1']) }} />{done.includes('h1') && <span className="fd-copied-tick" aria-label={t('fd.copied')}> ✓</span>}</li>
+      <li><CopyBtn text={company} label={t('fd.copyCompany')} t={t} glow={!allDone && next === 1} onCopied={() => { onCopied(); setDone(d => d.includes('h1') ? d : [...d, 'h1']) }} />{/* 2026-11-21 owner: the tick beside the button confused (Copied + tick, then Copy company name + tick) - the button's 2 s 'Copied' is the only sign */}</li>
       {keys.map(k => <li key={k}><Segs id={k} text={t(k)} />{k === 'fd.hand2' && <><br /><span className="fd-side"><Segs id="ph2b" text={t('fd.ph2b')} /></span></>}</li>)}   {/* 2026-11-18 owner: the Bookmarks line from the old Text guide, under step 2 */}
     </ol>
   </DoneCtx.Provider>
